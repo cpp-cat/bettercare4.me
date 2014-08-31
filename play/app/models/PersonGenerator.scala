@@ -7,8 +7,9 @@ import org.joda.time.DateTime
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 import scala.util.Random
+import org.joda.time.LocalDate
 
-class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, hedisDate: DateTime) {
+class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, val hedisDate: LocalDate) {
 
   val ageDistribution = List(0, 65, 131, 198, 269, 339, 407, 472, 537, 605, 679, 751, 815, 869, 909, 939, 963, 982, 1000)
   val maleNames: List[String] = CSVReader.open(new File(maleNameFile)).all().flatten
@@ -34,7 +35,7 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
     60 * ageGroupIdx + f.toInt
   }
   
-  def monthToDOB(nbrMo: Int): DateTime = hedisDate.minusMonths(nbrMo)
+  def monthToDOB(nbrMo: Int): LocalDate = hedisDate.minusMonths(nbrMo)
 
   def generatePatient(): Patient = {
 
@@ -43,13 +44,12 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
 
     val dob = monthToDOB(nbrMo)
     val gender = if (Random.nextInt(2) > 0) "F" else "M"
+    
+    def getOne[A](items: List[A]): A = items(Random.nextInt(items.size))
       
-    val firstName = if (gender == "F")
-      femaleNames(Random.nextInt(femaleNames.size))
-    else
-      maleNames(Random.nextInt(maleNames.size))
+    val firstName = if (gender == "F") getOne(femaleNames) else getOne(maleNames)
 
-    Patient("key", firstName, lastNames(Random.nextInt(lastNames.size)), gender, dob)
+    Patient("key", firstName, getOne(lastNames), gender, dob)
 
   }
 }

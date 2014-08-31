@@ -3,11 +3,11 @@
  */
 package models
 
-import org.joda.time.DateTime
+import org.joda.time.LocalDate
 
 case class Claim(
   val uuid: String, val patientUuid: String, val providerUuid: String,
-  val dos: DateTime,
+  val dos: LocalDate,
 
   // ICD-9 / ICD-10 CM (diagnostic codes)
   val icd_d_pri: String, val icd_d: Set[String],
