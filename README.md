@@ -62,7 +62,9 @@
 
 ## Completed User Stories
 - Added dependency on scala-csv (https://github.com/tototoshi/scala-csv) for creating and reading csv files.
-- Added denpendency on joda-time for DateTime (http://www.joda.org/joda-time/)
+- Added dependency on joda-time for DateTime (http://www.joda.org/joda-time/)
+- Added dependency on scalatest (scalatest.org) and scalactic (scalactic.org) for testing and error handling
+- Created a patient generator using US population distribution for age distribution
 
 
 # Sprint 0: Seeding the project
