@@ -16,6 +16,8 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
   val femaleNames: List[String] = CSVReader.open(new File(femaleNameFile)).all().flatten
   val lastNames: List[String] = CSVReader.open(new File(lastNameFile)).all().flatten
 
+  def getOne[A](items: List[A]): A = items(Random.nextInt(items.size))
+
   /**
    * Return age in month by converting seed (seed>0 and seed<=1000) into nbr of months
    * based on ageDistribution
@@ -34,7 +36,7 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
     val f = 60.0 * (seed - ageDistribution(ageGroupIdx)) / (ageDistribution(ageGroupIdx + 1) - ageDistribution(ageGroupIdx))
     60 * ageGroupIdx + f.toInt
   }
-  
+
   def monthToDOB(nbrMo: Int): LocalDate = hedisDate.minusMonths(nbrMo)
 
   def generatePatient(): Patient = {
@@ -44,12 +46,16 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
 
     val dob = monthToDOB(nbrMo)
     val gender = if (Random.nextInt(2) > 0) "F" else "M"
-    
-    def getOne[A](items: List[A]): A = items(Random.nextInt(items.size))
-      
+
     val firstName = if (gender == "F") getOne(femaleNames) else getOne(maleNames)
 
     Patient("key", firstName, getOne(lastNames), gender, dob)
+  }
 
+  def generateProvider(): Provider = {
+
+    val firstName = if (Random.nextInt(2) > 0) getOne(femaleNames) else getOne(maleNames)
+    
+    Provider("key", firstName, getOne(lastNames))
   }
 }

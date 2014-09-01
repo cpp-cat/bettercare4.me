@@ -15,14 +15,14 @@ object ClaimGeneratorActor {
   /**
    * Request to trigger a claim generation job.
    * 
-   * Nbr_pt is the number of 1000 patients to include in the generation
+   * Nbr_pt is the number of 1000 or block of patients to include in the simulation
    */
   case class GenerateClaimsRequest(nbr_pt: Int)
   
   /**
    * Provide a status on the ongoing claim generation
    * 
-   * Nbr_pt is the number of 1000 patients generate thus far.
+   * Nbr_pt is the number of 1000 or block of patients generated thus far.
    */
   case class GenerateClaimsStatus(nbr_pt: Int)
   
@@ -42,6 +42,7 @@ object ClaimGeneratorActor {
 class ClaimGeneratorActor() extends Actor with ActorLogging {
 
   import ClaimGeneratorActor._
+  
   def receive = {
 
     // Real simple request

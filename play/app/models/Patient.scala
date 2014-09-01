@@ -5,7 +5,10 @@ package models
 
 import org.joda.time.LocalDate
 
-case class Patient(val uuid: String, val firstName: String, val lastName: String, val gender: String, val dob: LocalDate)
+case class Patient(val uuid: String, val firstName: String, val lastName: String, val gender: String, val dob: LocalDate) {
+  
+  def toList = List(uuid, firstName, lastName, gender, dob.toString)
+}
 
 case class PatientHistory(
   val icd_d_pri: Map[String, LocalDate], val icd_d: Map[String, LocalDate],

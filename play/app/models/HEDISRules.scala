@@ -92,3 +92,9 @@ class HEDISRuleBase(eligRate: Int, meetMeasRate: Int, exclRate: Int) extends HED
   def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
   def isPatientInDenominator(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientEligible(patient, patientHistory) && !isPatientExcluded(patient, patientHistory)
 }
+
+object HEDISRules {
+  
+  val all: List[HEDISRule] = List.empty
+  
+}

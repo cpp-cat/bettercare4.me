@@ -17,7 +17,20 @@ case class Claim(
 
   // HCFA Form 1500 POS (Point of Service),
   // UB Revenue (billing code), CPT (procedure), HCPCS (medical goods and services)
-  val hcfaPOS: String, val ubRevenue: String, val cpt: String, val hcpcs: String)
+  val hcfaPOS: String, val ubRevenue: String, val cpt: String, val hcpcs: String) {
+
+  def toList: List[String] = {
+
+    List.concat(
+      List(uuid, patientUuid, providerUuid, dos.toString, icd_d_pri),
+      icd_d.toList,
+      for (i <- icd_d.size to 9) yield "",
+      icd_p.toList,
+      for (i <- icd_p.size to 9) yield "",
+      List(hcfaPOS, ubRevenue, cpt, hcpcs))
+
+  }
+}
 
 
 
