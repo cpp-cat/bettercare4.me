@@ -64,6 +64,7 @@
 - Added dependency on scala-csv (https://github.com/tototoshi/scala-csv) for creating and reading csv files.
 - Added dependency on joda-time for DateTime (http://www.joda.org/joda-time/)
 - Added dependency on scalatest (scalatest.org) and scalactic (scalactic.org) for testing and error handling
+- Added dependency on snakeyaml (https://code.google.com/p/snakeyaml/) for parsing YAML config files
 - Created a patient generator using US population distribution for age distribution
 
 

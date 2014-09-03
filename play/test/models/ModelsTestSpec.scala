@@ -74,4 +74,31 @@ class ModelsTestSpec extends PlaySpec with OneAppPerSuite {
     }
 
   }
+  
+  "The ClaimGeneratorConfig class" must {
+    
+    "load configuration from YAML text" in {
+      
+      
+      val config = ClaimGeneratorConfig.loadConfig("""
+          baseFname: HEDIS_sim
+          nbrGen: 1
+          nbrPatients: 100
+          nbrProviders: 1
+          maleNamesFile: ./data/male-names.csv
+          femaleNamesFile: ./data/female-names.csv
+          lastNamesFile: ./data/last-names.csv
+          hedisDateTxt: 2014-01-01
+          """)
+          
+          config.baseFname mustBe "HEDIS_sim"
+          config.nbrGen mustBe 1
+          config.nbrPatients mustBe 100
+          config.nbrProviders mustBe 1
+          config.maleNamesFile mustBe "./data/male-names.csv"
+          config.femaleNamesFile mustBe "./data/female-names.csv"
+          config.lastNamesFile mustBe "./data/last-names.csv"
+          config.hedisDate mustBe new LocalDate(2014, 1, 1)
+    }
+  }
 }
