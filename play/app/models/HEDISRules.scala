@@ -12,6 +12,10 @@ package models
 trait HEDISRule {
 
   /**
+   * Indicate the name of the rule for configuration and reporting purpose
+   */
+  def name: String
+  /**
    * Indicates the rate at which the patients are eligible to the  measure.
    *
    * To be eligible, the patient must first meet the demographic requirements.
@@ -79,11 +83,12 @@ trait HEDISRule {
 
 }
 
-class HEDISRuleBase(eligRate: Int, meetMeasRate: Int, exclRate: Int) extends HEDISRule {
+class HEDISRuleBase(config: RuleConfig) extends HEDISRule {
 
-  def eligibleRate: Int = eligRate
-  def meetMeasureRate: Int = meetMeasRate
-  def exclusionRate: Int = exclRate
+  def name: String = config.name
+  def eligibleRate: Int = config.eligibleRate
+  def meetMeasureRate: Int = config.meetMeasureRate
+  def exclusionRate: Int = config.exclusionRate
 
   def generateClaims(patient: Patient, provider: Provider): List[Claim] = List.empty
   def isPatientMeetDemographic(patient: Patient): Boolean = true

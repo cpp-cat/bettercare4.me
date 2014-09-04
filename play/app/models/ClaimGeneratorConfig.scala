@@ -28,6 +28,7 @@ object ClaimGeneratorConfig {
  * @param femaleNamesFile file name for female given names used for person generation
  * @param lastNamesFile file name for last names used for person generation
  * @param hedisDate date to used for HEDIS report date for the simulation (use Jan 1 of following year, i.e., use 2015/01/01 for HEDIS 2014 reports
+ * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
 class ClaimGeneratorConfig {
     @BeanProperty var baseFname: String = null
@@ -38,6 +39,22 @@ class ClaimGeneratorConfig {
     @BeanProperty var femaleNamesFile: String = null
     @BeanProperty var lastNamesFile: String = null
     @BeanProperty var hedisDateTxt: String = null
+    @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
     
     def hedisDate = LocalDate.parse(hedisDateTxt)
-  }
+}
+
+/**
+ * Class holding configuration parameters for HEDISRule
+ * 
+ * @param name of the rule this configuration applies to
+ * @param eligibleRate the rate at which the patients are eligible to the  measure
+ * @param meetMeasureRate the rate at which the patients meet the measure, in %
+ * @param exclusionRate the rate at which patients are excluded from measure, in %
+ */
+class RuleConfig {
+  @BeanProperty var name: String = null
+  @BeanProperty var eligibleRate: Int = 0
+  @BeanProperty var meetMeasureRate: Int = 0
+  @BeanProperty var exclusionRate: Int = 0
+}
