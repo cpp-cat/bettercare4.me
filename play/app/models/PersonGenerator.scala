@@ -9,7 +9,7 @@ import java.io.File
 import scala.util.Random
 import org.joda.time.LocalDate
 
-class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, val hedisDate: LocalDate) {
+class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, val hedisDate: LocalDate, persistenceLayer: PersistenceLayer) {
 
   val ageDistribution = List(0, 65, 131, 198, 269, 339, 407, 472, 537, 605, 679, 751, 815, 869, 909, 939, 963, 982, 1000)
   val maleNames: List[String] = CSVReader.open(new File(maleNameFile)).all().flatten
@@ -49,13 +49,13 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
 
     val firstName = if (gender == "F") getOne(femaleNames) else getOne(maleNames)
 
-    Patient("key", firstName, getOne(lastNames), gender, dob)
+    persistenceLayer.createPatient(firstName, getOne(lastNames), gender, dob)
   }
 
   def generateProvider(): Provider = {
 
     val firstName = if (Random.nextInt(2) > 0) getOne(femaleNames) else getOne(maleNames)
     
-    Provider("key", firstName, getOne(lastNames))
+    persistenceLayer.createProvider(firstName, getOne(lastNames))
   }
 }

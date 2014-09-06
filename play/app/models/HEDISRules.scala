@@ -3,6 +3,8 @@
  */
 package models
 
+import org.joda.time.LocalDate
+
 /**
  * Trait to define an HEDIS rule.
  *
@@ -15,6 +17,17 @@ trait HEDISRule {
    * Indicate the name of the rule for configuration and reporting purpose
    */
   def name: String
+
+  /**
+   * Indicate the full name of the rule (human readable)
+   */
+  def fullName: String
+
+  /**
+   * Indicate the rule description (human readable)
+   */
+  def description: String
+
   /**
    * Indicates the rate at which the patients are eligible to the  measure.
    *
@@ -47,7 +60,7 @@ trait HEDISRule {
    *
    * The patient is randomly in the numerator based on the \c targetCompliance rate.
    */
-  def generateClaims(patient: Patient, provider: Provider): List[Claim]
+  def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim]
 
   /**
    * Verify if the measure is applicable to the patient based on patient's
@@ -83,14 +96,13 @@ trait HEDISRule {
 
 }
 
-class HEDISRuleBase(config: RuleConfig) extends HEDISRule {
+abstract class HEDISRuleBase(config: RuleConfig, hedisDate: LocalDate) extends HEDISRule {
 
-  def name: String = config.name
   def eligibleRate: Int = config.eligibleRate
   def meetMeasureRate: Int = config.meetMeasureRate
   def exclusionRate: Int = config.exclusionRate
 
-  def generateClaims(patient: Patient, provider: Provider): List[Claim] = List.empty
+  def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def isPatientMeetDemographic(patient: Patient): Boolean = true
   def isPatientEligible(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientMeetDemographic(patient)
   def isPatientExcluded(patient: Patient, patientHistory: PatientHistory): Boolean = false
@@ -99,7 +111,41 @@ class HEDISRuleBase(config: RuleConfig) extends HEDISRule {
 }
 
 object HEDISRules {
-  
-  val all: List[HEDISRule] = List.empty
-  
+
+  val createRuleByName: Map[String, (RuleConfig, LocalDate) => HEDISRule] = Map(
+    "TEST" -> { (c, d) => new TestRule(c, d) },
+    "BCS" -> { (c, d) => new BCSRule(c, d) })
+
+}
+
+// define all rules
+
+/**
+ * Breast Cancer Screening Rule
+ */
+class TestRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(config, hedisDate) {
+
+  def name = "TEST"
+  def fullName = "Test Rule"
+  def description = "This rule is for testing."
+
+  override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+    List(
+      persistenceLayer.createClaim(patient.uuid, provider.uuid, new LocalDate(2014, 9, 5), "icd 1", Set("icd 1", "icd 2"), Set("icd p1"), "hcfaPOS", "ubRevenue", "cpt", "hcpcs"))
+  }
+}
+
+/**
+ * Breast Cancer Screening Rule
+ */
+class BCSRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(config, hedisDate) {
+
+  def name = "BCS"
+  def fullName = "Breast Cancer Screening"
+  def description = "The percentage of women between 50 - 74 years of age who had a mammogram to screen for breast cancer any time on or between October 1 two years prior to the measurement year and December 31 of the measurement year (27 months)."
+
+  override def isPatientMeetDemographic(patient: Patient): Boolean = {
+    val age = patient.age(hedisDate)
+    patient.gender == "F" && age > 49 && age < 75
+  }
 }

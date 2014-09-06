@@ -5,19 +5,19 @@ package actors
 
 import akka.actor.Actor
 import akka.actor.ActorLogging
-
 import org.apache.spark.SparkContext
 import org.apache.spark.SparkContext._
 import org.apache.spark.SparkConf
+import models.ClaimGeneratorConfig
 
 object ClaimGeneratorActor {
 
   /**
    * Request to trigger a claim generation job.
    * 
-   * Nbr_pt is the number of 1000 or block of patients to include in the simulation
+   * @param configTxt configuration for claim generation simulator
    */
-  case class GenerateClaimsRequest(nbr_pt: Int)
+  case class GenerateClaimsRequest(configTxt: String)
   
   /**
    * Provide a status on the ongoing claim generation
@@ -31,7 +31,7 @@ object ClaimGeneratorActor {
    * 
    * status: 0: OK, -1: Error (?)
    */
-  case class GenerateClaimsResponse(status: Int)
+  case class GenerateClaimsCompleted(status: Int)
 }
 
 /**
@@ -46,14 +46,16 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
   def receive = {
 
     // Real simple request
-    case GenerateClaimsRequest(nbr_pt) =>
+    case GenerateClaimsRequest(configTxt) =>
       
-      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, with Nbr of 1000 patients of $nbr_pt")
+      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
       
-      //TODO Generate claims, patients and providers
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
       
-      sender ! GenerateClaimsResponse(0)
-
+      //TODO Use a pool of actors to generate the simulation files
+      for(igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
+      
+      sender ! GenerateClaimsCompleted(0)
   }
 
 }

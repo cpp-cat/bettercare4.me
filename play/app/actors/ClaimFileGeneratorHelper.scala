@@ -9,8 +9,11 @@ import org.joda.time.LocalDate
 import models.PersonGenerator
 import models.Provider
 import scala.util.Random
-import models.HEDISRules
+import models.HEDISRule
 import models.ClaimGeneratorConfig
+import scala.collection.JavaConversions._
+import models.HEDISRules
+import models.SimplePersistenceLayer
 
 
 /**
@@ -18,23 +21,33 @@ import models.ClaimGeneratorConfig
  *
  * @param config Simulation parameters
  */
-class ClaimFileGeneratorHelper(val config: ClaimGeneratorConfig) {
+object ClaimFileGeneratorHelper {
 
   def getOne[A](items: IndexedSeq[A]): A = items(Random.nextInt(items.size))
   
   /**
    * Generate claims using simulation parameters from \c config
+   * 
+   * Generate the simulated \c Patients, \c Providers, and \c Claims to CSV files. 
+   * This simulator uses \c SimplePersistenceLayer for created the entities \c UUIDs
    *
    * @param igen Generation number
    */
-  def generateClaims(igen: Int): Unit = {
+  def generateClaims(igen: Int, config: ClaimGeneratorConfig): Unit = {
+
+    // The persistence layer provides an abstraction level to the UUID generation
+    val persistenceLayer = new SimplePersistenceLayer(igen)
 
     val patientsWriter = CSVWriter.open(new File(config.baseFname + "_patients_" + igen.toString + ".csv"))
     val providersWriter = CSVWriter.open(new File(config.baseFname + "_providers_" + igen.toString + ".csv"))
     val claimsWriter = CSVWriter.open(new File(config.baseFname + "_claims_" + igen.toString + ".csv"))
 
     // Person generator class
-    val personGenerator = new PersonGenerator(config.maleNamesFile, config.femaleNamesFile, config.lastNamesFile, config.hedisDate)
+    val personGenerator = new PersonGenerator(config.maleNamesFile, config.femaleNamesFile, config.lastNamesFile, config.hedisDate, persistenceLayer)
+    
+    // create and configure the rules to use for the simulation
+    val hedisDate = config.hedisDate
+    val rules: List[HEDISRule] = config.getRulesConfig().map{c => HEDISRules.createRuleByName(c.name)(c, hedisDate)}.toList
     
     // generate the providers
     val providers = for(i <- 1 to config.nbrProviders) yield personGenerator.generateProvider
@@ -52,8 +65,8 @@ class ClaimFileGeneratorHelper(val config: ClaimGeneratorConfig) {
     for {
         patient <- patients
         provider = getOne(providers)
-        rule <- HEDISRules.all
-        claim <- rule.generateClaims(patient, provider)
+        rule <- rules
+        claim <- rule.generateClaims(persistenceLayer, patient, provider)
     } claimsWriter.writeRow(claim.toList)
     
     // that's it, close all files

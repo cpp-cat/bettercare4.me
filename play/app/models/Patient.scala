@@ -4,8 +4,11 @@
 package models
 
 import org.joda.time.LocalDate
+import org.joda.time.Years
 
 case class Patient(uuid: String, firstName: String, lastName: String, gender: String, dob: LocalDate) {
+  
+  def age(asOf: LocalDate): Int = Years.yearsBetween(dob, asOf).getYears()
   
   def toList = List(uuid, firstName, lastName, gender, dob.toString)
 }

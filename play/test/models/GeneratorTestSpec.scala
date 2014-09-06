@@ -21,7 +21,7 @@ import scala.collection.JavaConversions._
 // ModelsTestSpec Class: Testing models classes
 // -----------------------------------------------------------------------------------------------------------
 
-class ModelsTestSpec extends PlaySpec with OneAppPerSuite {
+class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
 
   def fixture =
     new {
@@ -38,7 +38,7 @@ class ModelsTestSpec extends PlaySpec with OneAppPerSuite {
 
     "map a seed (range 0 to 1000) to month based on US population age distribution" in {
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"))
+      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"), new SimplePersistenceLayer(0))
 
       gen.seedToMonth(65) mustBe 60
       gen.seedToMonth(131) mustBe 120
@@ -51,7 +51,7 @@ class ModelsTestSpec extends PlaySpec with OneAppPerSuite {
     "Person given name must be consistent with gender and last name must be from last name pool" in {
 
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"))
+      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"), new SimplePersistenceLayer(0))
 
       def testPatient(patient: Patient): Unit = {
         if (patient.gender == "M") f.maleNames.contains(patient.firstName) mustBe true
