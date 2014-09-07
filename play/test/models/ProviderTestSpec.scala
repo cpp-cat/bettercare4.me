@@ -27,6 +27,12 @@ class ProviderTestSpec extends PlaySpec with OneAppPerSuite {
 
       provider.toList mustBe List("key1", "Michel", "Dufresne")
     }
+    
+    "create a Provider from a list of attributes" in {
+      val provider = Provider("key1", "Michel", "Dufresne")
+
+      ProviderParser.fromList(provider.toList) mustBe provider
+    }
   }
   
   "The SimplePersistenceLayer class" must {

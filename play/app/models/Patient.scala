@@ -6,6 +6,12 @@ package models
 import org.joda.time.LocalDate
 import org.joda.time.Years
 
+object PatientParser {
+  
+  def fromList(l: List[String]): Patient = Patient(l(0), l(1), l(2), l(3), LocalDate.parse(l(4)))
+}
+
+
 case class Patient(uuid: String, firstName: String, lastName: String, gender: String, dob: LocalDate) {
   
   def age(asOf: LocalDate): Int = Years.yearsBetween(dob, asOf).getYears()

@@ -64,6 +64,15 @@ class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
       l.size mustBe ans.size
       l mustBe ans
     }
+    
+    "parse a Claim from a list of attributes" in {
+      val claim = Claim("claim 1", "patient.uuid", "provider.uuid",
+        LocalDate.parse("2014-09-05"), "icd 1", Set("icd 1"), Set(),
+        "hcfaPOS", "ubRevenue", "cpt", "hcpcs")
+        
+        ClaimParser.fromList(claim.toList) mustBe claim
+      
+    }
   }
   
   "The SimplePersistenceLayer class" must {

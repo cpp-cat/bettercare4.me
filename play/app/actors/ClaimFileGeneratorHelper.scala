@@ -38,9 +38,14 @@ object ClaimFileGeneratorHelper {
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)
 
-    val patientsWriter = CSVWriter.open(new File(config.baseFname + "_patients_" + igen.toString + ".csv"))
-    val providersWriter = CSVWriter.open(new File(config.baseFname + "_providers_" + igen.toString + ".csv"))
-    val claimsWriter = CSVWriter.open(new File(config.baseFname + "_claims_" + igen.toString + ".csv"))
+    // Make a unique directory name based on today's date and create the directory if does not already exist.
+    val pathName = config.basePath + LocalDate.now().toString()
+    (new File(pathName)).mkdir()
+    
+    val fnameBase = pathName + "/" +config.baseFname
+    val patientsWriter = CSVWriter.open(new File(fnameBase + "_patients_" + igen.toString + ".csv"))
+    val providersWriter = CSVWriter.open(new File(fnameBase + "_providers_" + igen.toString + ".csv"))
+    val claimsWriter = CSVWriter.open(new File(fnameBase + "_claims_" + igen.toString + ".csv"))
 
     // Person generator class
     val personGenerator = new PersonGenerator(config.maleNamesFile, config.femaleNamesFile, config.lastNamesFile, config.hedisDate, persistenceLayer)

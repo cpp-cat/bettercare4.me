@@ -44,28 +44,25 @@
 - Version: 0.2.0.00
 - Start Date: 8/26/2014
 - Target Date: 8/30/2014
-- Actual Date: 8/XX/2014
+- Actual Date: 9/06/2014
 
 ## Product Features:
 - Agent-based claim simulator framework.
 - Generate patient profiles, physician profile (minimum viable)
-- Generate claims for HEDIS reporting simulation.
+- Generate claims for HEDIS reporting simulation (framework in place, actual HEDIS rule in separate sprint).
 
 ## User Stories Sprint Backlog
-- Generate a pool of physicians with minimum profile information
-- Generate claims and patient profile for each HEDIS measures, based on a in-measure target rate.
-- The HEDIS measures are represented by placeholders for the purpose of this sprint.
-- For each measures, generate the number of patients and associated claims based on target population count.
-- For each patient generate, have co-morbidity with rate of incidence defined per measure.
-- Generated claims are stored in CSV files, configurable number of files are generated each with a target number of patients.
-- The population is generated using a realistic representation of the age distribution of the population
 
 ## Completed User Stories
 - Added dependency on scala-csv (https://github.com/tototoshi/scala-csv) for creating and reading csv files.
 - Added dependency on joda-time for DateTime (http://www.joda.org/joda-time/)
 - Added dependency on scalatest (scalatest.org) and scalactic (scalactic.org) for testing and error handling
 - Added dependency on snakeyaml (https://code.google.com/p/snakeyaml/) for parsing YAML config files
-- Created a patient generator using US population distribution for age distribution
+- Generate a pool of physicians with minimum profile information
+- Generate claims and patient profile for each HEDIS measures, based on a in-measure target rate.
+- The HEDIS measures are represented by placeholders for the purpose of this sprint.
+- Generated claims are stored in CSV files, configurable number of files are generated each with a target number of patients.
+- The population is generated using a realistic representation of the age distribution of the population
 
 
 # Sprint 0: Seeding the project

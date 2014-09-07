@@ -9,7 +9,7 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 
 object ClaimGeneratorConfig {
-  
+
   def loadConfig(text: String): ClaimGeneratorConfig = {
     val yaml = new Yaml(new Constructor(classOf[ClaimGeneratorConfig]))
     yaml.load(text).asInstanceOf[ClaimGeneratorConfig]
@@ -20,7 +20,8 @@ object ClaimGeneratorConfig {
 /**
  * Class holding the parameters of the simulation
  *
- * @param baseFname Base file name and path for the output files (claims, patients, and providers)
+ * @param basePath base path for the output file. Simulator may add date to path and create new directory.
+ * @param baseFname Base file name for the output files (claims, patients, and providers)
  * @param nGen number of generation to simulate
  * @param nPatients number of patients to simulate per generation
  * @param nProviders number of providers to simulate per generation
@@ -31,22 +32,23 @@ object ClaimGeneratorConfig {
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
 class ClaimGeneratorConfig {
-    @BeanProperty var baseFname: String = null
-    @BeanProperty var nbrGen: Int = 0
-    @BeanProperty var nbrPatients: Int = 0
-    @BeanProperty var nbrProviders: Int = 0
-    @BeanProperty var maleNamesFile: String = null
-    @BeanProperty var femaleNamesFile: String = null
-    @BeanProperty var lastNamesFile: String = null
-    @BeanProperty var hedisDateTxt: String = null
-    @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
-    
-    def hedisDate = LocalDate.parse(hedisDateTxt)
+  @BeanProperty var basePath: String = null
+  @BeanProperty var baseFname: String = null
+  @BeanProperty var nbrGen: Int = 0
+  @BeanProperty var nbrPatients: Int = 0
+  @BeanProperty var nbrProviders: Int = 0
+  @BeanProperty var maleNamesFile: String = null
+  @BeanProperty var femaleNamesFile: String = null
+  @BeanProperty var lastNamesFile: String = null
+  @BeanProperty var hedisDateTxt: String = null
+  @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
+
+  def hedisDate = LocalDate.parse(hedisDateTxt)
 }
 
 /**
  * Class holding configuration parameters for HEDISRule
- * 
+ *
  * @param name of the rule this configuration applies to
  * @param eligibleRate the rate at which the patients are eligible to the  measure
  * @param meetMeasureRate the rate at which the patients meet the measure, in %

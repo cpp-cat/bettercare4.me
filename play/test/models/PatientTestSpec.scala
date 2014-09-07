@@ -36,6 +36,12 @@ class PatientTestSpec extends PlaySpec with OneAppPerSuite {
 
       patient.toList mustBe List("key1", "Michel", "Dufresne", "M", "1962-07-27")
     }
+    
+    "create a Patient from a list of attributes" in {
+      val patient = Patient("key1", "Michel", "Dufresne", "M", LocalDate.parse("1962-07-27"))
+      
+      PatientParser.fromList(patient.toList) mustBe patient      
+    }
   }
   
   "The SimplePersistenceLayer class" must {

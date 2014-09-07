@@ -81,6 +81,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
     "load configuration from YAML text" in {
 
       val config = ClaimGeneratorConfig.loadConfig("""
+          basePath: ./data/ClaimGenerator
           baseFname: HEDIS_sim
           nbrGen: 1
           nbrPatients: 100
@@ -91,6 +92,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
           hedisDateTxt: 2014-01-01
           """)
 
+      config.basePath mustBe "./data/ClaimGenerator"
       config.baseFname mustBe "HEDIS_sim"
       config.nbrGen mustBe 1
       config.nbrPatients mustBe 100
@@ -105,6 +107,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
     "load configuration from YAML text including HEDISRule config" in {
 
       val config = ClaimGeneratorConfig.loadConfig("""
+          basePath: ./data/ClaimGenerator
           baseFname: HEDIS_sim
           nbrGen: 1
           nbrPatients: 100
@@ -124,6 +127,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
                 exclusionRate: 13
           """)
 
+      config.basePath mustBe "./data/ClaimGenerator"
       config.baseFname mustBe "HEDIS_sim"
       config.nbrGen mustBe 1
       config.nbrPatients mustBe 100
@@ -132,21 +136,21 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
       config.femaleNamesFile mustBe "./data/female-names.csv"
       config.lastNamesFile mustBe "./data/last-names.csv"
       config.hedisDate mustBe new LocalDate(2014, 1, 1)
-      
+
       config.rulesConfig.size mustBe 2
-      
-      for(ruleConfig <- config.rulesConfig) ruleConfig.name match {
+
+      for (ruleConfig <- config.rulesConfig) ruleConfig.name match {
         case "CDC1" =>
           ruleConfig.eligibleRate mustBe 40
           ruleConfig.meetMeasureRate mustBe 92
           ruleConfig.exclusionRate mustBe 5
-          
+
         case "Rule2" =>
           ruleConfig.eligibleRate mustBe 60
           ruleConfig.meetMeasureRate mustBe 85
           ruleConfig.exclusionRate mustBe 13
-          
-        case _ => fail("Oops, unexpected rule name: "+ruleConfig.name)
+
+        case _ => fail("Oops, unexpected rule name: " + ruleConfig.name)
       }
     }
   }
