@@ -4,6 +4,8 @@
 package models
 
 import org.joda.time.LocalDate
+import scala.util.Random
+import org.joda.time.Interval
 
 /**
  * Trait to define an HEDIS rule.
@@ -102,12 +104,75 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: LocalDate) extends H
   def meetMeasureRate: Int = config.meetMeasureRate
   def exclusionRate: Int = config.exclusionRate
 
-  def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+  def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+  def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+  def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+
+  def generateClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+
+    // Check if the patient is to be considered for the rule
+    if (isPatientMeetDemographic(patient)) {
+
+      // Check if patient is eligible
+      if (Random.nextInt(100) < eligibleRate) {
+
+        // Generate the claims to make the patient eligible
+        val claims = generateEligibleClaims(pl, patient, provider)
+
+        // Check if the patient will meet the exclusion criteria
+        if (Random.nextInt(100) < exclusionRate) {
+
+          // Generate the claim to meet the exclusion criteria
+          List.concat(claims, generateExclusionClaims(pl, patient, provider))
+
+        } else {
+
+          // Check if the patient is in the measure
+          if (Random.nextInt(100) < meetMeasureRate) {
+
+            // Generate the claim to meet the measure
+            List.concat(claims, generateMeetMeasureClaims(pl, patient, provider))
+
+          } else {
+
+            // Patient does not meet the measure
+            claims
+          }
+        }
+
+      } else {
+
+        // Patient does not meet eligibility criteria
+        List.empty
+      }
+      
+    } else {
+
+      // Patient does not meet demographics
+      List.empty
+    }
+  }
+
   def isPatientMeetDemographic(patient: Patient): Boolean = true
   def isPatientEligible(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientMeetDemographic(patient)
   def isPatientExcluded(patient: Patient, patientHistory: PatientHistory): Boolean = false
   def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
   def isPatientInDenominator(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientEligible(patient, patientHistory) && !isPatientExcluded(patient, patientHistory)
+
+  /**
+   * Utility method to pick randomly one item from the list
+   */
+  def getOne[A](items: List[A]): A = items(Random.nextInt(items.size))
+  
+  /**
+   * Utility method to get an \c Interval from the \c hedisDate to the nbr of specified days prior to it.
+   * 
+   * This interval exclude the hedisDate
+   */
+  def getInterval(nbrDays: Int): Interval = {
+    val dt = hedisDate.toDateTimeAtStartOfDay()
+    new Interval(dt.minusDays(nbrDays), dt)
+  }
 }
 
 object HEDISRules {
@@ -148,4 +213,42 @@ class BCSRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(co
     val age = patient.age(hedisDate)
     patient.gender == "F" && age > 49 && age < 75
   }
+
+  // This rule has 100% eligibility when the demographics are meet
+  override def eligibleRate: Int = 100
+
+  override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+    getOne(List(
+      // One possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.42"), "", "", "19180", "")) },
+      // Another possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.41", "85.43"), "", "", "19220", "")) },
+      // Another possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.45", "85.47"), "", "", "19240", "")) }))()
+  }
+
+  override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+    getOne(List(
+      // One possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.36", "87.37"), "", "0401", "77055", "G0202")) },
+      // Another possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.37"), "", "0403", "77056", "G0204")) },
+      // Another possible set of claims
+      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.36"), "", "0401", "77057", "G0206")) }))()
+  }
+  
+  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
+    
+    // Check if patient had Bilateral Mastectomy
+    
+    
+    // Check if patient had 2 Unilateral Mastectomy on 2 different dates
+    
+    // Check if patient had a Unilateral Mastectomy with bilateral modifier
+    
+    // Check if patient had a Unilateral Mastectomy code with a right (RT) side modifier 
+    // and a Unilateral Mastectomy with a left (LT) side modifier (may be on same or different dates of service)
+    
+  }
+
 }
