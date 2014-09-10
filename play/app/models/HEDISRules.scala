@@ -236,19 +236,19 @@ class BCSRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(co
       // Another possible set of claims
       { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.36"), "", "0401", "77057", "G0206")) }))()
   }
-  
-  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
-    
-    // Check if patient had Bilateral Mastectomy
-    
-    
-    // Check if patient had 2 Unilateral Mastectomy on 2 different dates
-    
-    // Check if patient had a Unilateral Mastectomy with bilateral modifier
-    
-    // Check if patient had a Unilateral Mastectomy code with a right (RT) side modifier 
-    // and a Unilateral Mastectomy with a left (LT) side modifier (may be on same or different dates of service)
-    
-  }
+//  
+//  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
+//    
+//    // Check if patient had Bilateral Mastectomy
+//    
+//    
+//    // Check if patient had 2 Unilateral Mastectomy on 2 different dates
+//    
+//    // Check if patient had a Unilateral Mastectomy with bilateral modifier
+//    
+//    // Check if patient had a Unilateral Mastectomy code with a right (RT) side modifier 
+//    // and a Unilateral Mastectomy with a left (LT) side modifier (may be on same or different dates of service)
+//    
+//  }
 
 }
