@@ -24,18 +24,18 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       c.setMeetMeasureRate(92)
       c.setExclusionRate(5)
       
-      val hedisDate = new LocalDate(2015, 1, 1)
+      val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
       val rule = HEDISRules.createRuleByName(c.getName)(c, hedisDate)
 
       rule.name mustBe "TEST"
       rule.fullName mustBe "Test Rule"
       rule.description mustBe "This rule is for testing."
-      val patient = persistenceLayer.createPatient("M", "D", "M", new LocalDate(1962, 7, 27))
+      val patient = persistenceLayer.createPatient("M", "D", "M", new LocalDate(1962, 7, 27).toDateTimeAtStartOfDay())
       val provider = persistenceLayer.createProvider("M", "D")
       val claims = rule.generateClaims(persistenceLayer, patient, provider)
       claims.size mustBe 1
-      claims(0).patientUuid mustBe patient.uuid
-      claims(0).providerUuid mustBe provider.uuid
+      claims(0).patientID mustBe patient.patientID
+      claims(0).providerID mustBe provider.providerID
     }
     
     

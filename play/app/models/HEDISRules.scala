@@ -6,6 +6,7 @@ package models
 import org.joda.time.LocalDate
 import scala.util.Random
 import org.joda.time.Interval
+import org.joda.time.DateTime
 
 /**
  * Trait to define an HEDIS rule.
@@ -98,7 +99,7 @@ trait HEDISRule {
 
 }
 
-abstract class HEDISRuleBase(config: RuleConfig, hedisDate: LocalDate) extends HEDISRule {
+abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDISRule {
 
   def eligibleRate: Int = config.eligibleRate
   def meetMeasureRate: Int = config.meetMeasureRate
@@ -169,15 +170,12 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: LocalDate) extends H
    * 
    * This interval exclude the hedisDate
    */
-  def getInterval(nbrDays: Int): Interval = {
-    val dt = hedisDate.toDateTimeAtStartOfDay()
-    new Interval(dt.minusDays(nbrDays), dt)
-  }
+  def getInterval(nbrDays: Int): Interval = new Interval(hedisDate.minusDays(nbrDays), hedisDate)
 }
 
 object HEDISRules {
 
-  val createRuleByName: Map[String, (RuleConfig, LocalDate) => HEDISRule] = Map(
+  val createRuleByName: Map[String, (RuleConfig, DateTime) => HEDISRule] = Map(
     "TEST" -> { (c, d) => new TestRule(c, d) },
     "BCS" -> { (c, d) => new BCSRule(c, d) })
 
@@ -188,22 +186,25 @@ object HEDISRules {
 /**
  * Breast Cancer Screening Rule
  */
-class TestRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(config, hedisDate) {
+class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
   def name = "TEST"
   def fullName = "Test Rule"
   def description = "This rule is for testing."
 
   override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+    val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
     List(
-      persistenceLayer.createClaim(patient.uuid, provider.uuid, new LocalDate(2014, 9, 5), "icd 1", Set("icd 1", "icd 2"), Set("icd p1"), "hcfaPOS", "ubRevenue", "cpt", "hcpcs"))
+      persistenceLayer.createClaim(patient.patientID, provider.providerID, dos, dos, 
+          icdDPri="icd 1", icdD=Set("icd 1", "icd 2"), icdP=Set("icd p1"), 
+          hcfaPOS="hcfaPOS", ubRevenue="ubRevenue"))
   }
 }
 
 /**
  * Breast Cancer Screening Rule
  */
-class BCSRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(config, hedisDate) {
+class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
   def name = "BCS"
   def fullName = "Breast Cancer Screening"
@@ -217,24 +218,47 @@ class BCSRule(config: RuleConfig, hedisDate: LocalDate) extends HEDISRuleBase(co
   // This rule has 100% eligibility when the demographics are meet
   override def eligibleRate: Int = 100
 
+// Claim arguments:
+//    patientID: String,
+//    providerID: String,
+//    dos: DateTime,
+//    dosThru: DateTime,
+//    claimStatus: String,
+//    pcpFlag: String,
+//    icdDPri: String,
+//    icdD: Set[String],
+//    icdP: Set[String],
+//    hcfaPOS: String,
+//    drg: String,
+//    tob: String,
+//    ubRevenue: String,
+//    cpt: String,
+//    cptMod1: String,
+//    cptMod2: String,
+//    hcpcs: String,
+//    hcpcsMod: String,
+//    dischargeStatus: String,
+//    daysDenied: Int,
+//    roomBoardFlag: String    
+
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
     getOne(List(
       // One possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.42"), "", "", "19180", "")) },
+      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.42"), cpt="19180")) },
       // Another possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.41", "85.43"), "", "", "19220", "")) },
+      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.41", "85.43"), cpt="19220")) },
       // Another possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(30 * 365)), "", Set(), Set("85.45", "85.47"), "", "", "19240", "")) }))()
+      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.45", "85.47"), cpt="19240")) }))()
   }
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
     getOne(List(
       // One possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.36", "87.37"), "", "0401", "77055", "G0202")) },
+      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.36", "87.37"), ubRevenue="0401", cpt="77055", hcpcs="G0202")) },
       // Another possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.37"), "", "0403", "77056", "G0204")) },
+      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.37"), ubRevenue="0403", cpt="77056", hcpcs="G0204")) },
       // Another possible set of claims
-      { () => List(pl.createClaim(patient.uuid, provider.uuid, hedisDate.minusDays(Random.nextInt(27 * 30)), "", Set(), Set("87.36"), "", "0401", "77057", "G0206")) }))()
+      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.36"), ubRevenue="0401", cpt="77057", hcpcs="G0206")) }))()
   }
 //  
 //  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {

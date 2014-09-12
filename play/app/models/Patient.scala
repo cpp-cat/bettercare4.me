@@ -5,18 +5,19 @@ package models
 
 import org.joda.time.LocalDate
 import org.joda.time.Years
+import org.joda.time.DateTime
 
 object PatientParser {
   
-  def fromList(l: List[String]): Patient = Patient(l(0), l(1), l(2), l(3), LocalDate.parse(l(4)))
+  def fromList(l: List[String]): Patient = Patient(l(0), l(1), l(2), l(3), LocalDate.parse(l(4)).toDateTimeAtStartOfDay())
 }
 
 
-case class Patient(uuid: String, firstName: String, lastName: String, gender: String, dob: LocalDate) {
+case class Patient(patientID: String, firstName: String, lastName: String, gender: String, dob: DateTime) {
   
-  def age(asOf: LocalDate): Int = Years.yearsBetween(dob, asOf).getYears()
+  def age(asOf: DateTime): Int = Years.yearsBetween(dob, asOf).getYears()
   
-  def toList = List(uuid, firstName, lastName, gender, dob.toString)
+  def toList = List(patientID, firstName, lastName, gender, dob.toLocalDate().toString)
 }
 
 case class PatientHistory(

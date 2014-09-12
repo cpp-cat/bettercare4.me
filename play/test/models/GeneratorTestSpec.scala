@@ -38,7 +38,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
 
     "map a seed (range 0 to 1000) to month based on US population age distribution" in {
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"), new SimplePersistenceLayer(0))
+      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
 
       gen.seedToMonth(65) mustBe 60
       gen.seedToMonth(131) mustBe 120
@@ -51,7 +51,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
     "Person given name must be consistent with gender and last name must be from last name pool" in {
 
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01"), new SimplePersistenceLayer(0))
+      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
 
       def testPatient(patient: Patient): Unit = {
         if (patient.gender == "M") f.maleNames.contains(patient.firstName) mustBe true
@@ -100,7 +100,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
       config.maleNamesFile mustBe "./data/male-names.csv"
       config.femaleNamesFile mustBe "./data/female-names.csv"
       config.lastNamesFile mustBe "./data/last-names.csv"
-      config.hedisDate mustBe new LocalDate(2014, 1, 1)
+      config.hedisDate mustBe new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
       config.rulesConfig mustBe new java.util.ArrayList()
     }
 
@@ -135,7 +135,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
       config.maleNamesFile mustBe "./data/male-names.csv"
       config.femaleNamesFile mustBe "./data/female-names.csv"
       config.lastNamesFile mustBe "./data/last-names.csv"
-      config.hedisDate mustBe new LocalDate(2014, 1, 1)
+      config.hedisDate mustBe new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
 
       config.rulesConfig.size mustBe 2
 

@@ -85,8 +85,8 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
       val provider = ProviderParser.fromList(providers(0))
       val claim = ClaimParser.fromList(claims(0))
 
-      claim.patientUuid mustBe patient.uuid
-      claim.providerUuid mustBe provider.uuid
+      claim.patientID mustBe patient.patientID
+      claim.providerID mustBe provider.providerID
     }
 
     "generate Patients, Providers and Claims based on configuration, multiple entities" in {

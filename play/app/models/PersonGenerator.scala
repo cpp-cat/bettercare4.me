@@ -7,9 +7,8 @@ import org.joda.time.DateTime
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 import scala.util.Random
-import org.joda.time.LocalDate
 
-class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, val hedisDate: LocalDate, persistenceLayer: PersistenceLayer) {
+class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile: String, val hedisDate: DateTime, persistenceLayer: PersistenceLayer) {
 
   val ageDistribution = List(0, 65, 131, 198, 269, 339, 407, 472, 537, 605, 679, 751, 815, 869, 909, 939, 963, 982, 1000)
   val maleNames: List[String] = CSVReader.open(new File(maleNameFile)).all().flatten
@@ -37,7 +36,7 @@ class PersonGenerator(maleNameFile: String, femaleNameFile: String, lastNameFile
     60 * ageGroupIdx + f.toInt
   }
 
-  def monthToDOB(nbrMo: Int): LocalDate = hedisDate.minusMonths(nbrMo)
+  def monthToDOB(nbrMo: Int) = hedisDate.minusMonths(nbrMo)
 
   def generatePatient(): Patient = {
 

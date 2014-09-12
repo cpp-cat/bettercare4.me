@@ -43,7 +43,7 @@ class ClaimGeneratorConfig {
   @BeanProperty var hedisDateTxt: String = null
   @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
 
-  def hedisDate = LocalDate.parse(hedisDateTxt)
+  def hedisDate = LocalDate.parse(hedisDateTxt).toDateTimeAtStartOfDay()
 }
 
 /**

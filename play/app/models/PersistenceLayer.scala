@@ -3,7 +3,7 @@
  */
 package models
 
-import org.joda.time.LocalDate
+import org.joda.time.DateTime
 
 /**
  * Simple class to abstract the creation of \c Patients and \c Providers
@@ -12,13 +12,95 @@ import org.joda.time.LocalDate
  */
 trait PersistenceLayer {
 
-  def createPatient(firstName: String, lastName: String, gender: String, dob: LocalDate): Patient
+  def createPatient(firstName: String, lastName: String, gender: String, dob: DateTime): Patient
 
   def createProvider(firstName: String, lastName: String): Provider
 
-  def createClaim(patientUuid: String, providerUuid: String, dos: LocalDate,
-    icd_d_pri: String, icd_d: Set[String], icd_p: Set[String],
-    hcfaPOS: String, ubRevenue: String, cpt: String, hcpcs: String): Claim
+  def createClaim(
+    //2 patientID Patient ID
+    patientID: String,
+
+    //3 providerID Provider ID
+    providerID: String,
+
+    //4 dos Date of Service
+    dos: DateTime,
+
+    //5 dosThru DOS Thru - same as DOS for single day service, same as discharge date for in-patient claim
+    dosThru: DateTime,
+
+    //6 claimStatus Claim status: 
+    claimStatus: String = "",
+
+    //7 pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
+    pcpFlag: String = "",
+
+    //8 icdDPri ICD Primary Diagnostic
+    icdDPri: String = "",
+
+    //9-18 icdD Secondary Diagnostic codes (up to 10)
+    icdD: Set[String] = Set(),
+
+    //19-28 icdP ICD Procedure codes (up to 10)
+    icdP: Set[String] = Set(),
+
+    //29 hcfaPOS HCFA Form 1500 POS (Point of Service),
+    hcfaPOS: String = "",
+
+    //30 drg Diagnosis Related Group
+    drg: String = "",
+
+    //31 tob Type of Bill (3 chars)
+    tob: String = "",
+
+    //32 ubRevenue UB Revenue (billing code) 
+    ubRevenue: String = "",
+
+    //33 cpt CPT (procedure procedure)
+    cpt: String = "",
+
+    //34 cptMod1 CPT Modifier 1 (2 chars)
+    cptMod1: String = "",
+
+    //35 cptMod2 CPT Modifier 1 (2 chars)
+    cptMod2: String = "",
+
+    //36 hcpcs HCPCS (medical goods and services)
+    hcpcs: String = "",
+
+    //37 hcpcsMod HCPCS Modifier code (2 chars)
+    hcpcsMod: String = "",
+
+    //38 dischargeStatus Discharge Status (2 chars)
+    dischargeStatus: String = "",
+
+    //39 daysDenied Nbr of days denied for in-patient claims
+    daysDenied: Int = 0,
+
+    //40 roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
+    roomBoardFlag: String = "N"): Claim
+
+//    patientID: String,
+//    providerID: String,
+//    dos: DateTime,
+//    dosThru: DateTime,
+//    claimStatus: String,
+//    pcpFlag: String,
+//    icdDPri: String,
+//    icdD: Set[String],
+//    icdP: Set[String],
+//    hcfaPOS: String,
+//    drg: String,
+//    tob: String,
+//    ubRevenue: String,
+//    cpt: String,
+//    cptMod1: String,
+//    cptMod2: String,
+//    hcpcs: String,
+//    hcpcsMod: String,
+//    dischargeStatus: String,
+//    daysDenied: Int,
+//    roomBoardFlag: String): Claim
 }
 
 class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
@@ -30,7 +112,7 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
   var nextProviderKey = 0
   var nextClaimKey = 0
 
-  def createPatient(firstName: String, lastName: String, gender: String, dob: LocalDate): Patient = {
+  def createPatient(firstName: String, lastName: String, gender: String, dob: DateTime): Patient = {
     val k = nextPatientKey
     nextPatientKey = nextPatientKey + 1
     Patient(patientKeyPrefix + k, firstName, lastName, gender, dob)
@@ -42,11 +124,73 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     Provider(providerKeyPrefix + k, firstName, lastName)
   }
 
-  def createClaim(patientUuid: String, providerUuid: String, dos: LocalDate,
-    icd_d_pri: String, icd_d: Set[String], icd_p: Set[String],
-    hcfaPOS: String, ubRevenue: String, cpt: String, hcpcs: String): Claim = {
+  def createClaim(
+//    patientID: String,
+//    providerID: String,
+//    dos: DateTime,
+//    dosThru: DateTime,
+//    claimStatus: String = "",
+//    pcpFlag: String = "",
+//    icdDPri: String = "",
+//    icdD: Set[String] = Set(),
+//    icdP: Set[String] = Set(),
+//    hcfaPOS: String = "",
+//    drg: String = "",
+//    tob: String = "",
+//    ubRevenue: String = "",
+//    cpt: String = "",
+//    cptMod1: String = "",
+//    cptMod2: String = "",
+//    hcpcs: String = "",
+//    hcpcsMod: String = "",
+//    dischargeStatus: String = "",
+//    daysDenied: Int = 0,
+//    roomBoardFlag: String = "N"): Claim = {
+    patientID: String,
+    providerID: String,
+    dos: DateTime,
+    dosThru: DateTime,
+    claimStatus: String,
+    pcpFlag: String,
+    icdDPri: String,
+    icdD: Set[String],
+    icdP: Set[String],
+    hcfaPOS: String,
+    drg: String,
+    tob: String,
+    ubRevenue: String,
+    cpt: String,
+    cptMod1: String,
+    cptMod2: String,
+    hcpcs: String,
+    hcpcsMod: String,
+    dischargeStatus: String,
+    daysDenied: Int,
+    roomBoardFlag: String): Claim = {
+    
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
-    Claim(claimKeyPrefix + k, patientUuid, providerUuid, dos, icd_d_pri, icd_d, icd_p, hcfaPOS, ubRevenue, cpt, hcpcs)
+    Claim(claimKeyPrefix + k,
+      patientID,
+      providerID,
+      dos,
+      dosThru,
+      claimStatus,
+      pcpFlag,
+      icdDPri,
+      icdD,
+      icdP,
+      hcfaPOS,
+      drg,
+      tob,
+      ubRevenue,
+      cpt,
+      cptMod1,
+      cptMod2,
+      hcpcs,
+      hcpcsMod,
+      dischargeStatus,
+      daysDenied,
+      roomBoardFlag)
   }
 }
