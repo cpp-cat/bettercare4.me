@@ -41,22 +41,22 @@
 
 # Sprint 2: Claim detail class and HEDIS rules
 
-- Version: 0.3.0.00
+- Version: 0.3.0.00 (v0.3.0.00_09-13-2014)
 - Start Date: 9/07/2014
 - Target Date: 9/14/2014
-- Actual Date: 9/XX/2014
+- Actual Date: 9/13/2014
 
 ## Product Features:
 - Augment Claim class to capture all neccessairy details for HEDIS processing.
 - Complete HEDIS Rule framework
 
 ## User Stories Sprint Backlog
-- Refactor PatientHistory class to map ICD, CPT, HCPCS, and UB billing codes to claims
-- Detail a full HEDIS rule (Breast Cancer Screening)
 
 ## Completed User Stories
 - Augment Claim class to represent all details of a claim with exception to patient demographics and payment information
 - Adjust domain model for proper date processing
+- Refactor PatientHistory class to map ICD, CPT, HCPCS, and UB billing codes to claims
+- Detail a full HEDIS rule (Breast Cancer Screening)
 
 
 # Sprint 1: Claim simulator framework

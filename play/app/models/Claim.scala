@@ -59,6 +59,7 @@ object ClaimParser {
  *  - pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
  * 	- icdDPri ICD Primary Diagnostic
  *  - icdD Secondary Diagnostic codes (up to 10)
+ *  - icdP ICD Procedure codes (up to 10)
  *  - drg Diagnosis Related Group
  *  - tob Type of Bill (3 chars)
  *  - ubRevenue UB Revenue (billing code)

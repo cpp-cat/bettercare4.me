@@ -8,8 +8,6 @@ import org.scalatest._
 import org.scalatestplus.play._
 import org.joda.time.LocalDate
 import play.api.Logger
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
 
 class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
@@ -37,7 +35,5 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       claims(0).patientID mustBe patient.patientID
       claims(0).providerID mustBe provider.providerID
     }
-    
-    
   }
 }

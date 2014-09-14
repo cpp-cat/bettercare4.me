@@ -79,7 +79,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
       claims.size mustBe 1
 
       val patient = PatientParser.fromList(patients(0))
-      patient.age(config.hedisDate) must be > 0
+      patient.age(config.hedisDate) must be >= 0
       patient.age(config.hedisDate) must be < 100
 
       val provider = ProviderParser.fromList(providers(0))

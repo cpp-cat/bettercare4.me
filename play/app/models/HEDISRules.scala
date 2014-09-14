@@ -146,7 +146,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
         // Patient does not meet eligibility criteria
         List.empty
       }
-      
+
     } else {
 
       // Patient does not meet demographics
@@ -154,20 +154,38 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
     }
   }
 
-  def isPatientMeetDemographic(patient: Patient): Boolean = true
+  /**
+   * Utility that returns \c true as soon as the first function in the \c rules list returns \c true
+   *
+   * Returns \c false if the \c rules list is empty
+   */
+  def isAnyRuleMatch(rules: List[() => Boolean]): Boolean = {
+    if (rules.isEmpty) false
+    else if ((rules.head)()) true
+    else isAnyRuleMatch(rules.tail)
+  }
+
+  /**
+   * Utility that evaluate the function \c f for each element in \c l
+   * and returns \c true as soon as one element of \c l makes \c f to evaluate to \c true
+   */
+  def firstTrue[A](l: List[A], f: A => Boolean): Boolean = {
+    if (l.isEmpty) false
+    else if (f(l.head)) true
+    else firstTrue(l.tail, f)
+  }
+
   def isPatientEligible(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientMeetDemographic(patient)
-  def isPatientExcluded(patient: Patient, patientHistory: PatientHistory): Boolean = false
-  def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
   def isPatientInDenominator(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientEligible(patient, patientHistory) && !isPatientExcluded(patient, patientHistory)
 
   /**
    * Utility method to pick randomly one item from the list
    */
-  def getOne[A](items: List[A]): A = items(Random.nextInt(items.size))
-  
+  def pickOne[A](items: List[A]): A = items(Random.nextInt(items.size))
+
   /**
    * Utility method to get an \c Interval from the \c hedisDate to the nbr of specified days prior to it.
-   * 
+   *
    * This interval exclude the hedisDate
    */
   def getInterval(nbrDays: Int): Interval = new Interval(hedisDate.minusDays(nbrDays), hedisDate)
@@ -191,13 +209,17 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   def name = "TEST"
   def fullName = "Test Rule"
   def description = "This rule is for testing."
+    
+  def isPatientMeetDemographic(patient: Patient): Boolean = true
+  def isPatientExcluded(patient: Patient, patientHistory: PatientHistory): Boolean = false
+  def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
 
   override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
     val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
     List(
-      persistenceLayer.createClaim(patient.patientID, provider.providerID, dos, dos, 
-          icdDPri="icd 1", icdD=Set("icd 1", "icd 2"), icdP=Set("icd p1"), 
-          hcfaPOS="hcfaPOS", ubRevenue="ubRevenue"))
+      persistenceLayer.createClaim(patient.patientID, provider.providerID, dos, dos,
+        icdDPri = "icd 1", icdD = Set("icd 1", "icd 2"), icdP = Set("icd p1"),
+        hcfaPOS = "hcfaPOS", ubRevenue = "ubRevenue"))
   }
 }
 
@@ -208,71 +230,102 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   def name = "BCS"
   def fullName = "Breast Cancer Screening"
-  def description = "The percentage of women between 50 - 74 years of age who had a mammogram to screen for breast cancer any time on or between October 1 two years prior to the measurement year and December 31 of the measurement year (27 months)."
+  def description = "Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the " +
+    "measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two " +
+    "unilateral mastectomies."
 
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
     val age = patient.age(hedisDate)
-    patient.gender == "F" && age > 49 && age < 75
+    patient.gender == "F" && age > 41 && age < 70
   }
 
   // This rule has 100% eligibility when the demographics are meet
   override def eligibleRate: Int = 100
 
-// Claim arguments:
-//    patientID: String,
-//    providerID: String,
-//    dos: DateTime,
-//    dosThru: DateTime,
-//    claimStatus: String,
-//    pcpFlag: String,
-//    icdDPri: String,
-//    icdD: Set[String],
-//    icdP: Set[String],
-//    hcfaPOS: String,
-//    drg: String,
-//    tob: String,
-//    ubRevenue: String,
-//    cpt: String,
-//    cptMod1: String,
-//    cptMod2: String,
-//    hcpcs: String,
-//    hcpcsMod: String,
-//    dischargeStatus: String,
-//    daysDenied: Int,
-//    roomBoardFlag: String    
-
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
-    getOne(List(
-      // One possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.42"), cpt="19180")) },
-      // Another possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.41", "85.43"), cpt="19220")) },
-      // Another possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(30 * 365)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("85.45", "85.47"), cpt="19240")) }))()
+
+    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
+    val dos1 = hedisDate.minusDays(Random.nextInt(days))
+    pickOne(List(
+      // One possible set of claims based on ICD Procedure code
+       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(List("85.42", "85.44", "85.46", "85.48"))))),
+      // Another possible set of claims based on CPT codes and modifier being 50
+       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "50")),
+       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "50")),
+      // Another possible set of claims based on 2 claims have CPT codes and each have one of the modifier RT and LT
+      {() =>
+        val dos2 = hedisDate.minusDays(Random.nextInt(days))
+        List(
+          pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "RT"),
+          pl.createClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "LT"))
+      }))()
+  }
+
+  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
+
+    def hasCPTwithMod(mod: String): Boolean = {
+      firstTrue(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307"), { cpt: String =>
+        firstTrue(ph.claims4CPT(cpt), { claim: Claim =>
+          claim.dos.isBefore(hedisDate) && (claim.cptMod1 == mod || claim.cptMod2 == mod)
+        })
+      })
+    }
+
+    def rules = List[() => Boolean](
+      // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
+      () => firstTrue(List("85.42", "85.44", "85.46", "85.48"), { icdP: String =>
+        firstTrue(ph.claims4ICDP(icdP), { claim: Claim =>
+          claim.dos.isBefore(hedisDate)
+        })
+      }),
+
+      // Check if patient had a Unilateral Mastectomy with bilateral modifier (anytime prior to or during the measurement year)
+      () => hasCPTwithMod("50"),
+
+      // Check if patient had a previous right unilateral mastectomy and a previous
+      // left unilateral mastectomy (anytime prior to or during the measurement year)
+      () => hasCPTwithMod("RT") && hasCPTwithMod("LT"))
+
+    isAnyRuleMatch(rules)
   }
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
-    getOne(List(
-      // One possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.36", "87.37"), ubRevenue="0401", cpt="77055", hcpcs="G0202")) },
-      // Another possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.37"), ubRevenue="0403", cpt="77056", hcpcs="G0204")) },
-      // Another possible set of claims
-      { () => val dos=hedisDate.minusDays(Random.nextInt(27 * 30)); List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP=Set("87.36"), ubRevenue="0401", cpt="77057", hcpcs="G0206")) }))()
+
+    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
+    val dos = hedisDate.minusDays(Random.nextInt(days))
+    pickOne(List(
+      // One possible set of claims based on cpt
+      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(List("76083", "76090", "76091", "76092")))),
+      // Another possible set of claims based on hcpcs
+      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(List("G0202", "G0204", "G0206")))),
+      // Another possible set of claims based on ICD Procedure codes
+      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(List("87.36", "87.37"))))),
+      // Another possible set of claims based on UB Revenue Procedure codes
+      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(List("0401", "0403"))))))()
   }
-//  
-//  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
-//    
-//    // Check if patient had Bilateral Mastectomy
-//    
-//    
-//    // Check if patient had 2 Unilateral Mastectomy on 2 different dates
-//    
-//    // Check if patient had a Unilateral Mastectomy with bilateral modifier
-//    
-//    // Check if patient had a Unilateral Mastectomy code with a right (RT) side modifier 
-//    // and a Unilateral Mastectomy with a left (LT) side modifier (may be on same or different dates of service)
-//    
-//  }
+
+  override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
+
+    val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
+    def rules = List[() => Boolean](
+      // Check if patient had a Mammogram performed (during the measurement year or the year before)
+      () => firstTrue(List("76083", "76090", "76091", "76092"), { cpt: String =>
+        firstTrue(ph.claims4CPT(cpt), { claim: Claim => measurementInterval.contains(claim.dos) })
+      }),
+
+      () => firstTrue(List("G0202", "G0204", "G0206"), { hcpcs: String =>
+        firstTrue(ph.claims4HCPCS(hcpcs), { claim: Claim => measurementInterval.contains(claim.dos) })
+      }),
+
+      () => firstTrue(List("87.36", "87.37"), { icdP: String =>
+        firstTrue(ph.claims4ICDP(icdP), { claim: Claim => measurementInterval.contains(claim.dos) })
+      }),
+
+      () => firstTrue(List("0401", "0403"), { ubRevevue: String =>
+        firstTrue(ph.claims4UBRev(ubRevevue), { claim: Claim => measurementInterval.contains(claim.dos) })
+      }))
+
+    isAnyRuleMatch(rules)
+  }
 
 }
