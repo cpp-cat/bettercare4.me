@@ -14,6 +14,7 @@ import models.ClaimGeneratorConfig
 import scala.collection.JavaConversions._
 import models.HEDISRules
 import models.SimplePersistenceLayer
+import models.ClaimParser
 
 
 /**
@@ -72,7 +73,7 @@ object ClaimFileGeneratorHelper {
         provider = getOne(providers)
         rule <- rules
         claim <- rule.generateClaims(persistenceLayer, patient, provider)
-    } claimsWriter.writeRow(claim.toList)
+    } claimsWriter.writeRow(ClaimParser.toList(claim))
     
     // that's it, close all files
     patientsWriter.close

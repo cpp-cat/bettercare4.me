@@ -39,6 +39,28 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 3: RxClaim detail class and using NDCs in HEDIS rules
+
+- Version: 0.4.0.00 (v0.4.0.00_09-XX-2014)
+- Start Date: 9/16/2014
+- Target Date: 9/21/2014
+- Actual Date: 9/XX/2014
+
+## Product Features:
+- Add RxClaim class to capture pharmacy claims.
+- Add LabClaim class to capture lab claims.
+- Add NDCs as component for HEDIS Rule framework
+
+## User Stories Sprint Backlog
+- Define MedClaim, RxClaim and LabClaim using the same Claim base trait
+- Rename class Claim to MedClaim, representing medical claim
+- Add ability in ClaimParser to create the correct claim instance class based on claim type (Pharmacy vs Medical vs Lab)
+- Read NDC from CSV file for use in HEDIS rules
+- Detail CDC HEDIS rules
+
+## Completed User Stories
+
+
 # Sprint 2: Claim detail class and HEDIS rules
 
 - Version: 0.3.0.00 (v0.3.0.00_09-13-2014)

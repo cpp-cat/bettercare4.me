@@ -16,7 +16,7 @@ trait PersistenceLayer {
 
   def createProvider(firstName: String, lastName: String): Provider
 
-  def createClaim(
+  def createMedClaim(
     //2 patientID Patient ID
     patientID: String,
 
@@ -78,35 +78,69 @@ trait PersistenceLayer {
     daysDenied: Int = 0,
 
     //40 roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
-    roomBoardFlag: String = "N"): Claim
+    roomBoardFlag: String = "N"): MedClaim
 
-//    patientID: String,
-//    providerID: String,
-//    dos: DateTime,
-//    dosThru: DateTime,
-//    claimStatus: String,
-//    pcpFlag: String,
-//    icdDPri: String,
-//    icdD: Set[String],
-//    icdP: Set[String],
-//    hcfaPOS: String,
-//    drg: String,
-//    tob: String,
-//    ubRevenue: String,
-//    cpt: String,
-//    cptMod1: String,
-//    cptMod2: String,
-//    hcpcs: String,
-//    hcpcsMod: String,
-//    dischargeStatus: String,
-//    daysDenied: Int,
-//    roomBoardFlag: String): Claim
+    
+  def createRxClaim(
+
+    //2 patientID Patient ID
+    patientID: String,
+
+    //3 providerID Provider ID
+    providerID: String,
+
+    //4 fillD: fill date
+    fillD: DateTime,
+
+    //5 claimStatus Claim status: 
+    claimStatus: String = "",
+
+    //6 NDC drug NDC
+    ndc: String = "",
+
+    //7 daysSupply Nbr of days supply
+    daysSupply: Int = 1,
+
+    //8 Qty quantity dispensed
+    qty: Int = 0,
+
+    //9 Supply Flag, "Y" if DME rather than drugs
+    supplyF: String = "N"): RxClaim
+
+  
+  def createLabClaim(
+
+    //2 patientID Patient ID
+    patientID: String,
+
+    //3 providerID Provider ID
+    providerID: String,
+
+    //4 dos Date of Service
+    dos: DateTime,
+
+    //5 claimStatus Claim status: 
+    claimStatus: String = "",
+
+    //6 cpt CPT (procedure procedure)
+    cpt: String = "",
+
+    //7 LOINC
+    loinc: String = "",
+
+    //8 result: numeric (Double)
+    result: Double = 0.0,
+
+    //9 PosNegResult for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
+    posNegResult: String = ""): LabClaim
 }
 
 class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
   val patientKeyPrefix = "patient-" + keyGen + "-"
   val providerKeyPrefix = "provider-" + keyGen + "-"
-  val claimKeyPrefix = "claim-" + keyGen + "-"
+  val mdClaimKeyPrefix = "c-md-" + keyGen + "-"
+  val rxClaimKeyPrefix = "c-rx-" + keyGen + "-"
+  val lcClaimKeyPrefix = "c-lc-" + keyGen + "-"
 
   var nextPatientKey = 0
   var nextProviderKey = 0
@@ -124,28 +158,7 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     Provider(providerKeyPrefix + k, firstName, lastName)
   }
 
-  def createClaim(
-//    patientID: String,
-//    providerID: String,
-//    dos: DateTime,
-//    dosThru: DateTime,
-//    claimStatus: String = "",
-//    pcpFlag: String = "",
-//    icdDPri: String = "",
-//    icdD: Set[String] = Set(),
-//    icdP: Set[String] = Set(),
-//    hcfaPOS: String = "",
-//    drg: String = "",
-//    tob: String = "",
-//    ubRevenue: String = "",
-//    cpt: String = "",
-//    cptMod1: String = "",
-//    cptMod2: String = "",
-//    hcpcs: String = "",
-//    hcpcsMod: String = "",
-//    dischargeStatus: String = "",
-//    daysDenied: Int = 0,
-//    roomBoardFlag: String = "N"): Claim = {
+  def createMedClaim(
     patientID: String,
     providerID: String,
     dos: DateTime,
@@ -166,11 +179,11 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     hcpcsMod: String,
     dischargeStatus: String,
     daysDenied: Int,
-    roomBoardFlag: String): Claim = {
-    
+    roomBoardFlag: String): MedClaim = {
+
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
-    Claim(claimKeyPrefix + k,
+    MedClaim(mdClaimKeyPrefix + k,
       patientID,
       providerID,
       dos,
@@ -192,5 +205,51 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
       dischargeStatus,
       daysDenied,
       roomBoardFlag)
+  }
+
+  def createRxClaim(
+    patientID: String,
+    providerID: String,
+    fillD: DateTime,
+    claimStatus: String,
+    ndc: String,
+    daysSupply: Int,
+    qty: Int,
+    supplyF: String): RxClaim = {
+
+    val k = nextClaimKey
+    nextClaimKey = nextClaimKey + 1
+    RxClaim(rxClaimKeyPrefix + k,
+      patientID,
+      providerID,
+      fillD,
+      claimStatus,
+      ndc,
+      daysSupply,
+      qty,
+      supplyF)
+  }
+
+  def createLabClaim(
+    patientID: String,
+    providerID: String,
+    dos: DateTime,
+    claimStatus: String,
+    cpt: String,
+    loinc: String,
+    result: Double,
+    posNegResult: String): LabClaim = {
+
+    val k = nextClaimKey
+    nextClaimKey = nextClaimKey + 1
+    LabClaim(lcClaimKeyPrefix + k,
+      patientID,
+      providerID,
+      dos,
+      claimStatus,
+      cpt,
+      loinc,
+      result,
+      posNegResult)
   }
 }

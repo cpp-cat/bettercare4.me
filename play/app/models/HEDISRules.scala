@@ -217,7 +217,7 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
     val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
     List(
-      persistenceLayer.createClaim(patient.patientID, provider.providerID, dos, dos,
+      persistenceLayer.createMedClaim(patient.patientID, provider.providerID, dos, dos,
         icdDPri = "icd 1", icdD = Set("icd 1", "icd 2"), icdP = Set("icd p1"),
         hcfaPOS = "hcfaPOS", ubRevenue = "ubRevenue"))
   }
@@ -248,16 +248,16 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     pickOne(List(
       // One possible set of claims based on ICD Procedure code
-       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(List("85.42", "85.44", "85.46", "85.48"))))),
+       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(List("85.42", "85.44", "85.46", "85.48"))))),
       // Another possible set of claims based on CPT codes and modifier being 50
-       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "50")),
-       () => List(pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "50")),
+       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "50")),
+       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "50")),
       // Another possible set of claims based on 2 claims have CPT codes and each have one of the modifier RT and LT
       {() =>
         val dos2 = hedisDate.minusDays(Random.nextInt(days))
         List(
-          pl.createClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "RT"),
-          pl.createClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "LT"))
+          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "RT"),
+          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "LT"))
       }))()
   }
 
@@ -265,7 +265,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
     def hasCPTwithMod(mod: String): Boolean = {
       firstTrue(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307"), { cpt: String =>
-        firstTrue(ph.claims4CPT(cpt), { claim: Claim =>
+        firstTrue(ph.claims4CPT(cpt), { claim: MedClaim =>
           claim.dos.isBefore(hedisDate) && (claim.cptMod1 == mod || claim.cptMod2 == mod)
         })
       })
@@ -274,7 +274,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     def rules = List[() => Boolean](
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       () => firstTrue(List("85.42", "85.44", "85.46", "85.48"), { icdP: String =>
-        firstTrue(ph.claims4ICDP(icdP), { claim: Claim =>
+        firstTrue(ph.claims4ICDP(icdP), { claim: MedClaim =>
           claim.dos.isBefore(hedisDate)
         })
       }),
@@ -295,34 +295,34 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     val dos = hedisDate.minusDays(Random.nextInt(days))
     pickOne(List(
       // One possible set of claims based on cpt
-      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(List("76083", "76090", "76091", "76092")))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(List("76083", "76090", "76091", "76092")))),
       // Another possible set of claims based on hcpcs
-      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(List("G0202", "G0204", "G0206")))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(List("G0202", "G0204", "G0206")))),
       // Another possible set of claims based on ICD Procedure codes
-      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(List("87.36", "87.37"))))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(List("87.36", "87.37"))))),
       // Another possible set of claims based on UB Revenue Procedure codes
-      () => List(pl.createClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(List("0401", "0403"))))))()
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(List("0401", "0403"))))))()
   }
 
   override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
     def rules = List[() => Boolean](
-      // Check if patient had a Mammogram performed (during the measurement year or the year before)
+      // Check if patient had a Mamogram performed (during the measurement year or the year before)
       () => firstTrue(List("76083", "76090", "76091", "76092"), { cpt: String =>
-        firstTrue(ph.claims4CPT(cpt), { claim: Claim => measurementInterval.contains(claim.dos) })
+        firstTrue(ph.claims4CPT(cpt), { claim: MedClaim => measurementInterval.contains(claim.dos) })
       }),
 
       () => firstTrue(List("G0202", "G0204", "G0206"), { hcpcs: String =>
-        firstTrue(ph.claims4HCPCS(hcpcs), { claim: Claim => measurementInterval.contains(claim.dos) })
+        firstTrue(ph.claims4HCPCS(hcpcs), { claim: MedClaim => measurementInterval.contains(claim.dos) })
       }),
 
       () => firstTrue(List("87.36", "87.37"), { icdP: String =>
-        firstTrue(ph.claims4ICDP(icdP), { claim: Claim => measurementInterval.contains(claim.dos) })
+        firstTrue(ph.claims4ICDP(icdP), { claim: MedClaim => measurementInterval.contains(claim.dos) })
       }),
 
       () => firstTrue(List("0401", "0403"), { ubRevevue: String =>
-        firstTrue(ph.claims4UBRev(ubRevevue), { claim: Claim => measurementInterval.contains(claim.dos) })
+        firstTrue(ph.claims4UBRev(ubRevevue), { claim: MedClaim => measurementInterval.contains(claim.dos) })
       }))
 
     isAnyRuleMatch(rules)
