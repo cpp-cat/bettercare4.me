@@ -59,6 +59,9 @@
 - Define MedClaim, RxClaim and LabClaim using the same Claim base trait
 - Rename class Claim to MedClaim, representing medical claim
 - Add ability in ClaimParser to create the correct claim instance class based on claim type (Pharmacy vs Medical vs Lab)
+- Refactor package naming to add com.nickelsoftware.bettercare4me to all packages.
+- Created package com.nickelsoftware.bettercare4me.hedis to put base HEDIS rules framework classes
+- Created package com.nickelsoftware.bettercare4me.hedis.hedis2014 for all HEDIS 2014 rules
 
 
 # Sprint 2: Claim detail class and HEDIS rules

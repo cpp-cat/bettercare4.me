@@ -3,13 +3,13 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
+GET     /                           com.nickelsoftware.bettercare4me.controllers.Application.index
 
 # Akka simple test
-GET     /actor                      controllers.Application.actor
+GET     /actor                      com.nickelsoftware.bettercare4me.controllers.Application.actor
 
 # Spark simple test
-GET     /spark                      controllers.Application.spark
+GET     /spark                      com.nickelsoftware.bettercare4me.controllers.Application.spark
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
