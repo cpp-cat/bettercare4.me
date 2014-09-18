@@ -6,6 +6,7 @@ package models
 import org.joda.time.LocalDate
 import utils.NickelException
 import org.joda.time.DateTime
+import utils.NickelException
 
 object ClaimParser {
 
@@ -69,7 +70,7 @@ object ClaimParser {
         l(5), //5 claimStatus Claim status
         l(6), //6 cpt
         l(7), //7 LOINC
-        l(8).toDouble, //8 result
+        BigDecimal(l(8)), //8 result
         l(9) //9 positive/negative result
         )
     }
@@ -301,8 +302,8 @@ case class LabClaim(
   //7 LOINC
   loinc: String = "",
 
-  //8 result: numeric (Double)
-  result: Double = 0.0,
+  //8 result: numeric (BigDecimal)
+  result: BigDecimal = 0.0,
 
   //9 PosNegResult for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
   posNegResult: String = "") extends Claim {

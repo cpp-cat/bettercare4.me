@@ -58,7 +58,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
         else if (patient.gender == "F") f.femaleNames.contains(patient.firstName) mustBe true
         else fail("Invalid gender, got " + patient.gender)
         f.lastNames.contains(patient.lastName) mustBe true
-        assert(patient.dob.compareTo(gen.hedisDate) < 0)
+        assert(patient.dob.compareTo(gen.hedisDate) <= 0)
         assert(gen.hedisDate.minusMonths(1081).compareTo(patient.dob) < 0)
       }
 

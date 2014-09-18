@@ -21,6 +21,7 @@ import com.github.tototoshi.csv.CSVWriter
 import models.PatientParser
 import models.ProviderParser
 import models.ClaimParser
+import models.MedClaim
 
 trait TestFileGenerator extends SuiteMixin { this: Suite =>
 
@@ -83,10 +84,12 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
       patient.age(config.hedisDate) must be < 100
 
       val provider = ProviderParser.fromList(providers(0))
-      val claim = ClaimParser.fromList(claims(0))
-
-      claim.patientID mustBe patient.patientID
-      claim.providerID mustBe provider.providerID
+      ClaimParser.fromList(claims(0)) match {
+        case claim: MedClaim =>
+          claim.patientID mustBe patient.patientID
+          claim.providerID mustBe provider.providerID
+        case _ => fail("Invalid claim class type!")
+      }
     }
 
     "generate Patients, Providers and Claims based on configuration, multiple entities" in {

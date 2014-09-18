@@ -10,13 +10,13 @@ import java.io.File
 import org.joda.time.LocalDate
 import play.api.Logger
 
-class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
+class MedClaimTestSpec extends PlaySpec with OneAppPerSuite {
 
-  "The Claim class" must {
+  "The MedClaim class" must {
 
     "be created with valid arguments" in {
       val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
-      val claim = Claim("claim 1", "patient.uuid", "provider.uuid",
+      val claim = MedClaim("claim 1", "patient.uuid", "provider.uuid",
         dos, dos, claimStatus="claimStatus", pcpFlag="Y", icdDPri="icd 1", icdD=Set("icd 1", "icd 2"), icdP=Set("icd p1"),
         hcfaPOS="hcfaPOS", drg="drg", tob="tob", ubRevenue="ubRevenue", 
         cpt="cpt", cptMod1="cptMod1", cptMod2="cptMod2", 
@@ -48,14 +48,14 @@ class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
 
     "put all atributes into a List" in {
       val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
-      val claim = Claim("claim 1", "patient.uuid", "provider.uuid",
+      val claim = MedClaim("claim 1", "patient.uuid", "provider.uuid",
         dos, dos, claimStatus="claimStatus", pcpFlag="Y", icdDPri="icd 1", icdD=Set("icd 1", "icd 2"), icdP=Set("icd p1"),
         hcfaPOS="hcfaPOS", drg="drg", tob="tob", ubRevenue="ubRevenue", 
         cpt="cpt", cptMod1="cptMod1", cptMod2="cptMod2", 
         hcpcs="hcpcs", hcpcsMod="hcpcsMod", dischargeStatus="dischargeStatus", daysDenied=5, roomBoardFlag="Y")
 
       val l = claim.toList
-      val ans = List("claim 1", "patient.uuid", "provider.uuid",
+      val ans = List("MD", "claim 1", "patient.uuid", "provider.uuid",
         "2014-09-05", "2014-09-05", "claimStatus", "Y", "icd 1",
         "icd 1", "icd 2", "", "", "", "", "", "", "", "",
         "icd p1", "", "", "", "", "", "", "", "", "",
@@ -68,10 +68,10 @@ class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
 
     "put all atributes into a List (default values)" in {
       val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
-      val claim = Claim("claim 1", "patient.uuid", "provider.uuid", dos, dos)
+      val claim = MedClaim("claim 1", "patient.uuid", "provider.uuid", dos, dos)
 
       val l = claim.toList
-      val ans = List("claim 1", "patient.uuid", "provider.uuid",
+      val ans = List("MD", "claim 1", "patient.uuid", "provider.uuid",
         "2014-09-05", "2014-09-05", "", "", "",
         "", "", "", "", "", "", "", "", "", "",
         "", "", "", "", "", "", "", "", "", "",
@@ -84,7 +84,7 @@ class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
     
     "parse a Claim from a list of attributes" in {
       val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
-      val claim = Claim("claim 1", "patient.uuid", "provider.uuid",
+      val claim = MedClaim("claim 1", "patient.uuid", "provider.uuid",
         dos, dos, claimStatus="claimStatus", pcpFlag="Y", icdDPri="icd 1", icdD=Set("icd 1", "icd 2"), icdP=Set("icd p1"),
         hcfaPOS="hcfaPOS", drg="drg", tob="tob", ubRevenue="ubRevenue", 
         cpt="cpt", cptMod1="cptMod1", cptMod2="cptMod2", 
@@ -96,15 +96,15 @@ class ClaimTestSpec extends PlaySpec with OneAppPerSuite {
   
   "The SimplePersistenceLayer class" must {
     
-    "create Claims with sequential keys" in {
+    "create MedClaims with sequential keys" in {
       val persistenceLayer = new SimplePersistenceLayer(99)
       
       val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
-      persistenceLayer.createClaim("patient.uuid", "provider.uuid", dos, dos) mustBe Claim("claim-99-0", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createClaim("patient.uuid", "provider.uuid", dos, dos) mustBe Claim("claim-99-1", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createClaim("patient.uuid", "provider.uuid", dos, dos) mustBe Claim("claim-99-2", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createClaim("patient.uuid", "provider.uuid", dos, dos) mustBe Claim("claim-99-3", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createClaim("patient.uuid", "provider.uuid", dos, dos) mustBe Claim("claim-99-4", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-0", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-1", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-2", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-3", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-4", "patient.uuid", "provider.uuid", dos, dos)
     }
   }
 }

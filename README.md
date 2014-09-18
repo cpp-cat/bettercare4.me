@@ -52,13 +52,13 @@
 - Add NDCs as component for HEDIS Rule framework
 
 ## User Stories Sprint Backlog
-- Define MedClaim, RxClaim and LabClaim using the same Claim base trait
-- Rename class Claim to MedClaim, representing medical claim
-- Add ability in ClaimParser to create the correct claim instance class based on claim type (Pharmacy vs Medical vs Lab)
 - Read NDC from CSV file for use in HEDIS rules
 - Detail CDC HEDIS rules
 
 ## Completed User Stories
+- Define MedClaim, RxClaim and LabClaim using the same Claim base trait
+- Rename class Claim to MedClaim, representing medical claim
+- Add ability in ClaimParser to create the correct claim instance class based on claim type (Pharmacy vs Medical vs Lab)
 
 
 # Sprint 2: Claim detail class and HEDIS rules

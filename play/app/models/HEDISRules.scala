@@ -195,7 +195,7 @@ object HEDISRules {
 
   val createRuleByName: Map[String, (RuleConfig, DateTime) => HEDISRule] = Map(
     "TEST" -> { (c, d) => new TestRule(c, d) },
-    "BCS" -> { (c, d) => new BCSRule(c, d) })
+    "BCS-HEDIS-2014" -> { (c, d) => new BCSRule(c, d) })
 
 }
 
@@ -228,7 +228,7 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
  */
 class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  def name = "BCS"
+  def name = "BCS-HEDIS-2014"
   def fullName = "Breast Cancer Screening"
   def description = "Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the " +
     "measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two " +

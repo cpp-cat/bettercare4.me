@@ -17,13 +17,13 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
       val c = new RuleConfig
-      c.setName("BCS")
+      c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(66)
       c.setMeetMeasureRate(77)
       c.setExclusionRate(88)
       val rule = HEDISRules.createRuleByName(c.getName)(c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
 
-      rule.name mustBe "BCS"
+      rule.name mustBe "BCS-HEDIS-2014"
       rule.fullName mustBe "Breast Cancer Screening"
       rule.description mustBe "Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two unilateral mastectomies."
       rule.eligibleRate mustBe 100 // rule overrides this attribute
@@ -35,7 +35,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
       val c = new RuleConfig
-      c.setName("BCS")
+      c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(100)
       c.setMeetMeasureRate(100)
       c.setExclusionRate(0)      
@@ -56,7 +56,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
       val c = new RuleConfig
-      c.setName("BCS")
+      c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(100)
       c.setMeetMeasureRate(0)
       c.setExclusionRate(100)
@@ -76,7 +76,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
       val c = new RuleConfig
-      c.setName("BCS")
+      c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(100)
       c.setMeetMeasureRate(100)
       c.setExclusionRate(0)
@@ -96,7 +96,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
       val c = new RuleConfig
-      c.setName("BCS")
+      c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(100)		// not used, no claims generated
       c.setMeetMeasureRate(100)		// not used, no claims generated
       c.setExclusionRate(0)			// not used, no claims generated

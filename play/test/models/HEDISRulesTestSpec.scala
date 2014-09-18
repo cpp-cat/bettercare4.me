@@ -32,8 +32,12 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       val provider = persistenceLayer.createProvider("M", "D")
       val claims = rule.generateClaims(persistenceLayer, patient, provider)
       claims.size mustBe 1
-      claims(0).patientID mustBe patient.patientID
-      claims(0).providerID mustBe provider.providerID
+      claims(0) match {
+        case claim: MedClaim =>
+          claim.patientID mustBe patient.patientID
+          claim.providerID mustBe provider.providerID
+        case _ => fail("Invalid claim class type!")
+      }
     }
   }
 }
