@@ -123,6 +123,9 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
                 eligibleRate: 60
                 meetMeasureRate: 85
                 exclusionRate: 13
+                otherParams:
+                  key1: val1
+                  key2: val2
           """)
 
       config.basePath mustBe "./data/ClaimGenerator"
@@ -142,11 +145,15 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
           ruleConfig.eligibleRate mustBe 40
           ruleConfig.meetMeasureRate mustBe 92
           ruleConfig.exclusionRate mustBe 5
+          ruleConfig.otherParams.size() mustBe 0
 
         case "Rule2" =>
           ruleConfig.eligibleRate mustBe 60
           ruleConfig.meetMeasureRate mustBe 85
           ruleConfig.exclusionRate mustBe 13
+          ruleConfig.otherParams.size() mustBe 2
+          ruleConfig.otherParams.get("key1") mustBe "val1"
+          ruleConfig.otherParams.get("key2") mustBe "val2"
 
         case _ => fail("Oops, unexpected rule name: " + ruleConfig.name)
       }

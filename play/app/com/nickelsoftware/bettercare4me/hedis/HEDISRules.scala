@@ -184,6 +184,21 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
     else firstTrue(l.tail, f)
   }
 
+  /**
+   * Utility that evaluate the function \c f for each claim that has a key in \c m that
+   * is present in the set \c s
+   * 
+   * returns \c true as soon as one claim makes \c f to evaluate to \c true
+   */
+  def firstMatch[C](m: Map[String, List[C]], s: Set[String], f: C => Boolean): Boolean = {
+    if (m.isEmpty) false
+    else {
+      val key = m.head._1
+      if(s.contains(key) && firstTrue(m.head._2, f)) true
+      else firstMatch(m.tail, s, f)
+    }
+  }
+
   def isPatientEligible(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientMeetDemographic(patient)
   def isPatientInDenominator(patient: Patient, patientHistory: PatientHistory): Boolean = isPatientEligible(patient, patientHistory) && !isPatientExcluded(patient, patientHistory)
 

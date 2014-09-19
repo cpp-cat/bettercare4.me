@@ -60,4 +60,5 @@ class RuleConfig {
   @BeanProperty var eligibleRate: Int = 0
   @BeanProperty var meetMeasureRate: Int = 0
   @BeanProperty var exclusionRate: Int = 0
+  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap() 
 }
