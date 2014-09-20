@@ -29,7 +29,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
 
   val claimGeneratorActor = system.actorOf(Props[ClaimGeneratorActor])
 
-  def this() = this(ActorSystem("EventCrawlerSpec"))
+  def this() = this(ActorSystem("BetterCare4meSpec"))
   val basePath = "./data/temp-test-"
   val pathName = basePath + LocalDate.now().toString()
 

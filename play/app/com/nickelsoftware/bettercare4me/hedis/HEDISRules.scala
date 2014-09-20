@@ -44,8 +44,8 @@ trait HEDISRule {
    * Indicates the rate at which the patients are eligible to the  measure.
    *
    * To be eligible, the patient must first meet the demographic requirements.
-   * Example, an \c eligibleRate of 25 for CDC H1C, means that 25% of patient of age between 18 - 75
-   * will have diabetes. Note that all CDC measure should have the same \c eligibleRate
+   * Example, an  `eligibleRate` of 25 for CDC H1C, means that 25% of patient of age between 18 - 75
+   * will have diabetes. Note that all CDC measure should have the same `eligibleRate`
    */
   def eligibleRate: Int
 
@@ -70,7 +70,7 @@ trait HEDISRule {
   /**
    * Generate the claims for the patient to be in the denominator and possibly in the numerator as well.
    *
-   * The patient is randomly in the numerator based on the \c targetCompliance rate.
+   * The patient is randomly in the numerator based on the `targetCompliance` rate.
    */
   def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider): List[Claim]
 
@@ -117,6 +117,14 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+  
+  def generateEligibleAndExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider, isExcluded: Boolean): List[Claim] = {
+    
+    val claims = generateEligibleClaims(pl, patient, provider)
+    
+    if(isExcluded) List.concat(claims, generateExclusionClaims(pl, patient, provider))
+    else claims
+  }
 
   def generateClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
@@ -127,13 +135,15 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
       if (Random.nextInt(100) < eligibleRate) {
 
         // Generate the claims to make the patient eligible
-        val claims = generateEligibleClaims(pl, patient, provider)
+        val isExcluded = Random.nextInt(100) < exclusionRate
+        
+        val claims = generateEligibleAndExclusionClaims(pl, patient, provider, isExcluded)
 
-        // Check if the patient will meet the exclusion criteria
-        if (Random.nextInt(100) < exclusionRate) {
+        // Check if the patient meet the excluded criteria, if not check if meet criteria
+        if (isExcluded) {
 
-          // Generate the claim to meet the exclusion criteria
-          List.concat(claims, generateExclusionClaims(pl, patient, provider))
+          // Already generated the claim to meet the exclusion criteria
+          claims
 
         } else {
 
@@ -164,9 +174,9 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   }
 
   /**
-   * Utility that returns \c true as soon as the first function in the \c rules list returns \c true
+   * Utility that returns `true` as soon as the first function in the `rules` list returns `true`
    *
-   * Returns \c false if the \c rules list is empty
+   * Returns `false` if the `rules` list is empty
    */
   def isAnyRuleMatch(rules: List[() => Boolean]): Boolean = {
     if (rules.isEmpty) false
@@ -175,8 +185,8 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   }
 
   /**
-   * Utility that evaluate the function \c f for each element in \c l
-   * and returns \c true as soon as one element of \c l makes \c f to evaluate to \c true
+   * Utility that evaluate the function `f` for each element in `l`
+   * and returns `true` as soon as one element of `l` makes `f` to evaluate to `true`
    */
   def firstTrue[A](l: List[A], f: A => Boolean): Boolean = {
     if (l.isEmpty) false
@@ -185,10 +195,10 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   }
 
   /**
-   * Utility that evaluate the function \c f for each claim that has a key in \c m that
-   * is present in the set \c s
+   * Utility that evaluate the function `f` for each claim that has a key in `m` that
+   * is present in the set `s`
    * 
-   * returns \c true as soon as one claim makes \c f to evaluate to \c true
+   * @return `true` as soon as one claim makes `f` to evaluate to `true`
    */
   def firstMatch[C](m: Map[String, List[C]], s: Set[String], f: C => Boolean): Boolean = {
     if (m.isEmpty) false
@@ -208,9 +218,10 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   def pickOne[A](items: List[A]): A = items(Random.nextInt(items.size))
 
   /**
-   * Utility method to get an \c Interval from the \c hedisDate to the nbr of specified days prior to it.
+   * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified days prior to it.
    *
-   * This interval exclude the hedisDate
+   * @param nbrDays number of days for the interval, just prior the `hedisDate`
+   * @return The calculated interval, excluding the hedisDate
    */
   def getInterval(nbrDays: Int): Interval = new Interval(hedisDate.minusDays(nbrDays), hedisDate)
 }

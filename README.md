@@ -52,7 +52,6 @@
 - Add NDCs as component for HEDIS Rule framework
 
 ## User Stories Sprint Backlog
-- Read NDC from CSV file for use in HEDIS rules
 - Detail CDC HEDIS rules
 
 ## Completed User Stories
@@ -62,6 +61,8 @@
 - Refactor package naming to add com.nickelsoftware.bettercare4me to all packages.
 - Created package com.nickelsoftware.bettercare4me.hedis to put base HEDIS rules framework classes
 - Created package com.nickelsoftware.bettercare4me.hedis.hedis2014 for all HEDIS 2014 rules
+- Read NDC from CSV file for use in HEDIS rules
+- Created CDCRuleBase as base class for all CDC rule classes. This base class implement CDC meet and exlusion criteria
 
 
 # Sprint 2: Claim detail class and HEDIS rules

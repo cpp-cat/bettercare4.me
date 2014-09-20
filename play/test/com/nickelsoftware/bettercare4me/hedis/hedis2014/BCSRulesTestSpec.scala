@@ -62,8 +62,8 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
       val c = new RuleConfig
       c.setName("BCS-HEDIS-2014")
       c.setEligibleRate(100)
-      c.setMeetMeasureRate(0)
       c.setExclusionRate(100)
+      c.setMeetMeasureRate(0)
       val rule = HEDISRules.createRuleByName(c.getName)(c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
       val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
       val patient = persistenceLayer.createPatient("first", "last", "F", dob)

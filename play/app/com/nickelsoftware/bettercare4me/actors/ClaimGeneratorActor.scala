@@ -47,7 +47,7 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
     // Real simple request
     case GenerateClaimsRequest(configTxt) =>
       
-      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
+//      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
       
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
       
