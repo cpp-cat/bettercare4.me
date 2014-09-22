@@ -19,7 +19,7 @@ import com.github.tototoshi.csv.CSVReader
 import java.io.File
 import com.nickelsoftware.bettercare4me.utils.NickelException
 
-object CDCRule {
+object CDC {
   val ndcAKey = "ndc.cdc.a.fname"
 
   /**
@@ -166,10 +166,10 @@ object CDCRule {
  */
 abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  import CDCRule._
+  import CDC._
   val ndcA: List[String] = {
     if (config.otherParams.containsKey(ndcAKey)) CSVReader.open(new File(config.otherParams.get(ndcAKey))).all().flatten
-    else throw NickelException("CDCRuleBase: Config for CDC rules is missing " + CDCRule.ndcAKey + " for NDC of diabetes drugs")
+    else throw NickelException("CDCRuleBase: Config for CDC rules is missing " + ndcAKey + " for NDC of diabetes drugs")
   }
 
   val ndcAS = ndcA.toSet

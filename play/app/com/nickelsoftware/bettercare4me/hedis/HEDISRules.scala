@@ -9,13 +9,21 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
 
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest7Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest8Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest9Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestValue
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 /**
  * Trait to define an HEDIS rule.
@@ -28,17 +36,17 @@ trait HEDISRule {
   /**
    * Indicate the name of the rule for configuration and reporting purpose
    */
-  def name: String
+  val name: String
 
   /**
    * Indicate the full name of the rule (human readable)
    */
-  def fullName: String
+  val fullName: String
 
   /**
    * Indicate the rule description (human readable)
    */
-  def description: String
+  val description: String
 
   /**
    * Indicates the rate at which the patients are eligible to the  measure.
@@ -47,7 +55,7 @@ trait HEDISRule {
    * Example, an  `eligibleRate` of 25 for CDC H1C, means that 25% of patient of age between 18 - 75
    * will have diabetes. Note that all CDC measure should have the same `eligibleRate`
    */
-  def eligibleRate: Int
+  val eligibleRate: Int
 
   /**
    * Indicates the rate at which the patients meet the measure, in %
@@ -57,7 +65,7 @@ trait HEDISRule {
    * This rate does not apply to exclusions (patients excluded from measure).
    *
    */
-  def meetMeasureRate: Int
+  val meetMeasureRate: Int
 
   /**
    * Indicates the rate at which patients are excluded from measure, in %
@@ -65,7 +73,7 @@ trait HEDISRule {
    * Fraction of eligible patients that meet the exclusion criteria:
    * (excluded patients) / (eligible patients)
    */
-  def exclusionRate: Int
+  val exclusionRate: Int
 
   /**
    * Generate the claims for the patient to be in the denominator and possibly in the numerator as well.
@@ -110,9 +118,9 @@ trait HEDISRule {
 
 abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDISRule {
 
-  def eligibleRate: Int = config.eligibleRate
-  def meetMeasureRate: Int = config.meetMeasureRate
-  def exclusionRate: Int = config.exclusionRate
+  val eligibleRate: Int = config.eligibleRate
+  val meetMeasureRate: Int = config.meetMeasureRate
+  val exclusionRate: Int = config.exclusionRate
 
   def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
@@ -227,18 +235,28 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
 }
 
 object HEDISRules {
-
-  val createRuleByName: Map[String, (RuleConfig, DateTime) => HEDISRule] = Map(
+  
+  val rules: Map[String, (RuleConfig, DateTime) => HEDISRule] = Map(
     "TEST" -> { (c, d) => new TestRule(c, d) },
-    "BCS-HEDIS-2014" -> { (c, d) => new BCSRule(c, d) })
+    BCS.name -> { (c, d) => new BCSRule(c, d) },
+    CDCHbA1cTest.name -> { (c, d) => new CDCHbA1cTestRule(c, d) },
+    CDCHbA1cTestValue.name7 -> { (c, d) => new CDCHbA1cTest7Rule(c, d) },
+    CDCHbA1cTestValue.name8 -> { (c, d) => new CDCHbA1cTest8Rule(c, d) },
+    CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) }
+    )
+
+  def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule  = {
+    if(!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: "+name)
+    else rules(name)(config, hedisDate)
+  }
 
 }
 
 class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  def name = "TEST"
-  def fullName = "Test Rule"
-  def description = "This rule is for testing."
+  val name = "TEST"
+  val fullName = "Test Rule"
+  val description = "This rule is for testing."
     
   def isPatientMeetDemographic(patient: Patient): Boolean = true
   def isPatientExcluded(patient: Patient, patientHistory: PatientHistory): Boolean = false

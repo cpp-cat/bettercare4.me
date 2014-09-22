@@ -55,7 +55,7 @@ object ClaimFileGeneratorHelper {
     
     // create and configure the rules to use for the simulation
     val hedisDate = config.hedisDate
-    val rules: List[HEDISRule] = config.getRulesConfig().map{c => HEDISRules.createRuleByName(c.name)(c, hedisDate)}.toList
+    val rules: List[HEDISRule] = config.getRulesConfig().map{c => HEDISRules.createRuleByName(c.name, c, hedisDate)}.toList
     
     // generate the providers
     val providers = for(i <- 1 to config.nbrProviders) yield personGenerator.generateProvider

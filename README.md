@@ -63,6 +63,10 @@
 - Created package com.nickelsoftware.bettercare4me.hedis.hedis2014 for all HEDIS 2014 rules
 - Read NDC from CSV file for use in HEDIS rules
 - Created CDCRuleBase as base class for all CDC rule classes. This base class implement CDC meet and exlusion criteria
+- Added CDC - Diabetes HbA1c Test HEDIS rule
+- Added CDC - Diabetes HbA1c Test with values < 7% HEDIS rule
+- Added CDC - Diabetes HbA1c Test with values < 8% HEDIS rule
+- Added CDC - Diabetes HbA1c Test with values > 9% HEDIS rule
 
 
 # Sprint 2: Claim detail class and HEDIS rules

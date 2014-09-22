@@ -6,10 +6,10 @@ package com.nickelsoftware.bettercare4me.hedis;
 import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-
 import com.nickelsoftware.bettercare4me.models.MedClaim
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
@@ -25,7 +25,7 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       c.setExclusionRate(5)
       
       val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
-      val rule = HEDISRules.createRuleByName(c.getName)(c, hedisDate)
+      val rule = HEDISRules.createRuleByName(c.getName, c, hedisDate)
 
       rule.name mustBe "TEST"
       rule.fullName mustBe "Test Rule"
@@ -41,5 +41,21 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
         case _ => fail("Invalid claim class type!")
       }
     }
+
+    "throw NickelException when try to create a rule with an unknown name" in {
+
+      val persistenceLayer = new SimplePersistenceLayer(88)
+      val c = new RuleConfig
+      c.setName("Unknown Name")
+      c.setEligibleRate(40)
+      c.setMeetMeasureRate(92)
+      c.setExclusionRate(5)      
+      val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
+      
+      a[NickelException] should be thrownBy {
+        HEDISRules.createRuleByName(c.getName, c, hedisDate)
+      }
+    }
+    
   }
 }

@@ -17,14 +17,38 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 
+object BCS {
+  
+  val name = "BCS-HEDIS-2014"
+}
 /**
  * Breast Cancer Screening Rule
+ *
+ * Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the
+ * measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two
+ * unilateral mastectomies.
+ *
+ * DENOMINATOR:
+ * Identifies women members, aged 42 to 69 years. Because this measure looks back 24 months for a mammogram, the eligible
+ * population includes women who could have been 40 years of age at the time of the mammogram. This measure excludes
+ * women who had a bilateral mastectomy or 2 unilateral mastectomies.
+ *
+ * EXCLUSIONS:
+ * Excludes from the eligible population those women who had a bilateral mastectomy or a right and left unilateral mastectomy
+ * anytime prior to or during the measurement year (based on claims included in the database). Note: NCQA specifies that the
+ * mastectomy exclusion criteria should only be applied if a woman has not had a mammogram. This initial check for a
+ * mammogram has not been implemented.
+ *
+ * NUMERATOR:
+ * Identifies women members, aged 42 to 69 years, who had a mammogram done during the measurement year or the year prior to
+ * the measurement year.
+ *
  */
 class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  def name = "BCS-HEDIS-2014"
-  def fullName = "Breast Cancer Screening"
-  def description = "Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the " +
+  val name = BCS.name
+  val fullName = "Breast Cancer Screening"
+  val description = "Breast Cancer Screening indicates whether a woman member, aged 42 to 69 years, had a mammogram done during the " +
     "measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two " +
     "unilateral mastectomies."
 
@@ -34,7 +58,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
   }
 
   // This rule has 100% eligibility when the demographics are meet
-  override def eligibleRate: Int = 100
+  override val eligibleRate: Int = 100
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
@@ -42,12 +66,12 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     pickOne(List(
       // One possible set of claims based on ICD Procedure code
-       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(List("85.42", "85.44", "85.46", "85.48"))))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(List("85.42", "85.44", "85.46", "85.48"))))),
       // Another possible set of claims based on CPT codes and modifier being 50
-       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "50")),
-       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod2 = "50")),
       // Another possible set of claims based on 2 claims have CPT codes and each have one of the modifier RT and LT
-      {() =>
+      { () =>
         val dos2 = hedisDate.minusDays(Random.nextInt(days))
         List(
           pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(List("19180", "19200", "19220", "19240", "19303", "19304", "19305", "19306", "19307")), cptMod1 = "RT"),
