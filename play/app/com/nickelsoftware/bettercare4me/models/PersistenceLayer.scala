@@ -16,71 +16,36 @@ trait PersistenceLayer {
 
   def createProvider(firstName: String, lastName: String): Provider
 
-  def createMedClaim(
-    //2 patientID Patient ID
-    patientID: String,
+  /**
+   * create Medical Claim
+   *
+   * The params are:
+   *  - patientID Patient ID
+   *  - providerID Provider ID
+   *  - dos Date of Service
+   *  - dosThru DOS Thru - same as DOS for single day service, same as discharge date for in-patient claim
+   *  - claimStatus Claim status
+   *  - pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
+   *  - specialtyCde - NUCC Provider Specialty
+   *  - icdDPri ICD Primary Diagnostic
+   *  - icdD Secondary Diagnostic codes (up to 10)
+   *  - icdP ICD Procedure codes (up to 10)
+   *  - drg Diagnosis Related Group
+   *  - cpt CPT (procedure procedure)
+   *  - cptMod1 CPT Modifier 1 (2 chars)
+   *  - cptMod2 CPT Modifier 2 (2 chars)
+   *  - tob Type of Bill (3 chars)
+   *  - ubRevenue UB Revenue (billing code)
+   *  - hcpcs HCPCS (medical goods and services)
+   *  - hcpcsMod HCPCS Modifier code (2 chars)
+   */
+  def createMedClaim(patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
+    claimStatus: String = "", pcpFlag: String = "", specialtyCde: String = "", hcfaPOS: String = "",
+    dischargeStatus: String = "", daysDenied: Int = 0, roomBoardFlag: String = "N",
+    icdDPri: String = "", icdD: Set[String] = Set(), icdP: Set[String] = Set(), drg: String = "",
+    cpt: String = "", cptMod1: String = "", cptMod2: String = "",
+    tob: String = "", ubRevenue: String = "", hcpcs: String = "", hcpcsMod: String = ""): MedClaim
 
-    //3 providerID Provider ID
-    providerID: String,
-
-    //4 dos Date of Service
-    dos: DateTime,
-
-    //5 dosThru DOS Thru - same as DOS for single day service, same as discharge date for in-patient claim
-    dosThru: DateTime,
-
-    //6 claimStatus Claim status: 
-    claimStatus: String = "",
-
-    //7 pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
-    pcpFlag: String = "",
-
-    //8 icdDPri ICD Primary Diagnostic
-    icdDPri: String = "",
-
-    //9-18 icdD Secondary Diagnostic codes (up to 10)
-    icdD: Set[String] = Set(),
-
-    //19-28 icdP ICD Procedure codes (up to 10)
-    icdP: Set[String] = Set(),
-
-    //29 hcfaPOS HCFA Form 1500 POS (Point of Service),
-    hcfaPOS: String = "",
-
-    //30 drg Diagnosis Related Group
-    drg: String = "",
-
-    //31 tob Type of Bill (3 chars)
-    tob: String = "",
-
-    //32 ubRevenue UB Revenue (billing code) 
-    ubRevenue: String = "",
-
-    //33 cpt CPT (procedure procedure)
-    cpt: String = "",
-
-    //34 cptMod1 CPT Modifier 1 (2 chars)
-    cptMod1: String = "",
-
-    //35 cptMod2 CPT Modifier 1 (2 chars)
-    cptMod2: String = "",
-
-    //36 hcpcs HCPCS (medical goods and services)
-    hcpcs: String = "",
-
-    //37 hcpcsMod HCPCS Modifier code (2 chars)
-    hcpcsMod: String = "",
-
-    //38 dischargeStatus Discharge Status (2 chars)
-    dischargeStatus: String = "",
-
-    //39 daysDenied Nbr of days denied for in-patient claims
-    daysDenied: Int = 0,
-
-    //40 roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
-    roomBoardFlag: String = "N"): MedClaim
-
-    
   def createRxClaim(
 
     //2 patientID Patient ID
@@ -107,7 +72,6 @@ trait PersistenceLayer {
     //9 Supply Flag, "Y" if DME rather than drugs
     supplyF: String = "N"): RxClaim
 
-  
   def createLabClaim(
 
     //2 patientID Patient ID
@@ -158,53 +122,19 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     Provider(providerKeyPrefix + k, firstName, lastName)
   }
 
-  def createMedClaim(
-    patientID: String,
-    providerID: String,
-    dos: DateTime,
-    dosThru: DateTime,
-    claimStatus: String,
-    pcpFlag: String,
-    icdDPri: String,
-    icdD: Set[String],
-    icdP: Set[String],
-    hcfaPOS: String,
-    drg: String,
-    tob: String,
-    ubRevenue: String,
-    cpt: String,
-    cptMod1: String,
-    cptMod2: String,
-    hcpcs: String,
-    hcpcsMod: String,
-    dischargeStatus: String,
-    daysDenied: Int,
-    roomBoardFlag: String): MedClaim = {
+  def createMedClaim(patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
+    claimStatus: String, pcpFlag: String, specialtyCde: String, hcfaPOS: String,
+    dischargeStatus: String, daysDenied: Int, roomBoardFlag: String,
+    icdDPri: String, icdD: Set[String], icdP: Set[String], drg: String,
+    cpt: String, cptMod1: String, cptMod2: String,
+    tob: String, ubRevenue: String, hcpcs: String, hcpcsMod: String): MedClaim = {
 
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
-    MedClaim(mdClaimKeyPrefix + k,
-      patientID,
-      providerID,
-      dos,
-      dosThru,
-      claimStatus,
-      pcpFlag,
-      icdDPri,
-      icdD,
-      icdP,
-      hcfaPOS,
-      drg,
-      tob,
-      ubRevenue,
-      cpt,
-      cptMod1,
-      cptMod2,
-      hcpcs,
-      hcpcsMod,
-      dischargeStatus,
-      daysDenied,
-      roomBoardFlag)
+    MedClaim(mdClaimKeyPrefix + k, patientID, providerID, dos, dosThru,
+        MHead(claimStatus, pcpFlag, specialtyCde, hcfaPOS, dischargeStatus, daysDenied, roomBoardFlag),
+        MCodes(icdDPri, icdD, icdP, drg, cpt, cptMod1, cptMod2),
+        MBill(tob, ubRevenue, hcpcs, hcpcsMod))
   }
 
   def createRxClaim(

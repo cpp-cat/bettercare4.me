@@ -113,7 +113,30 @@
 - The HEDIS measures are represented by placeholders for the purpose of this sprint.
 - Generated claims are stored in CSV files, configurable number of files are generated each with a target number of patients.
 - The population is generated using a realistic representation of the age distribution of the population
+- Added NUCC Provider Specialty to Claim class
+- Refactored Claim class due to excessive number of class parameters.
 
+## HEDIS Measures Information
+- http://www.bcbstx.com/provider/pdf/diabetes_2014.pdf
+- http://www.bcbstx.com/provider/pdf/bronchitis_2014.pdf
+- http://www.bcbstx.com/provider/pdf/anticonvulsants_2014.pdf
+- http://www.bcbstx.com/provider/pdf/med_monitoring_2014.pdf
+- http://www.bcbstx.com/provider/pdf/asthma_2014.pdf
+- http://www.bcbstx.com/provider/pdf/chlamydia_2014.pdf
+- http://www.bcbstx.com/provider/pdf/antirheumatic_2014.pdf
+- http://www.bcbstx.com/provider/pdf/uri_2014.pdf
+- http://www.bcbstx.com/provider/pdf/mammography_2014.pdf
+- http://www.bcbstx.com/provider/pdf/pharyngitis_2014.pdf
+- http://www.bcbstx.com/provider/pdf/colorectal_2014.pdf
+- http://www.bcbstx.com/provider/pdf/cervical_2014.pdf
+- http://www.bcbstx.com/provider/pdf/backpain_2014.pdf
+- http://www.bcbstx.com/provider/pdf/well_child_2014.pdf
+- http://www.bcbstx.com/provider/pdf/cardiovascular_2014.pdf
+
+
+
+of interest:
+http://www.bcbstx.com/provider/pdf/ebm_guidelines_desc_14.pdf
 
 # Sprint 0: Seeding the project
 
