@@ -11,6 +11,8 @@ import org.joda.time.LocalDate
 
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEE
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEERule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest7Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest8Rule
@@ -242,7 +244,8 @@ object HEDISRules {
     CDCHbA1cTest.name -> { (c, d) => new CDCHbA1cTestRule(c, d) },
     CDCHbA1cTestValue.name7 -> { (c, d) => new CDCHbA1cTest7Rule(c, d) },
     CDCHbA1cTestValue.name8 -> { (c, d) => new CDCHbA1cTest8Rule(c, d) },
-    CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) }
+    CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) },
+    CDCEE.name -> { (c, d) => new CDCEERule(c, d) }
     )
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule  = {

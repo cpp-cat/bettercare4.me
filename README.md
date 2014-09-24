@@ -115,6 +115,7 @@
 - The population is generated using a realistic representation of the age distribution of the population
 - Added NUCC Provider Specialty to Claim class
 - Refactored Claim class due to excessive number of class parameters.
+- Added parameters to PatientHistory and some refactoring
 
 ## HEDIS Measures Information
 - http://www.bcbstx.com/provider/pdf/diabetes_2014.pdf

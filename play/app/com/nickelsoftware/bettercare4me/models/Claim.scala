@@ -141,7 +141,7 @@ case class MHead(claimStatus: String = "", pcpFlag: String = "", specialtyCde: S
 case class MCodes(icdDPri: String = "", icdD: Set[String] = Set(), icdP: Set[String] = Set(), drg: String = "",
   cpt: String = "", cptMod1: String = "", cptMod2: String = "") {
 
-  def toList = List.concat(List(icdDPri), icdD.toList, List.fill(10 - icdD.size)(""), icdP.toList, List.fill(10 - icdP.size)(""))
+  def toList = List.concat(List(icdDPri), icdD.toList, List.fill(10 - icdD.size)(""), icdP.toList, List.fill(10 - icdP.size)(""), List(drg, cpt, cptMod1, cptMod2))
 }
 
 /**
@@ -171,6 +171,10 @@ case class MBill(tob: String = "", ubRevenue: String = "", hcpcs: String = "", h
  *  	- claimStatus Claim status
  *  	- pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
  *  	- specialtyCde - NUCC Provider Specialty
+ *  	- hcfaPOS HCFA Form 1500 POS (Point of Service),
+ *  	- dischargeStatus Discharge Status (2 chars)
+ *  	- daysDenied Nbr of days denied for in-patient claims
+ *  	- roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
  *  - mCodes: MCodes - Medical Claim clinical codes:
  * 		- icdDPri ICD Primary Diagnostic
  *  	- icdD Secondary Diagnostic codes (up to 10)
