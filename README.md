@@ -41,10 +41,10 @@
 
 # Sprint 3: RxClaim detail class and using NDCs in HEDIS rules
 
-- Version: 0.4.0.00 (v0.4.0.00_09-XX-2014)
+- Version: 0.4.0.00 (v0.4.0.00_09-23-2014)
 - Start Date: 9/16/2014
 - Target Date: 9/21/2014
-- Actual Date: 9/XX/2014
+- Actual Date: 9/23/2014
 
 ## Product Features:
 - Add RxClaim class to capture pharmacy claims.
@@ -67,6 +67,28 @@
 - Added CDC - Diabetes HbA1c Test with values < 7% HEDIS rule
 - Added CDC - Diabetes HbA1c Test with values < 8% HEDIS rule
 - Added CDC - Diabetes HbA1c Test with values > 9% HEDIS rule
+- Added NUCC Provider Specialty to Claim class
+- Refactored Claim class due to excessive number of class parameters.
+- Added parameters to PatientHistory and some refactoring
+- Added CDC - Diabetes Eye Exam Hedis Rule
+
+## HEDIS Measures Information
+- http://www.bcbstx.com/provider/pdf/diabetes_2014.pdf
+- http://www.bcbstx.com/provider/pdf/bronchitis_2014.pdf
+- http://www.bcbstx.com/provider/pdf/anticonvulsants_2014.pdf
+- http://www.bcbstx.com/provider/pdf/med_monitoring_2014.pdf
+- http://www.bcbstx.com/provider/pdf/asthma_2014.pdf
+- http://www.bcbstx.com/provider/pdf/chlamydia_2014.pdf
+- http://www.bcbstx.com/provider/pdf/antirheumatic_2014.pdf
+- http://www.bcbstx.com/provider/pdf/uri_2014.pdf
+- http://www.bcbstx.com/provider/pdf/mammography_2014.pdf
+- http://www.bcbstx.com/provider/pdf/pharyngitis_2014.pdf
+- http://www.bcbstx.com/provider/pdf/colorectal_2014.pdf
+- http://www.bcbstx.com/provider/pdf/cervical_2014.pdf
+- http://www.bcbstx.com/provider/pdf/backpain_2014.pdf
+- http://www.bcbstx.com/provider/pdf/well_child_2014.pdf
+- http://www.bcbstx.com/provider/pdf/cardiovascular_2014.pdf
+- Also of interest: http://www.bcbstx.com/provider/pdf/ebm_guidelines_desc_14.pdf
 
 
 # Sprint 2: Claim detail class and HEDIS rules
@@ -113,31 +135,6 @@
 - The HEDIS measures are represented by placeholders for the purpose of this sprint.
 - Generated claims are stored in CSV files, configurable number of files are generated each with a target number of patients.
 - The population is generated using a realistic representation of the age distribution of the population
-- Added NUCC Provider Specialty to Claim class
-- Refactored Claim class due to excessive number of class parameters.
-- Added parameters to PatientHistory and some refactoring
-
-## HEDIS Measures Information
-- http://www.bcbstx.com/provider/pdf/diabetes_2014.pdf
-- http://www.bcbstx.com/provider/pdf/bronchitis_2014.pdf
-- http://www.bcbstx.com/provider/pdf/anticonvulsants_2014.pdf
-- http://www.bcbstx.com/provider/pdf/med_monitoring_2014.pdf
-- http://www.bcbstx.com/provider/pdf/asthma_2014.pdf
-- http://www.bcbstx.com/provider/pdf/chlamydia_2014.pdf
-- http://www.bcbstx.com/provider/pdf/antirheumatic_2014.pdf
-- http://www.bcbstx.com/provider/pdf/uri_2014.pdf
-- http://www.bcbstx.com/provider/pdf/mammography_2014.pdf
-- http://www.bcbstx.com/provider/pdf/pharyngitis_2014.pdf
-- http://www.bcbstx.com/provider/pdf/colorectal_2014.pdf
-- http://www.bcbstx.com/provider/pdf/cervical_2014.pdf
-- http://www.bcbstx.com/provider/pdf/backpain_2014.pdf
-- http://www.bcbstx.com/provider/pdf/well_child_2014.pdf
-- http://www.bcbstx.com/provider/pdf/cardiovascular_2014.pdf
-
-
-
-of interest:
-http://www.bcbstx.com/provider/pdf/ebm_guidelines_desc_14.pdf
 
 # Sprint 0: Seeding the project
 
