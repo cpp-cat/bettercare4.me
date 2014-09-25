@@ -39,6 +39,25 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 4: Enhanced Rule Framework for HEDIS rules
+
+- Version: 0.5.0.00 (v0.5.0.00_09-XX-2014)
+- Start Date: 9/24/2014
+- Target Date: 9/29/2014
+- Actual Date: 9/XX/2014
+
+## Product Features:
+- Enhancing the rule framework to be able to report which claim and which rule made the patient
+  to meet the measure criteria (denominator), be excluded, and meet the measure.
+
+## User Stories Sprint Backlog
+- Create a Predicate class to wrapp each predicates of the Hedis rule.
+- Create a Scorecard class to keep track of the score of each prediates.
+
+## Completed User Stories
+- Define MedClaim, RxClaim and LabClaim using the same Claim base trait
+
+
 # Sprint 3: RxClaim detail class and using NDCs in HEDIS rules
 
 - Version: 0.4.0.00 (v0.4.0.00_09-23-2014)

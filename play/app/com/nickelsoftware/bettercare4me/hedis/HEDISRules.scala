@@ -4,11 +4,9 @@
 package com.nickelsoftware.bettercare4me.hedis
 
 import scala.util.Random
-
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
-
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEE
@@ -26,6 +24,8 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCLDLCRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C
 
 /**
  * Trait to define an HEDIS rule.
@@ -245,7 +245,8 @@ object HEDISRules {
     CDCHbA1cTestValue.name7 -> { (c, d) => new CDCHbA1cTest7Rule(c, d) },
     CDCHbA1cTestValue.name8 -> { (c, d) => new CDCHbA1cTest8Rule(c, d) },
     CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) },
-    CDCEE.name -> { (c, d) => new CDCEERule(c, d) }
+    CDCEE.name -> { (c, d) => new CDCEERule(c, d) },
+    CDC_LDL_C.name -> { (c, d) => new CDCLDLCRule(c, d) }
     )
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule  = {
