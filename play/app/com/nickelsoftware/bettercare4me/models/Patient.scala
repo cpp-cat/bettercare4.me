@@ -9,6 +9,7 @@ import org.joda.time.Months
 import org.joda.time.Years
 
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 
 object PatientParser {
 
@@ -30,11 +31,6 @@ object PatientHistoryFactory {
 
   def createPatientHistory(patient: Patient, claims: List[Claim]): PatientHistory = {
 
-    def add2Map[C](s: String, c: C, map: Map[String, List[C]]): Map[String, List[C]] = {
-      val l = map.getOrElse(s, List())
-      map + (s -> (c :: l))
-    }
-
     claims.foldLeft(PatientHistory(MedMap(), RxMap(), LabMap())) { (ph, claim) =>
 
       /*
@@ -53,10 +49,10 @@ object PatientHistoryFactory {
 
         // Provider specialty
         val specialtyCde = if (c.specialtyCde.length() > 0) add2Map(c.specialtyCde, c, ph.specialtyCde); else ph.specialtyCde
-        
+
         // HCFA POS place of service
         val hcfaPOS = if (c.hcfaPOS.length() > 0) add2Map(c.hcfaPOS, c, ph.hcfaPOS); else ph.hcfaPOS
-        
+
         // ICD primary & secondary Diagnostics
         val icdD1 = if (c.icdDPri.length() > 0) add2Map(c.icdDPri, c, ph.icdD); else ph.icdD
         val icdD = c.icdD.foldLeft(icdD1)((m, s) => add2Map(s, c, m))

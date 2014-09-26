@@ -21,6 +21,10 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 
 object CDC {
   val ndcAKey = "ndc.cdc.a.fname"
+  
+  //*
+  val ndcA: List[String] = CSVReader.open(new File("./data/cdc.ndc.a.csv")).all().flatten
+  val ndcAS = ndcA.toSet
 
   /**
    * ICD Diagnosis code for type 1 or type 2 diabetes
@@ -39,7 +43,6 @@ object CDC {
     "357.2", "366.41",
     "362.0", "362.01", "362.02", "362.03", "362.04", "362.05", "362.06", "362.07",
     "648.0", "648.01", "648.02", "648.03", "648.04")
-
   val icd9DAS = icd9DA.toSet
 
   /**
@@ -60,7 +63,6 @@ object CDC {
     "251.8",
     "648.8", "648.80", "648.81", "648.82", "648.83", "648.84",
     "962.0")
-
   val icd9DBS = icd9DB.toSet
 
   /**
@@ -167,12 +169,6 @@ object CDC {
 abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
   import CDC._
-  val ndcA: List[String] = {
-    if (config.otherParams.containsKey(ndcAKey)) CSVReader.open(new File(config.otherParams.get(ndcAKey))).all().flatten
-    else throw NickelException("CDCRuleBase: Config for CDC rules is missing " + ndcAKey + " for NDC of diabetes drugs")
-  }
-
-  val ndcAS = ndcA.toSet
 
   //
   // isPatientMeetDemographic
