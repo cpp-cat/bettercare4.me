@@ -6,7 +6,9 @@ package com.nickelsoftware.bettercare4me.hedis.hedis2014
 import scala.util.Random
 import org.joda.time.DateTime
 import org.joda.time.Interval
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.HEDISRuleBase
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.MedClaim
 import com.nickelsoftware.bettercare4me.models.RxClaim
@@ -21,7 +23,12 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 
 object CDC {
   val ndcAKey = "ndc.cdc.a.fname"
-  
+
+  val diabetesDrugs = "Diabetes Drugs"
+  val twoF2FDiabetesICD = "Two F2F Diabetes ICD"
+  val oneF2FDiabetesICD = "One F2F Diabetes ICD"
+  val exclutionDiabetesICD = "Exclution Diabetes ICD"
+
   //*
   val ndcA: List[String] = CSVReader.open(new File("./data/cdc.ndc.a.csv")).all().flatten
   val ndcAS = ndcA.toSet
@@ -46,7 +53,7 @@ object CDC {
   val icd9DAS = icd9DA.toSet
 
   /**
-   * ICD Diagnosis for Gestational diabetes or steroid-induced diabetes
+   * ICD Diagnosis for Gestational diabetes or Polycystic Ovaries or Steroid-induced Diabetes
    * to identify exclusions.
    */
   val icd9DB = List(
@@ -60,7 +67,7 @@ object CDC {
     "249.7", "249.70", "249.71",
     "249.8", "249.80", "249.81",
     "249.9", "249.90", "249.91",
-    "251.8",
+    "251.8", "256.4",
     "648.8", "648.80", "648.81", "648.82", "648.83", "648.84",
     "962.0")
   val icd9DBS = icd9DB.toSet
@@ -83,6 +90,7 @@ object CDC {
     "99394", "99395", "99396", "99397",
     "99401", "99402", "99403", "99404",
     "99411", "99412", "99420", "99429", "99455", "99456")
+  val cptAS = cptA.toSet
 
   /**
    * UB Revenue codes for face-to-face encounters in an ambulatory or nonacute inpatient
@@ -104,6 +112,7 @@ object CDC {
     "0850", "0851", "0852", "0853", "0854", "0855", "0856", "0857", "0858", "0859",
     "0880", "0881", "0882", "0883", "0884", "0885", "0886", "0887", "0888", "0889", "088X",
     "0982", "0983")
+  val ubAS = ubA.toSet
 
   /**
    * Place-of-Service codes for face-to-face encounters in an ambulatory or nonacute inpatient
@@ -112,6 +121,7 @@ object CDC {
   val posA = List(
     "4", "5", "6", "7", "8", "9", "10", "11", "12", "15", "20", "22", "24",
     "26", "49", "50", "52", "53", "57", "61", "62", "65", "71", "72", "95", "99")
+  val posAS = posA.toSet
 
   /**
    * UB Revenue codes for face-to-face encounter in an acute
@@ -132,6 +142,7 @@ object CDC {
     "0720", "0721", "0722", "0723", "0724", "0725", "0726", "0727", "0728", "0729", "072X",
     "0800", "0801", "0802", "0803", "0804", "0805", "0806", "0807", "0808", "0809", "080X",
     "0981", "0987")
+  val ubBS = ubB.toSet
 
   /**
    * CPT codes for face-to-face encounter in an acute
@@ -142,6 +153,7 @@ object CDC {
     "99221", "99222", "99223", "99231", "99232", "99233",
     "99238", "99239", "99251", "99252", "99253", "99254", "99255", "99261", "99262", "99263",
     "99281", "99282", "99283", "99284", "99285", "99291")
+  val cptBS = cptB.toSet
 
   /**
    * Place-of-Service codes for face-to-face encounter in an acute
@@ -149,6 +161,7 @@ object CDC {
    * of diabetes
    */
   val posB = List("21", "23", "25", "51", "55")
+  val posBS = posB.toSet
 }
 
 /**
@@ -186,94 +199,84 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
     val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     val dos2 = hedisDate.minusDays(Random.nextInt(days))
-    val excludedClaim = pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), cpt = pickOne(cptA))
-    pickOne(List(
 
-      // One possible set of claims based on NDC code - patient taking diabetes drug
-      () => {
-        val ndc1 = pickOne(ndcA)
-        val eligibleClaims = List(
-          pl.createRxClaim(patient.patientID, provider.providerID, dos1, ndc = ndc1, daysSupply = 90, qty = 90),
-          pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(80 + Random.nextInt(20)), ndc = ndc1, daysSupply = 90, qty = 90),
-          pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(170 + Random.nextInt(30)), ndc = ndc1, daysSupply = 90, qty = 90))
+    def generateDiabetesRx: List[Claim] = {
+      val ndc1 = pickOne(ndcA)
+      List(
+        pl.createRxClaim(patient.patientID, provider.providerID, dos1, ndc = ndc1, daysSupply = 90, qty = 90),
+        pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(80 + Random.nextInt(20)), ndc = ndc1, daysSupply = 90, qty = 90),
+        pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(170 + Random.nextInt(30)), ndc = ndc1, daysSupply = 90, qty = 90))
+    }
 
-        if (isExcluded) List.concat(eligibleClaims, generateExclusionClaims(pl, patient, provider))
-        else eligibleClaims
-      },
+    if (isExcluded) {
 
-      // Another possible set of claims based on 2 face-to-face diagnosis
-      () => {
-        val eligibleClaims = List(
-        pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)))),
-        pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA)))))
+      // the only eligible claims are those with diabetes drugs
+      List.concat(generateDiabetesRx, generateExclusionClaims(pl, patient, provider))
 
-        if (isExcluded) excludedClaim :: eligibleClaims
-        else eligibleClaims
-      },
+    } else {
+      pickOne(List(
 
-      // Another possible set of claims based on 1 face to face in ER
-      () => {
-        val eligibleClaim = pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptB)) 
-        if(isExcluded) List(eligibleClaim, excludedClaim)
-        else List(eligibleClaim)
-      },
-      () => {
-        val eligibleClaim = pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubB), hcfaPOS = pickOne(posB)) 
-        if(isExcluded) List(eligibleClaim, excludedClaim)
-        else List(eligibleClaim)
-      },
+        // One possible set of claims based on NDC code - patient taking diabetes drug
+        () => generateDiabetesRx,
 
-      // Another possible set of claims based on 1 face to face in ER with gestional diabetes or steroid-induced diabetes (test the exclusion creteria)
-      () => {
-        val eligibleClaim = pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), icdD = Set(pickOne(icd9DA)), cpt = pickOne(cptB)) 
-        if(isExcluded) List(eligibleClaim, excludedClaim)
-        else List(eligibleClaim)
-      },
-      () => {
-        val eligibleClaim = pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), icdD = Set(pickOne(icd9DA)), ubRevenue = pickOne(ubB), hcfaPOS = pickOne(posB)) 
-        if(isExcluded) List(eligibleClaim, excludedClaim)
-        else List(eligibleClaim)
-      }))()
+        // Another possible set of claims based on 2 face-to-face diagnosis
+        () => {
+          List(
+            pickOne(List(
+              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA)),
+              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)))),
+            pickOne(List(
+              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)),
+              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA)))))
+        },
+
+        // Another possible set of claims based on 1 face-to-face in ER
+        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptB))),
+        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubB), hcfaPOS = pickOne(posB)))
+        ))()
+    }
   }
 
   //
   // isPatientEligible
   //
-  override def isPatientEligible(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
 
-    // returns the date of a claim that match the face 2 face criteria that is on a different date than the argument
-    // otherwise returns None
-    def hasFace2Face(d: DateTime, cptL: List[String], ubL: List[String], posL: List[String]): Option[DateTime] = {
-      var ret: Option[DateTime] = None
-      firstMatch(ph.icdD, icd9DAS, { claim: MedClaim =>
-        claim.dos != d && measurementInterval.contains(claim.dos) && (
-          firstTrue(cptL, { cpt: String => if (claim.cpt == cpt) { ret = Some(claim.dos); true } else false }) ||
-          firstTrue(ubL, { ubRevenue: String => claim.ubRevenue == ubRevenue && firstTrue(posL, { pos: String => if (claim.hcfaPOS == pos) { ret = Some(claim.dos); true } else false }) }))
-      })
-      ret
-    }
-
-    def rules = List[() => Boolean](
+    def rules = List[(Scorecard) => Scorecard](
 
       // Check if patient is taking diabetes drugs
-      () => firstMatch(ph.ndc, ndcAS, { claim: RxClaim => measurementInterval.contains(claim.fillD) }),
-
-      // check if patient has 2 face 2 face on different dates
-      () => {
-        val date = hasFace2Face(hedisDate, cptA, ubA, posA)
-        !(date map { hasFace2Face(_, cptA, ubA, posA) } isEmpty)
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.ndc, ndcAS, { claim: RxClaim => measurementInterval.contains(claim.fillD) })
+        s.addScore(name, HEDISRule.eligible, diabetesDrugs, claims)
       },
 
-      // check if patient has 1 face 2 face in ER
-      () => !(hasFace2Face(hedisDate, cptB, ubB, posB) isEmpty))
+      // check if patient has 2 face-2-face Diagnosis on different dates
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.icdD, icd9DAS, { claim: MedClaim =>
+          measurementInterval.contains(claim.dos) &&
+            posAS.contains(claim.hcfaPOS) &&
+            (cptAS.contains(claim.cpt) || ubAS.contains(claim.ubRevenue))
+        })
 
-    isPatientMeetDemographic(patient) && isAnyRuleMatch(rules)
+        // need to check we have 2 claims with different DOS
+        if (Claim.twoDifferentDOS(claims)) {
+          s.addScore(name, HEDISRule.eligible, twoF2FDiabetesICD, claims)
+        } else s
+      },
+
+      // check if patient has 1 face-2-face in ER
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.icdD, icd9DAS, { claim: MedClaim =>
+          measurementInterval.contains(claim.dos) &&
+            (cptBS.contains(claim.cpt) || (ubBS.contains(claim.ubRevenue) && posBS.contains(claim.hcfaPOS)))
+        })
+        s.addScore(name, HEDISRule.eligible, oneF2FDiabetesICD, claims)
+      })
+
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    else applyRules(scorecard, rules)
   }
 
   //
@@ -283,35 +286,31 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
 
     val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
-    pickOne(List(
-
-      // One possible set of claims based on Polycystic ovaries (anytime prior to or during the measurement year)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = "256.4")),
-
-      // Another possible set of claims based on Gestational diabetes or steroid-induced diabetes and no face 2 face diagnosis
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), cpt = pickOne(cptA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), cpt = pickOne(cptB))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB), ubRevenue = pickOne(ubB), hcfaPOS = pickOne(posB)))))()
+    
+    // Exclusion based on ICD Diagnostic (anytime prior to or during the measurement year)
+    List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB)))
   }
 
   //
   // isPatientExcluded
   //
-  override def isPatientExcluded(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
-
-    def rules = List[() => Boolean](
-      // Check if patient had Polycystic ovaries (anytime prior to or during the measurement year)
-      () => firstTrue(ph.claims4ICDD("256.4"), { claim: MedClaim => measurementInterval.contains(claim.dos) }),
-
-      // Check if patient had a Gestational diabetes or steroid-induced diabetes and no face 2 face diagnosis
-      // - Find a claim with diagnosis for Gestational diabetes or steroid-induced diabetes (icd9DBS)
-      // - Check that the claim does not have a primary or secondary diagnosis for diabetes (icd9DAS)
-      () => firstMatch(ph.icdD, icd9DBS, { claim: MedClaim => (claim.icdD + claim.icdDPri).find({ icd9DAS.contains(_) }) isEmpty }))
-
-    isAnyRuleMatch(rules)
+    
+    // Patient is excluded if has diagnosis from ICD9DB and no face-2-face visit (identified from ICD9DA) - regardless of POS
+    // --
+    // all claims w/ exclusion diagnosis
+    val exClaims = filterClaims(ph.icdD, icd9DBS, { _: Claim => true})
+    
+    if(exClaims.isEmpty) scorecard
+    else {
+      
+      // see if have any claims w/ face-2-face diagnosis
+      val claims = filterClaims(ph.icdD, icd9DAS, { _: Claim => true})
+      if(claims.isEmpty) scorecard.addScore(name, HEDISRule.excluded, exclutionDiabetesICD, exClaims)
+      else scorecard
+    }
   }
 }
 

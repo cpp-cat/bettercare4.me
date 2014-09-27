@@ -4,20 +4,27 @@
 package com.nickelsoftware.bettercare4me.hedis.hedis2014
 
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import com.nickelsoftware.bettercare4me.models.RuleConfig
-import com.nickelsoftware.bettercare4me.models.PersistenceLayer
-import com.nickelsoftware.bettercare4me.models.Patient
-import com.nickelsoftware.bettercare4me.models.Provider
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
-import com.nickelsoftware.bettercare4me.models.PatientHistory
-import com.nickelsoftware.bettercare4me.models.MedClaim
 import com.nickelsoftware.bettercare4me.models.LabClaim
+import com.nickelsoftware.bettercare4me.models.MedClaim
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
+import com.nickelsoftware.bettercare4me.models.PersistenceLayer
+import com.nickelsoftware.bettercare4me.models.Provider
+import com.nickelsoftware.bettercare4me.models.RuleConfig
 
 object CDC_LDL_C {
 
   val name = "CDC-LDL-C-HEDIS-2014"
+
+  val cptLipidTest = "Lipid Test Claim (CPT)"
+  val loincLipidTest = "Lipid Test Lab Claim (LOINC)"
 
   /**
    * CPT codes for Lipid Test
@@ -67,18 +74,24 @@ class CDCLDLCRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(c
       () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA)))))()
   }
 
-  override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
 
-    def rules = List[() => Boolean](
+    def rules = List[(Scorecard) => Scorecard](
 
       // Check for patient has CPT
-      () => firstMatch(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) }),
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.eligible, cptLipidTest, claims)
+      },
 
       // Check for LOINC on Lab Claim
-      () => firstMatch(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) }))
-
-    isAnyRuleMatch(rules)
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.eligible, loincLipidTest, claims)
+      })
+      
+    applyRules(scorecard, rules)
   }
 }

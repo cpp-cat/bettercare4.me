@@ -3,17 +3,22 @@
  */
 package com.nickelsoftware.bettercare4me.hedis.hedis2014
 
+import scala.math.BigDecimal.double2bigDecimal
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import com.nickelsoftware.bettercare4me.models.RuleConfig
-import com.nickelsoftware.bettercare4me.models.PersistenceLayer
-import com.nickelsoftware.bettercare4me.models.Patient
-import com.nickelsoftware.bettercare4me.models.Provider
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.LabClaim
-import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.MedClaim
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
+import com.nickelsoftware.bettercare4me.models.PersistenceLayer
+import com.nickelsoftware.bettercare4me.models.Provider
+import com.nickelsoftware.bettercare4me.models.RuleConfig
 
 object CDCHbA1cTestValue {
 
@@ -44,8 +49,8 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
 
   val name = ruleName
   val fullName = "Diabetes HbA1c " + tag + "."
-  val description = "Diabetes HbA1c "+tag+" indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had at least one" +
-    "HbA1c test record in the database, and the most recent non-zero test result value was "+tag+". This excludes patients with" +
+  val description = "Diabetes HbA1c " + tag + " indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had at least one" +
+    "HbA1c test record in the database, and the most recent non-zero test result value was " + tag + ". This excludes patients with" +
     "a previous diagnosis of polycystic ovaries, gestational diabetes, or steroid-induced diabetes."
 
   import CDCHbA1cTestValue._
@@ -56,16 +61,16 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
     val dos2 = dos.minusDays(Random.nextInt(80))
     pickOne(List(
 
-      // One possible set: Most recent HbA1c test result > 0% and < 8% (during the measurement year)
+      // One possible set: Most recent HbA1c test result (during the measurement year)
       () => List(
-        pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA), result = baseVal + Random.nextDouble*0.01),
-        pl.createLabClaim(patient.patientID, provider.providerID, dos2, loinc = pickOne(loincA), result = baseVal + Random.nextDouble*0.01)),
+        pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01),
+        pl.createLabClaim(patient.patientID, provider.providerID, dos2, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01)),
 
-      // Another possible set: cpt = 3044F
+      // Another possible set: by cpt
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = cptV))))()
   }
 
-  override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
 
@@ -76,7 +81,7 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
       val allClaims = ph.loinc flatMap {
         (_: (String, List[LabClaim])) match {
           case (k, l) =>
-            if (loincAS.contains(k)) l filter {(c: LabClaim) => measurementInterval.contains(c.dos)}
+            if (loincAS.contains(k)) l filter { (c: LabClaim) => measurementInterval.contains(c.dos) }
             else List.empty
 
           case _ => List.empty
@@ -84,22 +89,33 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
       } toList
 
       // sort the claim by dos, in descending order. The head will be the most recent
-      if(allClaims.isEmpty) false
-      else meetCriteria(allClaims sortWith { (c1: LabClaim, c2: LabClaim) => c1.dos.isAfter(c2.dos) } head) 
+      if (allClaims.isEmpty) false
+      else meetCriteria(allClaims sortWith { (c1: LabClaim, c2: LabClaim) => c1.dos.isAfter(c2.dos) } head)
     }
 
-    def rules = List[() => Boolean](
-        
-      // Check if patient has claim with cpt 3044F
-      () => firstTrue(ph.claims4CPT(cptV), {claim: MedClaim => measurementInterval.contains(claim.dos)}),
+    def rules = List[(Scorecard) => Scorecard](
+
+      // Check if patient has claim with cpt
+      (s: Scorecard) => {
+        val claims = ph.claims4CPT(cptV) filter { claim: MedClaim => measurementInterval.contains(claim.dos) }
+        s.addScore(name, HEDISRule.meetMeasure, "HbA1C " + tag + " (CPT)", claims)
+      },
 
       // Check if most recent lab test
-      () => checkMostRecentLabClaim)
-      
-    isAnyRuleMatch(rules)
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
+        if (claims.isEmpty) s
+        else {
+          val claim = (claims sortWith { (c1: LabClaim, c2: LabClaim) => c1.dos.isAfter(c2.dos) }).head
+          if (meetCriteria(claim)) s.addScore(name, HEDISRule.meetMeasure, "HbA1C Test Value " + tag, List(claim))
+          else s
+        }
+      })
+
+    applyRules(scorecard, rules)
   }
 }
 
-class CDCHbA1cTest7Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name7, "less than 7%", "3044F", 0.06, {(c: LabClaim) => c.result < 0.07}, config, hedisDate)
-class CDCHbA1cTest8Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name8, "less than 8%", "3044F", 0.07, {(c: LabClaim) => c.result < 0.08}, config, hedisDate)
-class CDCHbA1cTest9Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name9, "greater than 9%", "3046F", 0.091, {(c: LabClaim) => c.result > 0.09}, config, hedisDate)
+class CDCHbA1cTest7Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name7, "less than 7%", "3044F", 0.06, { (c: LabClaim) => c.result < 0.07 }, config, hedisDate)
+class CDCHbA1cTest8Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name8, "less than 8%", "3044F", 0.07, { (c: LabClaim) => c.result < 0.08 }, config, hedisDate)
+class CDCHbA1cTest9Rule(config: RuleConfig, hedisDate: DateTime) extends CDCHbA1cTestValueRule(CDCHbA1cTestValue.name9, "greater than 9%", "3046F", 0.091, { (c: LabClaim) => c.result > 0.09 }, config, hedisDate)

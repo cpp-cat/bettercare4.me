@@ -4,19 +4,27 @@
 package com.nickelsoftware.bettercare4me.hedis.hedis2014
 
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import com.nickelsoftware.bettercare4me.models.RuleConfig
-import com.nickelsoftware.bettercare4me.models.PersistenceLayer
-import com.nickelsoftware.bettercare4me.models.Patient
-import com.nickelsoftware.bettercare4me.models.Provider
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
-import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.MedClaim
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
+import com.nickelsoftware.bettercare4me.models.PersistenceLayer
+import com.nickelsoftware.bettercare4me.models.Provider
+import com.nickelsoftware.bettercare4me.models.RuleConfig
 
 object CDCEE {
 
   val name = "CDC-EE-HEDIS-2014"
+
+  val cptEyeProfessional = "Eye Professional Exam (CPT)"
+  val cptDrOffice = "Eye Exam by Med Dr (CPT)"
+  val hcpcsEyeProfessional = "Eye Professional Exam (HCPCS)"
 
   /**
    * NUCC Provider Taxonomy Code for Eye Care Professional
@@ -86,23 +94,31 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, specialtyCde = splty, hcpcs = pickOne(hcpcsA)))))()
   }
 
-  override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
 
-    def rules = List[() => Boolean](
+    def rules = List[(Scorecard) => Scorecard](
 
       // Check for patient has CPT by Eye Professional
-      () => firstMatch(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) }),
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) })
+        s.addScore(name, HEDISRule.eligible, cptEyeProfessional, claims)
+      },
 
       // Check for CPT Type II
-      () => firstMatch(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) }),
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.eligible, cptDrOffice, claims)
+      },
 
       // Check for HCPCS by Eye Professional
-      () => firstMatch(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) }))
+      (s: Scorecard) => {
+        val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) })
+        s.addScore(name, HEDISRule.eligible, hcpcsEyeProfessional, claims)
+      })
 
-    isAnyRuleMatch(rules)
-
+    applyRules(scorecard, rules)
   }
 
 }

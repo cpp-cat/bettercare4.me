@@ -4,19 +4,24 @@
 package com.nickelsoftware.bettercare4me.hedis.hedis2014
 
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
-import com.nickelsoftware.bettercare4me.models.RuleConfig
-import com.nickelsoftware.bettercare4me.models.PersistenceLayer
-import com.nickelsoftware.bettercare4me.models.Patient
-import com.nickelsoftware.bettercare4me.models.Provider
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
-import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.MedClaim
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
+import com.nickelsoftware.bettercare4me.models.PersistenceLayer
+import com.nickelsoftware.bettercare4me.models.Provider
+import com.nickelsoftware.bettercare4me.models.RuleConfig
 
 object CDCHbA1cTest {
-  
+
   val name = "CDC-HbA1c-Test-HEDIS-2014"
+  val hasHbA1cTest = "HbA1c Test"
 
   /**
    * CPT codes for HbA1c Test
@@ -54,12 +59,13 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
     List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA)))
   }
 
-  override def isPatientMeetMeasure(patient: Patient, ph: PatientHistory): Boolean = {
+  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
 
     // Check if patient had at least one HbA1c test (during the measurement year)
-    firstMatch(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+    val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+    scorecard.addScore(name, HEDISRule.eligible, hasHbA1cTest, claims)
   }
 
 }

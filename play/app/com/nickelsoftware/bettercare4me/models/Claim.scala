@@ -20,62 +20,62 @@ object ClaimParser {
       if (l.size < 42) throw NickelException("ClaimParser.fromList - MedClaim must have a least 42 elements, have " + l.size)
 
       MedClaim(
-        l(1), 											// claimID claim ID
-        l(2), 											// patientID Patient ID 
-        l(3), 											// providerID Provider ID
+        l(1), // claimID claim ID
+        l(2), // patientID Patient ID 
+        l(3), // providerID Provider ID
         LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // dos Date of Service
         LocalDate.parse(l(5)).toDateTimeAtStartOfDay(), // dosThru DOS Thru
         MHead(
-          l(6), 										// claimStatus Claim status
-          l(7), 										// pcpFlag PCP Flag
-          l(8), 										// specialtyCde
-          l(9), 										// hcfaPOS HCFA Form 1500 POS (Point of Service),
-          l(10), 										// dischargeStatus Discharge Status (2 chars)
-          l(11).toInt, 									// daysDenied Nbr of days denied for in-patient claims
-          l(12)), 										// roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
+          l(6), // claimStatus Claim status
+          l(7), // pcpFlag PCP Flag
+          l(8), // specialtyCde
+          l(9), // hcfaPOS HCFA Form 1500 POS (Point of Service),
+          l(10), // dischargeStatus Discharge Status (2 chars)
+          l(11).toInt, // daysDenied Nbr of days denied for in-patient claims
+          l(12)), // roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
         MCodes(
-          l(13), 										// icdDPri ICD Primary Diagnostic
-          toSet(l.slice(14, 24)), 						// icdD Secondary Diagnostic codes (up to 10)
-          toSet(l.slice(24, 34)), 						// icdP ICD Procedure codes (up to 10)
-          l(34), 										// drg Diagnosis Related Group
-          l(35), 										// cpt CPT (procedure procedure)
-          l(36), 										// cptMod1 CPT Modifier 1 (2 chars)
-          l(37)), 										// cptMod2 CPT Modifier 1 (2 chars)
+          l(13), // icdDPri ICD Primary Diagnostic
+          toSet(l.slice(14, 24)), // icdD Secondary Diagnostic codes (up to 10)
+          toSet(l.slice(24, 34)), // icdP ICD Procedure codes (up to 10)
+          l(34), // drg Diagnosis Related Group
+          l(35), // cpt CPT (procedure procedure)
+          l(36), // cptMod1 CPT Modifier 1 (2 chars)
+          l(37)), // cptMod2 CPT Modifier 1 (2 chars)
         MBill(
-          l(38), 										// tob Type of Bill (3 chars)
-          l(39), 										// ubRevenue UB Revenue (billing code) 
-          l(40), 										// hcpcs HCPCS (medical goods and services)
-          l(41))) 										// hcpcsMod HCPCS Modifier code (2 chars)
+          l(38), // tob Type of Bill (3 chars)
+          l(39), // ubRevenue UB Revenue (billing code) 
+          l(40), // hcpcs HCPCS (medical goods and services)
+          l(41))) // hcpcsMod HCPCS Modifier code (2 chars)
     }
 
     def mkRxClaim(l: List[String]): Claim = {
       if (l.size < 10) throw NickelException("ClaimParser.fromList - RxClaim must have a least 10 elements, have " + l.size)
 
       RxClaim(
-        l(1), 											// claimID claim ID
-        l(2), 											// patientID Patient ID 
-        l(3), 											// providerID Provider ID
+        l(1), // claimID claim ID
+        l(2), // patientID Patient ID 
+        l(3), // providerID Provider ID
         LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // fill date
-        l(5), 											// claimStatus Claim status
-        l(6), 											// ndc
-        l(7).toInt, 									// days of supply
-        l(8).toInt, 									// quantity
-        l(9)) 											// supply flag
+        l(5), // claimStatus Claim status
+        l(6), // ndc
+        l(7).toInt, // days of supply
+        l(8).toInt, // quantity
+        l(9)) // supply flag
     }
 
     def mkLabClaim(l: List[String]): Claim = {
       if (l.size < 10) throw NickelException("ClaimParser.fromList - RxClaim must have a least 10 elements, have " + l.size)
 
       LabClaim(
-        l(1), 											// claimID claim ID
-        l(2), 											// patientID Patient ID 
-        l(3), 											// providerID Provider ID
+        l(1), // claimID claim ID
+        l(2), // patientID Patient ID 
+        l(3), // providerID Provider ID
         LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // date of service
-        l(5), 											// claimStatus Claim status
-        l(6), 											// cpt
-        l(7), 											// LOINC
-        BigDecimal(l(8)), 								// result
-        l(9)) 											// positive/negative result
+        l(5), // claimStatus Claim status
+        l(6), // cpt
+        l(7), // LOINC
+        BigDecimal(l(8)), // result
+        l(9)) // positive/negative result
     }
 
     if (l(0) == "MD") mkMedClaim(l)
@@ -90,6 +90,24 @@ object ClaimParser {
       case rxClaim: RxClaim => rxClaim.toList
       case labClaim: LabClaim => labClaim.toList
       case _ => throw NickelException("ClaimParser.toList - Unknown claim type")
+    }
+  }
+}
+
+/**
+ * Define utility methods
+ */
+object Claim {
+
+  /**
+   * @returns true if there is at least 2 claims with different DOS
+   */
+  def twoDifferentDOS(claims: List[MedClaim]): Boolean = {
+    
+    if (claims.size < 2) false
+    else {
+      val dos = claims.head.dos
+      claims.tail.foldLeft(false)({ (b, c) => if (!b && dos == c.dos) false else true })
     }
   }
 }
