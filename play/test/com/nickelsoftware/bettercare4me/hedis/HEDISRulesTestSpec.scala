@@ -6,10 +6,41 @@ package com.nickelsoftware.bettercare4me.hedis;
 import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+
 import com.nickelsoftware.bettercare4me.models.MedClaim
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
+import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import com.nickelsoftware.bettercare4me.utils.NickelException
+
+object HEDISRulesTestSpec {
+
+  def setupTest(name: String, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
+    val persistenceLayer = new SimplePersistenceLayer(88)
+    val c = new RuleConfig
+    c.setName(name)
+    c.setEligibleRate(eligibleRate)
+    c.setExclusionRate(exclusionRate)
+    c.setMeetMeasureRate(meetMeasureRate)
+    val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+    val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
+    val patient = persistenceLayer.createPatient("first", "last", "F", dob)
+    val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
+    val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
+    (patient, patientHistory, rule)
+  }
+
+  def scoreRule(rule: HEDISRule, patient: Patient, ph: PatientHistory): Scorecard = {
+    val s1 = rule.scorePatientEligible(rule.scorePatientMeetDemographic(Scorecard(), patient), patient, ph)
+    if (rule.isPatientEligible(s1)) {
+      val s2 = rule.scorePatientExcluded(s1, patient, ph)
+      if (rule.isPatientExcluded(s2)) s2
+      else rule.scorePatientMeetMeasure(s2, patient, ph)
+    } else s1
+  }
+}
 
 class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
 

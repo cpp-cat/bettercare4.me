@@ -51,11 +51,11 @@
   to meet the measure criteria (denominator), be excluded, and meet the measure.
 
 ## User Stories Sprint Backlog
-- Create a Predicate class to wrapp each predicates of the Hedis rule.
-- Create a Scorecard class to keep track of the score of each prediates.
 
 ## Completed User Stories
 - Define MedClaim, RxClaim and LabClaim using the same Claim base trait
+- Create a Scorecard class to keep track of the score of each prediates.
+- Refactor HEDISRuleBase class to leverage Scorecard class to scoring HEDIS measure using claims
 
 
 # Sprint 3: RxClaim detail class and using NDCs in HEDIS rules

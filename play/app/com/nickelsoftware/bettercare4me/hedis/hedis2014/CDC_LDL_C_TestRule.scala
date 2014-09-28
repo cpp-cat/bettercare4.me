@@ -83,13 +83,13 @@ class CDCLDLCRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(c
       // Check for patient has CPT
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, cptLipidTest, claims)
+        s.addScore(name, HEDISRule.meetMeasure, cptLipidTest, claims)
       },
 
       // Check for LOINC on Lab Claim
       (s: Scorecard) => {
         val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, loincLipidTest, claims)
+        s.addScore(name, HEDISRule.meetMeasure, loincLipidTest, claims)
       })
       
     applyRules(scorecard, rules)

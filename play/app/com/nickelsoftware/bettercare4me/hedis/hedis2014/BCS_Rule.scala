@@ -166,8 +166,8 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
-    val dos = hedisDate.minusDays(Random.nextInt(days))
+    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(180)
     pickOne(List(
 
       // One possible set of claims based on cpt

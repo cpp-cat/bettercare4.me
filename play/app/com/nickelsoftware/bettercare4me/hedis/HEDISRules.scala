@@ -30,22 +30,6 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 
 /**
- * Class to represent a predicate used in a HEDIS measure.
- *
- * Multiple predicates can be used in each of:
- * @see HEDISRule.isPatientMeetDemographic
- * @see HEDISRule.isPatientEligible
- * @see HEDISRule.isPatientExcluded
- * @see HEDISRule.isPatientMeetMeasure
- *
- * @param measureName is the name of the HEDIS measure
- * @param criteriaName is one of: eligible, excluded, meetMeasure
- * @param predicateName is the name of the predicate, i.e., the specific condition.
- * @param f is the predicate evaluator, which is context-specific to the HEDIS class.
- */
-class Predicate[A](val measureName: String, val criteriaName: String, val predicateName: String, val f: (A) => List[Claim])
-
-/**
  * Singleton to avoid creating empty object over and over again and other useful names
  */
 object HEDISRule {
@@ -115,6 +99,10 @@ case class RuleScore(
 
   /**
    * Add a criteria score to the HEDIS Rule based on claim match
+   * @param criteriaName is the measure predicate name (defined in `HEDISRule object)
+   * @param predicateName is the predicate rule name (specific to each measures)
+   * @param l the list of claims that satisfy the predicate
+   * @throws NickelException for unknown `criteriaName
    */
   def addScore(criteriaName: String, predicateName: String, l: List[Claim]): RuleScore = {
     criteriaName match {
@@ -144,6 +132,7 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
    * @param measureName is the HEDIS measure name (HEDISRule::name)
    * @param criteriaName is the criteria being updated for the HEDIS measure (meetDemographic, eligible, excluded, meetMeasure)
    * @param oride is the override to set for the criteria
+   * @throws NickelException for unknown `criteriaName
    */
   def addScore(measureName: String, criteriaName: String, oride: Boolean): Scorecard = {
     val ruleScore = hedisRuleMap.getOrElse(measureName, HEDISRule.emptyRuleScore)
@@ -156,7 +145,8 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
    * @param measureName is the HEDIS measure name (HEDISRule::name)
    * @param criteriaName is the criteria being updated for the HEDIS measure (meetDemographic, eligible, excluded, meetMeasure)
    * @param predicateName is the name of the predicate that was evaluated (Predicate::predicateName)
-   * @param claimOpt is the claim that matched the predicate, if `None then the predicate did not match (no update to scorecard)
+   * @param claims is the list of claim that matched the predicate, if the list is empty then the predicate did not match (no update to scorecard)
+   * @throws NickelException for unknown `criteriaName
    */
   def addScore(measureName: String, criteriaName: String, predicateName: String, claims: List[Claim]): Scorecard = {
 
@@ -373,18 +363,18 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
 
   /**
    * Utility method to filter all claims in code2Claims with codes (keys of code2Claims) that are in filterCodes
-   * 
+   *
    * @param code2Claims is the mapping of clinical codes to matching claims (from PatientHistory)
    * @param filterCodes is the set of clinical codes that we retain from code2Claims
    * @param f is the filter function applied to claims that have the filtered clinical codes (second level of filtering)
-   * @returns All the claims that match both the clinical codes and the filter function f 
+   * @returns All the claims that match both the clinical codes and the filter function f
    */
   def filterClaims[C](code2Claims: Map[String, List[C]], filterCodes: Set[String], f: (C) => Boolean): List[C] = {
     def loop(l: List[C], m: Map[String, List[C]]): List[C] = {
-      if(m.isEmpty) l
+      if (m.isEmpty) l
       else {
         val (k, v) = m.head
-        if(filterCodes.contains(k)) loop(List.concat(v.filter(f), l), m.tail)
+        if (filterCodes.contains(k)) loop(List.concat(v.filter(f), l), m.tail)
         else loop(l, m.tail)
       }
     }
@@ -393,49 +383,14 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
 
   /**
    * Utility method to increase readability in the HEDIS Rule classes.
-   * 
+   *
    * Simply fold all the rules and build up the scorecard from an initial value
-   * 
+   *
    * @param scorecard the initial scorecard on which we build up additional scores from the list of rules
    * @param rules is the list of predicates that adds contributions to the scorecard
    * @returns the build up scorecard
    */
   def applyRules(scorecard: Scorecard, rules: List[(Scorecard) => Scorecard]): Scorecard = rules.foldLeft(scorecard)({ (s, f) => f(s) })
-  
-//  /**
-//   * Utility that evaluate the predicate against potential claims and update the
-//   * scorecard with each matches.
-//   *
-//   * @param scorecard to be updated with each time a predicate is evaluated with a matching claim
-//   * @param claims list of claims to evaluate
-//   * @param predicate is a HEDIS rule predicate
-//   * @return updated `Scorecard based on predicate matching
-//   */
-//  def evalPredicate[C](scorecard: Scorecard, claims: List[C], predicate: Predicate[List[C]]): Scorecard = {
-//    //    claims.foldLeft(scorecard)({ (scard, claim) => scard.addScore(predicate.measureName, predicate.criteriaName, predicate.predicateName, predicate.f(claim)) })
-//    scorecard.addScore(predicate.measureName, predicate.criteriaName, predicate.predicateName, predicate.f(claims))
-//  }
-
-//  /**
-//   * Utility that evaluate the predicate against potential claims and update the
-//   * scorecard with each matches.
-//   *
-//   * @param scorecard to be updated with each time a predicate is evaluated with a matching claim
-//   * @param code2Claims is mapping clinical codes to  `Claim (see `PatientHistory)
-//   * @param referenceCodes are the codes we retain for the predicate
-//   * @param predicate is a HEDIS rule predicate
-//   * @return updated `Scorecard based on predicate matching
-//   */
-//  def evalPredicate[C](scorecard: Scorecard, code2Claims: Map[String, List[C]], referenceCodes: Set[String], predicate: Predicate[C]): Scorecard = {
-//    code2Claims.foldLeft(scorecard)({ (scard, item) =>
-//      item match {
-//        case (code, claims) =>
-//          if (referenceCodes.contains(code)) evalPredicate(scard, claims, predicate)
-//          else scard
-//        case _ => scard
-//      }
-//    })
-//  }
 
   def isPatientMeetDemographic(scorecard: Scorecard): Boolean = scorecard.isPatientMeetDemographic(name)
   def isPatientEligible(scorecard: Scorecard): Boolean = scorecard.isPatientEligible(name)
@@ -452,7 +407,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   /**
    * By default, assume there is no claim-based predicates, defaults to isPatientMeetDemographic
    */
-  def scorePatientEligible(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.meetDemographic, isPatientMeetDemographic(patient))
+  def scorePatientEligible(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.eligible, isPatientMeetDemographic(patient))
 
   /**
    * Utility method to pick randomly one item from the list
@@ -504,4 +459,13 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         icdDPri = "icd 1", icdD = Set("icd 1", "icd 2"), icdP = Set("icd p1"),
         hcfaPOS = "hcfaPOS", ubRevenue = "ubRevenue"))
   }
+  
+  def scorePatientMeetDemographic(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
+    scorecard.addScore("TEST", HEDISRule.meetDemographic, true)
+  
+  def scorePatientExcluded(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
+    scorecard.addScore("TEST", HEDISRule.excluded, true)
+  
+  def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
+    scorecard.addScore("TEST", HEDISRule.meetMeasure, true)
 }
