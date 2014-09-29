@@ -41,10 +41,10 @@
 
 # Sprint 4: Enhanced Rule Framework for HEDIS rules
 
-- Version: 0.5.0.00 (v0.5.0.00_09-XX-2014)
+- Version: 0.5.0.00 (v0.5.0.00_09-28-2014)
 - Start Date: 9/24/2014
 - Target Date: 9/29/2014
-- Actual Date: 9/XX/2014
+- Actual Date: 9/28/2014
 
 ## Product Features:
 - Enhancing the rule framework to be able to report which claim and which rule made the patient
@@ -56,6 +56,7 @@
 - Define MedClaim, RxClaim and LabClaim using the same Claim base trait
 - Create a Scorecard class to keep track of the score of each prediates.
 - Refactor HEDISRuleBase class to leverage Scorecard class to scoring HEDIS measure using claims
+- Added CDC - Urine Microalbumin Test HEDIS Rule
 
 
 # Sprint 3: RxClaim detail class and using NDCs in HEDIS rules

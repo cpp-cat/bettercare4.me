@@ -28,6 +28,8 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCLDLCRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
 
 /**
  * Singleton to avoid creating empty object over and over again and other useful names
@@ -433,7 +435,8 @@ object HEDISRules {
     CDCHbA1cTestValue.name8 -> { (c, d) => new CDCHbA1cTest8Rule(c, d) },
     CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) },
     CDCEE.name -> { (c, d) => new CDCEERule(c, d) },
-    CDC_LDL_C.name -> { (c, d) => new CDCLDLCRule(c, d) })
+    CDC_LDL_C.name -> { (c, d) => new CDCLDLCRule(c, d) },
+    CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)
