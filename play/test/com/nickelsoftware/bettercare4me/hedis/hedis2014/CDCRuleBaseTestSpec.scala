@@ -19,6 +19,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import CDC.ndcAKey
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
 
@@ -86,7 +87,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patients in the denominator (eligible and not excluded)" in {
 
       val (patient, patientHistory, rule) = setupTest("TEST", 100, 0, 100)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false
@@ -96,7 +97,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patients not in the denominator (not eligible)" in {
 
       val (patient, patientHistory, rule) = setupTest("TEST", 0, 0, 0)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe false
       rule.isPatientExcluded(scorecard) mustBe false
@@ -106,7 +107,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     "validate excluded patients criteria (eligible and excluded)" in {
 
       val (patient, patientHistory, rule) = setupTest("TEST", 100, 100, 0)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe true

@@ -39,6 +39,38 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 5: Completing HEDIS rules Implementation
+
+- Version: 0.6.0.00 (v0.6.0.00_10-XX-2014)
+- Start Date: 9/29/2014
+- Target Date: 10/05/2014
+- Actual Date: 10/XX/2014
+
+## Product Features:
+- Completing the implementation of the HEDIS 2014 Rules
+
+## User Stories Sprint Backlog
+- Cervical Cancer Screening
+- Chlamydia Screening by Age
+- Colorectal Cancer Screening
+- Childhood Immunization Status by Immunization Type
+- Lead Screening in Children
+- Glaucoma Screening in Older Adults
+- Well-Child Visits in the First 15 Months of Life
+- Well-Child Visits in the 3 - 6 Years of Life
+- Adolescent Well Care Visits
+- Asthma Medication Ratio by Age
+- Cholesterol Management for Patient with Cardiovascular Conditions
+- Annual Monitoring for Patients on Persistent Medication by Medication
+- Appropriate Testing for Children with Pharyngitis
+- Appropriate Treatment for Children with Upper Repiratory Infection
+- Avoidance of Antibiotics Treatment in Adults with Acute Bronchitis
+- Use of Imaging Studies for Low Back Pain
+
+## Completed User Stories
+- Added CDC - Diabetes Lipid Test < 100 mg/dL HEDIS Rule
+
+
 # Sprint 4: Enhanced Rule Framework for HEDIS rules
 
 - Version: 0.5.0.00 (v0.5.0.00_09-28-2014)

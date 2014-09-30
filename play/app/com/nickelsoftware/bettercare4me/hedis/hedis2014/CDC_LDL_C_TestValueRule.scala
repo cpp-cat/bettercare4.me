@@ -19,9 +19,9 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 
-object CDC_LDL_C {
+object CDC_LDL_C_Value {
 
-  val name = "CDC-LDL-C-HEDIS-2014"
+  val name = "CDC-LDL-C-Value-HEDIS-2014"
 
   val cptLipidTest = "Lipid Test Claim (CPT)"
   val loincLipidTest = "Lipid Test Lab Claim (LOINC)"
@@ -40,23 +40,24 @@ object CDC_LDL_C {
 }
 
 /**
- * Diabetes Lipid Test
+ * Diabetes Lipid Test < 100 mg/dL
  *
- * Diabetes Lipid Test indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had an eye exam performed.
+ * Diabetes Eye Exam indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had an eye exam performed.
  * This excludes patients with a previous diagnosis of polycystic ovaries, gestational diabetes, or steroid-induced diabetes.
  *
  * NUMERATOR:
- * Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had a lipid test done.
+ * Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had an eye exam done. NOTE: Through
+ * administrative data there is no way to determine whether a dilated eye exam was performed. Therefore, eye exams provided by
+ * eye care professionals are used as a proxy for dilated exams.
  *
  */
-class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(config, hedisDate) {
+class CDC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(config, hedisDate) {
 
-  val name = CDC_LDL_C.name
+  val name = CDC_LDL_C_Value.name
   val fullName = "Diabetes Lipid Test"
-  val description = "Diabetes Lipid Test indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had a lipid test performed. " +
-    "This excludes patients with a previous diagnosis of polycystic ovaries, gestational diabetes, or steroid-induced diabetes."
+  val description = "Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had at least one LDL cholesterol lab result record with a value greater than zero and less than 100 mg/dL."
 
-  import CDC_LDL_C._
+  import CDC_LDL_C_Value._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
     val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
@@ -68,8 +69,8 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
       // Possible set: CPT
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
 
-      // Another possible set: LOINC on lab claim
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA)))))()
+      // Another possible set: Most recent LDL-C test result > 0 and < 100 mg/dL
+      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA), result=Random.nextDouble*99.0)) ))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -86,10 +87,10 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
 
       // Check for LOINC on Lab Claim
       (s: Scorecard) => {
-        val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
+        val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) && claim.result>0.0 && claim.result<100.0 })
         s.addScore(name, HEDISRule.meetMeasure, loincLipidTest, claims)
       })
-      
+
     applyRules(scorecard, rules)
   }
 }

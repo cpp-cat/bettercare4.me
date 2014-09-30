@@ -4,9 +4,11 @@
 package com.nickelsoftware.bettercare4me.hedis
 
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
+
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEE
@@ -17,6 +19,12 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest8Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest9Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestValue
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_TestRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_TestValueRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_Value
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
@@ -24,12 +32,7 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.NickelException
-import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCLDLCRule
-import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C
-import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
-import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN
-import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
 
 /**
  * Singleton to avoid creating empty object over and over again and other useful names
@@ -295,6 +298,24 @@ trait HEDISRule {
    * Verify if the patient is in the denominator of the rule, i.e., eligible to the measure and not excluded.
    */
   def isPatientInDenominator(scorecard: Scorecard): Boolean
+  
+  /**
+   * Apply the rule criteria to patient
+   * 
+   * Apply the following scoring methods:
+   * - scorePatientMeetDemographic
+   * - scorePatientEligible
+   * 
+   * Then the following methods, conditionally:
+   * - scorePatientExcluded (if isPatientEligible is true)
+   * - scorePatientMeetMeasure (if isPatientExcluded is false)
+   * 
+   * @param scorecard to be updated with the criteria of this rule
+   * @param patient to evaluate on this rule
+   * @param ph is the patient claim's history
+   * @returns the updated scorecard
+   */
+  def scoreRule(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard
 
 }
 
@@ -423,6 +444,32 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @return The calculated interval, excluding the hedisDate
    */
   def getInterval(nbrDays: Int): Interval = new Interval(hedisDate.minusDays(nbrDays), hedisDate)
+
+  /**
+   * Apply the rule criteria to patient
+   * 
+   * Apply the following scoring methods:
+   * - scorePatientMeetDemographic
+   * - scorePatientEligible
+   * 
+   * Then the following methods, conditionally:
+   * - scorePatientExcluded (if isPatientEligible is true)
+   * - scorePatientMeetMeasure (if isPatientExcluded is false)
+   * 
+   * @param scorecard to be updated with the criteria of this rule
+   * @param patient to evaluate on this rule
+   * @param ph is the patient claim's history
+   * @returns the updated scorecard
+   */
+  def scoreRule(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
+    val s1 = scorePatientEligible(scorePatientMeetDemographic(scorecard, patient), patient, ph)
+    if (isPatientEligible(s1)) {
+      val s2 = scorePatientExcluded(s1, patient, ph)
+      if (isPatientExcluded(s2)) s2
+      else scorePatientMeetMeasure(s2, patient, ph)
+    } else s1
+  }
+  
 }
 
 object HEDISRules {
@@ -435,7 +482,8 @@ object HEDISRules {
     CDCHbA1cTestValue.name8 -> { (c, d) => new CDCHbA1cTest8Rule(c, d) },
     CDCHbA1cTestValue.name9 -> { (c, d) => new CDCHbA1cTest9Rule(c, d) },
     CDCEE.name -> { (c, d) => new CDCEERule(c, d) },
-    CDC_LDL_C.name -> { (c, d) => new CDCLDLCRule(c, d) },
+    CDC_LDL_C.name -> { (c, d) => new CDC_LDL_C_TestRule(c, d) },
+    CDC_LDL_C_Value.name -> { (c, d) => new CDC_LDL_C_TestValueRule(c, d) },
     CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {

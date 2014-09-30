@@ -12,6 +12,7 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import CDC.ndcAKey
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 class CDCHbA1cTestRuleTestSpec extends PlaySpec with OneAppPerSuite {
   
@@ -20,7 +21,7 @@ class CDCHbA1cTestRuleTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient that meet the measure criteria" in {
 
       val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDCHbA1cTest.name, 100, 0, 100)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false
@@ -30,7 +31,7 @@ class CDCHbA1cTestRuleTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient that does not meet the measure criteria and is not excluded" in {
 
       val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDCHbA1cTest.name, 100, 0, 0)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false

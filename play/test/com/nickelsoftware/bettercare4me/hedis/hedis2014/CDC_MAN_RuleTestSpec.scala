@@ -5,8 +5,8 @@ package com.nickelsoftware.bettercare4me.hedis.hedis2014;
 
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 class CDC_MAN_RuleTestSpec extends PlaySpec with OneAppPerSuite {
   
@@ -15,7 +15,7 @@ class CDC_MAN_RuleTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient that meet the measure criteria" in {
 
       val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_MAN.name, 100, 0, 100)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false
@@ -25,7 +25,7 @@ class CDC_MAN_RuleTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient that does not meet the measure criteria and is not excluded" in {
 
       val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_MAN.name, 100, 0, 0)
-      val scorecard = HEDISRulesTestSpec.scoreRule(rule, patient, patientHistory)
+      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
       
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false

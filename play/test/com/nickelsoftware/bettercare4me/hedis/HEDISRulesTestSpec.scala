@@ -31,15 +31,6 @@ object HEDISRulesTestSpec {
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
     (patient, patientHistory, rule)
   }
-
-  def scoreRule(rule: HEDISRule, patient: Patient, ph: PatientHistory): Scorecard = {
-    val s1 = rule.scorePatientEligible(rule.scorePatientMeetDemographic(Scorecard(), patient), patient, ph)
-    if (rule.isPatientEligible(s1)) {
-      val s2 = rule.scorePatientExcluded(s1, patient, ph)
-      if (rule.isPatientExcluded(s2)) s2
-      else rule.scorePatientMeetMeasure(s2, patient, ph)
-    } else s1
-  }
 }
 
 class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
