@@ -19,11 +19,12 @@ object CDC {
     import com.github.tototoshi.csv.CSVReader
     import com.github.tototoshi.csv.CSVWriter
     import java.io.File
-    val l = CSVReader.open(new File("./data/cdc.ndc.l.csv")).all().flatten
-    val w = CSVWriter.open(new File("./data/cdc.ndc.flat.l.csv"))
+    val l = CSVReader.open(new File("./data/temp1.csv")).all().flatten
+    val w = CSVWriter.open(new File("./data/temp2.csv"))
     w.writeAll(List(l))
     w.close
     */
+  // com.nickelsoftware.bettercare4me.utils.Utils.flattenFile("./data/temp1.csv", "./data/temp2.csv")
   /**
    * NDC for diabetes drugs
    */

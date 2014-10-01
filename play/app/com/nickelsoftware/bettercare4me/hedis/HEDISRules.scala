@@ -11,6 +11,8 @@ import org.joda.time.LocalDate
 
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CCS
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CCS_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEE
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCEERule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest
@@ -25,6 +27,9 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_TestValueRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_Value
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_16_20_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_21_26_Rule
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
@@ -484,7 +489,10 @@ object HEDISRules {
     CDCEE.name -> { (c, d) => new CDCEERule(c, d) },
     CDC_LDL_C.name -> { (c, d) => new CDC_LDL_C_TestRule(c, d) },
     CDC_LDL_C_Value.name -> { (c, d) => new CDC_LDL_C_TestValueRule(c, d) },
-    CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) })
+    CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) },
+    CCS.name -> { (c, d) => new CCS_Rule(c, d) },
+    CHL.name16 -> { (c, d) => new CHL_16_20_Rule(c, d) },
+    CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)

@@ -50,7 +50,8 @@ object CDC_MAN {
   /**
    * Diagnosis / Treatment for Nephropathy (ICD Diagnosis)
    */
-  val icdDA = List("250.4", "250.40", "250.41", "250.42", "250.43",
+  val icdDA = List(
+    "250.4", "250.40", "250.41", "250.42", "250.43",
     "403", "403.0", "403.00", "403.01", "403.1", "403.10", "403.11", "403.9", "403.90", "403.91",
     "404", "404.0", "404.00", "404.01", "404.02", "404.03", "404.1", "404.10", "404.11", "404.12", "404.13", "404.9", "404.90", "404.91", "404.92", "404.93",
     "405.01", "405.11", "405.91",
@@ -80,7 +81,8 @@ object CDC_MAN {
   /**
    * Diagnosis / Treatment for Nephropathy (UB)
    */
-  val ubA = List("0367", "0800", "0801", "0802", "0803", "0804", "0809", "080X",
+  val ubA = List("0367",
+    "0800", "0801", "0802", "0803", "0804", "0809", "080X",
     "0820", "0821", "0822", "0823", "0824", "0829", "082X",
     "0830", "0831", "0832", "0833", "0834", "0839", "083X",
     "0840", "0841", "0842", "0843", "0844", "0849", "084X",
@@ -139,15 +141,15 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(icdPA)))),
 
       // Diagnosis / Treatment for Nephropathy (UB)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA))), 
-      
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA))),
+
       // Diagnosis / Treatment for Nephropathy (TOB)
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, tob = pickOne(tobA))),
-      
+
       // Diagnosis / Treatment for Nephropathy (NDC)
       () => List(pl.createRxClaim(patient.patientID, provider.providerID, dos, ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
-          pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(30 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
-          pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(60 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60) ),
+        pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(30 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
+        pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(60 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60)),
 
       // Diagnosis / Treatment for Nephropathy (HCFA POS)
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcfaPOS = pickOne(hcfaposA)))))()

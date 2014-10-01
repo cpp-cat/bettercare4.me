@@ -9,7 +9,7 @@ object Utils {
   }
 
   def add2Map[C](s: String, l: List[C], map: Map[String, List[C]]): Map[String, List[C]] = {
-    
+
     if (l.isEmpty) map
     else {
 
@@ -17,5 +17,16 @@ object Utils {
       if (l2.isEmpty) map + (s -> l)
       else map + (s -> List.concat(l, l2))
     }
+  }
+
+  def flattenFile(from: String, to: String): Unit = {
+
+    import com.github.tototoshi.csv.CSVReader
+    import com.github.tototoshi.csv.CSVWriter
+    import java.io.File
+    val l = CSVReader.open(new File(from)).all().flatten
+    val w = CSVWriter.open(new File(to))
+    w.writeAll(List(l))
+    w.close
   }
 }

@@ -118,6 +118,7 @@ object Claim {
 trait Claim {
 
   def claimType: String
+  def date: DateTime
 
 }
 
@@ -211,6 +212,7 @@ case class MedClaim(claimID: String, patientID: String, providerID: String, dos:
   mHead: MHead = MHead(), mCodes: MCodes = MCodes(), mBill: MBill = MBill()) extends Claim {
 
   override def claimType = "MD"
+  override def date = dos
 
   def claimStatus = mHead.claimStatus
   def pcpFlag = mHead.pcpFlag
@@ -284,6 +286,7 @@ case class RxClaim(
   supplyF: String = "N") extends Claim {
 
   override def claimType = "RX"
+  override def date = fillD
 
   def toList: List[String] = List("RX", claimID, patientID, providerID,
     fillD.toLocalDate().toString, claimStatus, ndc, daysSupply.toString(), qty.toString(), supplyF)
@@ -324,6 +327,7 @@ case class LabClaim(
   posNegResult: String = "") extends Claim {
 
   override def claimType = "LC"
+  override def date = dos
 
   def toList: List[String] = List("LC", claimID, patientID, providerID,
     dos.toLocalDate().toString, claimStatus, cpt, loinc, result.toString(), posNegResult)

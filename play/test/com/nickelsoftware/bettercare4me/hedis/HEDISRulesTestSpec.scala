@@ -6,7 +6,6 @@ package com.nickelsoftware.bettercare4me.hedis;
 import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-
 import com.nickelsoftware.bettercare4me.models.MedClaim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
@@ -14,10 +13,16 @@ import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import org.joda.time.DateTime
 
 object HEDISRulesTestSpec {
 
   def setupTest(name: String, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
+    val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
+    setupTest(name, "F", dob, eligibleRate, exclusionRate, meetMeasureRate)
+  }
+
+  def setupTest(name: String, gender: String, dob: DateTime, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
     val persistenceLayer = new SimplePersistenceLayer(88)
     val c = new RuleConfig
     c.setName(name)
@@ -25,8 +30,7 @@ object HEDISRulesTestSpec {
     c.setExclusionRate(exclusionRate)
     c.setMeetMeasureRate(meetMeasureRate)
     val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
-    val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
-    val patient = persistenceLayer.createPatient("first", "last", "F", dob)
+    val patient = persistenceLayer.createPatient("first", "last", gender, dob)
     val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
     (patient, patientHistory, rule)
