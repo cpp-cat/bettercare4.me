@@ -30,6 +30,8 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_16_20_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_21_26_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
@@ -492,7 +494,8 @@ object HEDISRules {
     CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) },
     CCS.name -> { (c, d) => new CCS_Rule(c, d) },
     CHL.name16 -> { (c, d) => new CHL_16_20_Rule(c, d) },
-    CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) })
+    CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) },
+    COL.name -> { (c, d) => new COL_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)

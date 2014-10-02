@@ -236,6 +236,19 @@ case class MedClaim(claimID: String, patientID: String, providerID: String, dos:
   def hcpcsMod = mBill.hcpcsMod
 
   def toList: List[String] = List.concat(List("MD", claimID, patientID, providerID, dos.toLocalDate().toString, dosThru.toLocalDate().toString), mHead.toList, mCodes.toList, mBill.toList)
+
+  /**
+   * @param dia set of diasgnotics to check against
+   * @returns true if this claim has any of the diagnostics passed as argument
+   */
+  def hasDiagnostic(dia: Set[String]): Boolean = {
+    if(dia.isEmpty) false
+    else {
+      val d = dia.head
+      if(mCodes.icdDPri==d || mCodes.icdD.contains(d)) true
+      else hasDiagnostic(dia.tail)
+    }
+  }
 }
 
 /**

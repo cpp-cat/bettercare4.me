@@ -95,7 +95,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
     val age = patient.age(hedisDate)
-    patient.gender == "F" && age > 41 && age < 70
+    patient.gender == "F" && age >= 42 && age <= 69
   }
 
   // This rule has 100% eligibility when the demographics are meet

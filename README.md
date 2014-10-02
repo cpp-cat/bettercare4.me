@@ -50,7 +50,6 @@
 - Completing the implementation of the HEDIS 2014 Rules
 
 ## User Stories Sprint Backlog
-- Colorectal Cancer Screening
 - Childhood Immunization Status by Immunization Type
 - Lead Screening in Children
 - Glaucoma Screening in Older Adults
@@ -68,7 +67,8 @@
 ## Completed User Stories
 - Added CDC - Diabetes Lipid Test < 100 mg/dL HEDIS Rule
 - Added CDC - Cervical Cancer Screening HEDIS Rule
-- Added CDC - Chlamydia Screening by Age HEDIS Rule
+- Added Chlamydia Screening by Age HEDIS Rule
+- Added Colorectal Cancer Screening HEDIS Rule
 
 
 # Sprint 4: Enhanced Rule Framework for HEDIS rules
