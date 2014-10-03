@@ -103,7 +103,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromMonths(24).toDuration().getStandardDays().toInt
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     val dos2 = dos1.minusDays(Random.nextInt(180) + 1) // to make sure it's not on the same day
     pickOne(List(
@@ -128,13 +128,13 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    def claimWithMod(claim: MedClaim, mod: String): Boolean = claim.dos.isBefore(hedisDate) && (claim.cptMod1 == mod || claim.cptMod2 == mod)
+    def claimWithMod(claim: MedClaim, mod: String): Boolean = !claim.dos.isAfter(hedisDate) && (claim.cptMod1 == mod || claim.cptMod2 == mod)
 
     def rules = List[(Scorecard) => Scorecard](
 
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, BCS.icdPAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdP, BCS.icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, BCS.bilateralMastectomy, claims)
       },
 
@@ -155,7 +155,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
       // Check if patient had 2 previous unilateral mastectomy on different days based on icdP (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, BCS.icdPCS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdP, BCS.icdPCS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         if (Claim.twoDifferentDOS(claims)) {
           s.addScore(name, HEDISRule.excluded, BCS.unilateralMastectomy2, claims)
         } else s
@@ -166,7 +166,7 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromMonths(12).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(180)
     pickOne(List(
 

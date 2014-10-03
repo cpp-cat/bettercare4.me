@@ -56,6 +56,9 @@ object CDC {
     "648.0", "648.01", "648.02", "648.03", "648.04")
   val icd9DAS = icd9DA.toSet
 
+  // subset of ubA to avaoid false positive in generated claims - avoid CDC_MAN to meet measure from eligible claims
+  val icd9DAT = icd9DA.diff(CDC_MAN.icdDA)
+
   /**
    * ICD Diagnosis for Gestational diabetes or Polycystic Ovaries or Steroid-induced Diabetes
    * to identify exclusions.
@@ -117,6 +120,9 @@ object CDC {
     "0880", "0881", "0882", "0883", "0884", "0885", "0886", "0887", "0888", "0889", "088X",
     "0982", "0983")
   val ubAS = ubA.toSet
+  
+  // subset of ubA to avaoid false positive in generated claims - avoid CDC_MAN to meet measure from eligible claims
+  val ubAT = ubA.diff(CDC_MAN.ubA)
 
   /**
    * Place-of-Service codes for face-to-face encounters in an ambulatory or nonacute inpatient
@@ -126,6 +132,9 @@ object CDC {
     "4", "5", "6", "7", "8", "9", "10", "11", "12", "15", "20", "22", "24",
     "26", "49", "50", "52", "53", "57", "61", "62", "65", "71", "72", "95", "99")
   val posAS = posA.toSet
+  
+  // subset of to avoid false positive in generated claims - avoid CDC_MAN to meet measure from eligible claims
+  val posAT = posA.diff(CDC_MAN.hcfaposA)
 
   /**
    * UB Revenue codes for face-to-face encounter in an acute
@@ -147,6 +156,9 @@ object CDC {
     "0800", "0801", "0802", "0803", "0804", "0805", "0806", "0807", "0808", "0809", "080X",
     "0981", "0987")
   val ubBS = ubB.toSet
+  
+  // subset of to avoid false positive in generated claims - avoid CDC_MAN to meet measure from eligible claims
+  val ubBT = ubB.diff(CDC_MAN.ubA)
 
   /**
    * CPT codes for face-to-face encounter in an acute

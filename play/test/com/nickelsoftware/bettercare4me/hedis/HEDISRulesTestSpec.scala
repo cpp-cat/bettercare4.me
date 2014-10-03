@@ -14,6 +14,8 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.joda.time.DateTime
+import org.joda.time.Interval
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object HEDISRulesTestSpec {
 
@@ -29,7 +31,7 @@ object HEDISRulesTestSpec {
     c.setEligibleRate(eligibleRate)
     c.setExclusionRate(exclusionRate)
     c.setMeetMeasureRate(meetMeasureRate)
-    val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+    val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val patient = persistenceLayer.createPatient("first", "last", gender, dob)
     val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
@@ -39,6 +41,41 @@ object HEDISRulesTestSpec {
 
 class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
 
+  "The DateTime class" must {
+    
+    "compute age from an HEDIS date" in {
+      
+      val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
+      val dobMin = new LocalDate(2012, 1, 1).toDateTimeAtStartOfDay()
+      val dobMax = new LocalDate(2012, 12, 31).toDateTimeAtStartOfDay()
+      Patient("key1", "Michel", "Dufresne", "M", dobMin).age(hedisDate) mustBe 2
+      Patient("key1", "Michel", "Dufresne", "M", dobMax).age(hedisDate) mustBe 2
+      
+      Patient("key1", "Michel", "Dufresne", "M", dobMin).ageInMonths(hedisDate) mustBe 35
+      Patient("key1", "Michel", "Dufresne", "M", dobMax).ageInMonths(hedisDate) mustBe 24
+    }
+    
+    "compute intervale from an HEDIS date" in {
+      
+      val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()      
+      val dobMin = new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
+      val dobMax = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
+      
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMin) mustBe true
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMax) mustBe true
+      
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMin.minusDays(1)) mustBe false
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMax.minusDays(1)) mustBe true
+      
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMin.plusDays(1)) mustBe true
+      Utils.getIntervalFromMonths(12, hedisDate).contains(dobMax.plusDays(1)) mustBe false
+      
+      Utils.getIntervalFromDays(10, hedisDate).contains(new LocalDate(2014, 12, 22).toDateTimeAtStartOfDay()) mustBe true
+      Utils.getIntervalFromDays(10, hedisDate).contains(new LocalDate(2014, 12, 21).toDateTimeAtStartOfDay()) mustBe false
+      Utils.getIntervalFromDays(10, hedisDate).contains(dobMax) mustBe true
+    }
+  }
+  
   "The HEDISRules class" must {
 
     "create a TestRule properly from config" in {
@@ -50,9 +87,9 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       c.setMeetMeasureRate(92)
       c.setExclusionRate(5)
       
-      val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
+      val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
       val rule = HEDISRules.createRuleByName(c.getName, c, hedisDate)
-
+      
       rule.name mustBe "TEST"
       rule.fullName mustBe "Test Rule"
       rule.description mustBe "This rule is for testing."
@@ -66,6 +103,25 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
           claim.providerID mustBe provider.providerID
         case _ => fail("Invalid claim class type!")
       }
+    }
+    
+    "contains a date withing a specified interval" in {
+      
+      val c = new RuleConfig
+      c.setName("TEST")
+      c.setEligibleRate(40)
+      c.setMeetMeasureRate(92)
+      c.setExclusionRate(5)
+      
+      val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
+      val rule = new TestRule(c, hedisDate)
+      
+      rule.getIntervalFromMonths(6).contains(new LocalDate(2014, 7, 1).toDateTimeAtStartOfDay()) mustBe true
+      rule.getIntervalFromDays(31).contains(new LocalDate(2014, 12, 1).toDateTimeAtStartOfDay()) mustBe true
+      
+      rule.getIntervalFromMonths(6).contains(new LocalDate(2014, 6, 30).toDateTimeAtStartOfDay()) mustBe false
+      rule.getIntervalFromDays(31).contains(new LocalDate(2014, 11, 30).toDateTimeAtStartOfDay()) mustBe false
+      
     }
 
     "throw NickelException when try to create a rule with an unknown name" in {

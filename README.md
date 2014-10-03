@@ -69,6 +69,10 @@
 - Added CDC - Cervical Cancer Screening HEDIS Rule
 - Added Chlamydia Screening by Age HEDIS Rule
 - Added Colorectal Cancer Screening HEDIS Rule
+- Added Chicken Pox Immunization
+- Added DTaP Immunization
+- Fix HEDIS date range
+- Fix CDC and CHL rules where the eligible criteria was also trigering the meet measure and creating false positive
 
 
 # Sprint 4: Enhanced Rule Framework for HEDIS rules

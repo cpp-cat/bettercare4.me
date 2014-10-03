@@ -56,7 +56,7 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
   import CDCHbA1cTestValue._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
     val dos2 = dos.minusDays(Random.nextInt(80))
     pickOne(List(
@@ -72,7 +72,7 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     // fnc to return true if the most recent lab claim has a result < 8%
     def checkMostRecentLabClaim(): Boolean = {

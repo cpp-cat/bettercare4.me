@@ -9,27 +9,32 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 class CDC_MAN_RuleTestSpec extends PlaySpec with OneAppPerSuite {
-  
-    "The CDC_MAN_Rule class representing Diabetes Urine Microalbumin Test HEDIS rule" must {
-    
+
+  "The CDC_MAN_Rule class representing Diabetes Urine Microalbumin Test HEDIS rule" must {
+
     "validate patient that meet the measure criteria" in {
 
       val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_MAN.name, 100, 0, 100)
       val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
-      
+
       rule.isPatientEligible(scorecard) mustBe true
       rule.isPatientExcluded(scorecard) mustBe false
       rule.isPatientMeetMeasure(scorecard) mustBe true
-   }
-    
+    }
+
     "validate patient that does not meet the measure criteria and is not excluded" in {
 
-      val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_MAN.name, 100, 0, 0)
-      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
-      
-      rule.isPatientEligible(scorecard) mustBe true
-      rule.isPatientExcluded(scorecard) mustBe false
-      rule.isPatientMeetMeasure(scorecard) mustBe false
+      for (i <- 1 to 1000) {
+        val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_MAN.name, 100, 0, 0)
+        val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
+
+        rule.isPatientEligible(scorecard) mustBe true
+        rule.isPatientExcluded(scorecard) mustBe false
+
+        if (rule.isPatientMeetMeasure(scorecard)) {
+          fail("Meet Measure should have failed, but rule fired: " + scorecard.hedisRuleMap(rule.name).meetMeasure.criteriaScore.keySet)
+        }
+      }
     }
   }
 }

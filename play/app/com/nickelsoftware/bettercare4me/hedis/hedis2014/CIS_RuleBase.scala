@@ -60,8 +60,8 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
   import CIS._
 
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
-    val age = patient.ageInMonths(hedisDate)
-    age <= 24
+    val age = patient.age(hedisDate)
+    age == 2
   }
 
   // This rule has 100% eligibility when the demographics are meet
@@ -69,8 +69,8 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusMonths(22), hedisDate).toDuration().getStandardDays().toInt
-    val dos = hedisDate.minusDays(Random.nextInt(days) + 1)
+    val days = getIntervalFromMonths(20).toDuration().getStandardDays().toInt
+    val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
 
@@ -90,19 +90,19 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
 
       // exclusions - Anaphylactic reaction to the vaccine or its components (ICD D)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, anaphylactic, claims)
       },
 
       // exclusions - Encephalopathy (ICD D)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => claim.hasDiagnostic(icdDCS) && claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => claim.hasDiagnostic(icdDCS) && !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, encephalopathy, claims)
       },
 
       // exclusion - Immunodeficiency syndromes, HIV disease. . . (ICD D)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdD, icdDDS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdD, icdDDS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, immunodeficiency, claims)
       })
 

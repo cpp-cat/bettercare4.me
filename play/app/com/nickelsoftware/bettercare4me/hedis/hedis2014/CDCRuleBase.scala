@@ -45,7 +45,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
     val age = patient.age(hedisDate)
-    age > 17 && age < 76
+    age >= 18 && age <= 75
   }
 
   //
@@ -53,9 +53,9 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def generateEligibleAndExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider, isExcluded: Boolean): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
-    val dos1 = hedisDate.minusDays(Random.nextInt(days)).minusDays(60)
-    val dos2 = hedisDate.minusDays(Random.nextInt(days)).minusDays(180)
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val dos1 = hedisDate.minusDays(Random.nextInt(days))
+    val dos2 = dos1.minusDays(Random.nextInt(180)+2)
 
     def generateDiabetesRx: List[Claim] = {
       val ndc1 = pickOne(ndcA)
@@ -80,16 +80,16 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
         () => {
           List(
             pickOne(List(
-              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA), hcfaPOS = pickOne(posA)),
-              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)))),
+              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)),
+              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)))),
             pickOne(List(
-              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubA), hcfaPOS = pickOne(posA)),
-              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DA), cpt = pickOne(cptA), hcfaPOS = pickOne(posA)))))
+              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)),
+              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)))))
         },
 
         // Another possible set of claims based on 1 face-to-face in ER
-        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), cpt = pickOne(cptB), hcfaPOS = pickOne(posB))),
-        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DA), ubRevenue = pickOne(ubB), hcfaPOS = pickOne(posB)))))()
+        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptB), hcfaPOS = pickOne(posB))),
+        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubBT), hcfaPOS = pickOne(posB)))))()
     }
   }
 
@@ -98,7 +98,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
+    val measurementInterval = getIntervalFromYears(2)
 
     def rules = List[(Scorecard) => Scorecard](
 
@@ -141,7 +141,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(2).toDuration().getStandardDays().toInt
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
 
     // Exclusion based on ICD Diagnostic (anytime prior to or during the measurement year)
@@ -153,7 +153,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
+    val measurementInterval = getIntervalFromYears(2)
 
     // Patient is excluded if has diagnosis from ICD9DB and no face-2-face visit (identified from ICD9DA) - regardless of POS
     // --

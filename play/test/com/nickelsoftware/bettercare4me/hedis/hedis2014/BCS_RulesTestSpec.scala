@@ -24,7 +24,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
       c.setEligibleRate(66)
       c.setExclusionRate(88)
       c.setMeetMeasureRate(77)
-      val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+      val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
 
       rule.name mustBe BCS.name
       rule.fullName mustBe "Breast Cancer Screening"
@@ -42,7 +42,7 @@ class BCSRulesTestSpec extends PlaySpec with OneAppPerSuite {
       c.setEligibleRate(100)
       c.setExclusionRate(0)
       c.setMeetMeasureRate(100)
-      val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+      val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
       val dob = new LocalDate(2014, 9, 12).toDateTimeAtStartOfDay()
 
       rule.isPatientMeetDemographic(persistenceLayer.createPatient("first", "last", "M", dob)) mustBe false

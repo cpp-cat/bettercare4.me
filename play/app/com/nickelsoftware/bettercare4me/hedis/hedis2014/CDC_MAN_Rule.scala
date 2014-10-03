@@ -26,7 +26,13 @@ object CDC_MAN {
 
   val urineMicroalbuminTest = "Urine Microalbumin Test"
   val neuphrologist = "Vist to a Neuphrologist"
-  val nephropathyTreatment = "Diagnosis / Treatment for Nephropathy"
+  val nephropathyTreatment1 = "Diagnosis / Treatment for Nephropathy (1)"
+  val nephropathyTreatment2 = "Diagnosis / Treatment for Nephropathy (2)"
+  val nephropathyTreatment3 = "Diagnosis / Treatment for Nephropathy (3)"
+  val nephropathyTreatment4 = "Diagnosis / Treatment for Nephropathy (4)"
+  val nephropathyTreatment5 = "Diagnosis / Treatment for Nephropathy (5)"
+  val nephropathyTreatment6 = "Diagnosis / Treatment for Nephropathy (6)"
+  val nephropathyTreatment7 = "Diagnosis / Treatment for Nephropathy (7)"
   val aceArbTheraphy = "ACE / ARB Theraphy"
 
   /**
@@ -64,7 +70,7 @@ object CDC_MAN {
    * Diagnosis / Treatment for Nephropathy (CPT)
    */
   val cptB = List("36145", "36147", "36800", "36810", "36815", "36818", "36819", "36820", "36821", "36831", "36832", "36833", "50300", "50320", "50340", "50360", "50365", "50370", "50380", "90920", "90921", "90924", "90925", "90935", "90937", "90939", "90940", "90945", "90947", "90957", "90958", "90959", "90960", "90961", "90962", "90965", "90966", "90969", "90970", "90989", "90993", "90997", "90999", "99512", "3066F", "4009F")
-  val cptBS = cptA.toSet
+  val cptBS = cptB.toSet
 
   /**
    * Diagnosis / Treatment for Nephropathy (HCPCS)
@@ -114,7 +120,7 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
   import CDC_MAN._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
@@ -157,7 +163,7 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     def rules = List[(Scorecard) => Scorecard](
 
@@ -182,37 +188,37 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
       // Diagnosis / Treatment for Nephropathy (ICD Diagnosis)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment1, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment2, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment3, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment4, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (UB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment5, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (TOB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.tob, tobAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment6, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (NDC)
@@ -224,7 +230,7 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
       // Diagnosis / Treatment for Nephropathy (TOB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcfaPOS, hcfaposAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment, claims)
+        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment7, claims)
       })
 
     applyRules(scorecard, rules)

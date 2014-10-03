@@ -1,6 +1,25 @@
 package com.nickelsoftware.bettercare4me.utils
 
+import org.joda.time.Interval
+import org.joda.time.DateTime
+
 object Utils {
+  
+  /**
+   * @returns an interval in months leading to date
+   */
+  def getIntervalFromMonths(months: Int, date: DateTime): Interval = {
+      val temp = date.plusDays(1)
+      new Interval(temp.minusMonths(months), temp)
+  }
+  
+  /**
+   * @returns an interval in days leading to date
+   */
+  def getIntervalFromDays(days: Int, date: DateTime): Interval = {
+      val temp = date.plusDays(1)
+      new Interval(temp.minusDays(days), temp)
+  }
 
   def add2Map[C](s: String, c: C, map: Map[String, List[C]]): Map[String, List[C]] = {
 

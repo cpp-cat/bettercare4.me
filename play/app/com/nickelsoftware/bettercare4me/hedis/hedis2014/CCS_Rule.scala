@@ -82,7 +82,7 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
     val age = patient.age(hedisDate)
-    patient.gender == "F" && age > 23 && age < 65
+    patient.gender == "F" && age >= 24 && age <= 64
   }
 
   // This rule has 100% eligibility when the demographics are meet
@@ -91,7 +91,7 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(15), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(15).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
     pickOne(List(
 
@@ -111,19 +111,19 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // Previous hysterectomy with no residual cervix (CPT)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
       },
 
       // Previous hysterectomy with no residual cervix (ICD D)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
       },
 
       // Previous hysterectomy with no residual cervix (ICD P)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
       })
 
@@ -132,7 +132,7 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(2), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(2).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(180)
     pickOne(List(
 

@@ -122,7 +122,7 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(30), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(30).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
@@ -146,25 +146,25 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // exclusions - Total Colectomy (CPT)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, totalColectomy, claims)
       },
 
       // exclusions - Total Colectomy (ICD P)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, totalColectomy, claims)
       },
 
       // exclusions - Total Colorectal cancer (ICD D)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, colorectalCancer, claims)
       },
 
       // exclusion - Colorectal cancer (HCPCS)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => claim.dos.isBefore(hedisDate) })
+        val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         s.addScore(name, HEDISRule.excluded, colorectalCancer, claims)
       })
 
@@ -173,8 +173,8 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusDays(300), hedisDate).toDuration().getStandardDays().toInt
-    val dos = hedisDate.minusDays(Random.nextInt(days) + 1)
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
 
@@ -205,7 +205,7 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     def rules = List[(Scorecard) => Scorecard](
 

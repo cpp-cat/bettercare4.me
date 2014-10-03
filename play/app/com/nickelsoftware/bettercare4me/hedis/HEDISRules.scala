@@ -30,6 +30,10 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_MAN_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_16_20_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_21_26_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_DTaP
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_DTaP_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
 import com.nickelsoftware.bettercare4me.models.Claim
@@ -305,18 +309,18 @@ trait HEDISRule {
    * Verify if the patient is in the denominator of the rule, i.e., eligible to the measure and not excluded.
    */
   def isPatientInDenominator(scorecard: Scorecard): Boolean
-  
+
   /**
    * Apply the rule criteria to patient
-   * 
+   *
    * Apply the following scoring methods:
    * - scorePatientMeetDemographic
    * - scorePatientEligible
-   * 
+   *
    * Then the following methods, conditionally:
    * - scorePatientExcluded (if isPatientEligible is true)
    * - scorePatientMeetMeasure (if isPatientExcluded is false)
-   * 
+   *
    * @param scorecard to be updated with the criteria of this rule
    * @param patient to evaluate on this rule
    * @param ph is the patient claim's history
@@ -331,6 +335,39 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   val eligibleRate: Int = config.eligibleRate
   val meetMeasureRate: Int = config.meetMeasureRate
   val exclusionRate: Int = config.exclusionRate
+
+  /**
+   * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified years prior to it.
+   *
+   * @param years number of years for the interval, just prior the `hedisDate`
+   * @return The calculated interval, including the hedisDate
+   */
+  def getIntervalFromYears(years: Int): Interval = {
+    val temp = hedisDate.plusDays(1)
+    new Interval(temp.minusYears(years), temp)
+  }
+
+  /**
+   * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified months prior to it.
+   *
+   * @param months number of months for the interval, just prior the `hedisDate`
+   * @return The calculated interval, including the hedisDate
+   */
+  def getIntervalFromMonths(months: Int): Interval = {
+    val temp = hedisDate.plusDays(1)
+    new Interval(temp.minusMonths(months), temp)
+  }
+
+  /**
+   * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified days prior to it.
+   *
+   * @param days number of days for the interval, just prior the `hedisDate`
+   * @return The calculated interval, including the hedisDate
+   */
+  def getIntervalFromDays(days: Int): Interval = {
+    val temp = hedisDate.plusDays(1)
+    new Interval(temp.minusDays(days), temp)
+  }
 
   def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
@@ -412,6 +449,22 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   }
 
   /**
+   * @returns true if have nbr claims with different dates in claims
+   */
+  def hasDifferentDates(nbr: Int, claims: List[Claim]): Boolean = {
+    def loop(dates: Set[DateTime], c: List[Claim]): Boolean = {
+      if (dates.size == nbr) true
+      else {
+        if (c.isEmpty) false
+        else {
+          if (!dates.contains(c.head.date)) loop(dates + c.head.date, c.tail)
+          else loop(dates, c.tail)
+        }
+      }
+    }
+    loop(Set(), claims)
+  }
+  /**
    * Utility method to increase readability in the HEDIS Rule classes.
    *
    * Simply fold all the rules and build up the scorecard from an initial value
@@ -445,24 +498,16 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   def pickOne[A](items: List[A]): A = items(Random.nextInt(items.size))
 
   /**
-   * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified days prior to it.
-   *
-   * @param nbrDays number of days for the interval, just prior the `hedisDate`
-   * @return The calculated interval, excluding the hedisDate
-   */
-  def getInterval(nbrDays: Int): Interval = new Interval(hedisDate.minusDays(nbrDays), hedisDate)
-
-  /**
    * Apply the rule criteria to patient
-   * 
+   *
    * Apply the following scoring methods:
    * - scorePatientMeetDemographic
    * - scorePatientEligible
-   * 
+   *
    * Then the following methods, conditionally:
    * - scorePatientExcluded (if isPatientEligible is true)
    * - scorePatientMeetMeasure (if isPatientExcluded is false)
-   * 
+   *
    * @param scorecard to be updated with the criteria of this rule
    * @param patient to evaluate on this rule
    * @param ph is the patient claim's history
@@ -476,7 +521,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
       else scorePatientMeetMeasure(s2, patient, ph)
     } else s1
   }
-  
+
 }
 
 object HEDISRules {
@@ -495,7 +540,9 @@ object HEDISRules {
     CCS.name -> { (c, d) => new CCS_Rule(c, d) },
     CHL.name16 -> { (c, d) => new CHL_16_20_Rule(c, d) },
     CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) },
-    COL.name -> { (c, d) => new COL_Rule(c, d) })
+    COL.name -> { (c, d) => new COL_Rule(c, d) },
+    CIS_VZV.name -> { (c, d) => new CIS_VZV_Rule(c, d) },
+    CIS_DTaP.name -> { (c, d) => new CIS_DTaP_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)
@@ -521,13 +568,13 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         icdDPri = "icd 1", icdD = Set("icd 1", "icd 2"), icdP = Set("icd p1"),
         hcfaPOS = "hcfaPOS", ubRevenue = "ubRevenue"))
   }
-  
+
   def scorePatientMeetDemographic(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
     scorecard.addScore("TEST", HEDISRule.meetDemographic, true)
-  
+
   def scorePatientExcluded(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
     scorecard.addScore("TEST", HEDISRule.excluded, true)
-  
+
   def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
     scorecard.addScore("TEST", HEDISRule.meetMeasure, true)
 }

@@ -76,6 +76,9 @@ object CHL {
   // meet measure - At least one chlamydia test (CPT)
   val cptD = List("87110", "87270", "87320", "87490", "87491", "87492", "87810")
   val cptDS = cptD.toSet
+  
+  // create list of cpt w/o the value included in the meet measure so we can test when eligible but don't meet measure
+  val cptAT = cptA.diff(cptD)
 }
 /**
  * Chlamydia Screen Rule
@@ -110,13 +113,13 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
 
       // Sexually-active women (CPT)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptAT))),
 
       // Sexually-active women (ICD D)
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDA))),
@@ -136,7 +139,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     def rules = List[(Scorecard) => Scorecard](
 
@@ -182,8 +185,8 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(350), hedisDate).toDuration().getStandardDays().toInt
-    val dos = hedisDate.minusDays(Random.nextInt(days)).plusDays(10)
+    val days = getIntervalFromDays(350).toDuration().getStandardDays().toInt
+    val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(10)
     val dos2 = dos.plusDays(Random.nextInt(7))
 
     pickOne(List(
@@ -202,7 +205,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     // exclusion - Pregnancy test (UB)
     // exclusion - X-ray or prescription for isotretinoin (CPT)
@@ -227,7 +230,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptD)))
@@ -235,7 +238,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     // Check if patient had tested
     val claims = filterClaims(ph.cpt, cptDS, { claim: MedClaim => measurementInterval.contains(claim.dos) })

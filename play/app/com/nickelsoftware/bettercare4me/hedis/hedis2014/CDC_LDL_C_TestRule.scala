@@ -59,7 +59,7 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
   import CDC_LDL_C._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one Lipid Test (during the measurement year)
@@ -74,7 +74,7 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     def rules = List[(Scorecard) => Scorecard](
 

@@ -52,7 +52,7 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
   import CDCHbA1cTest._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one HbA1c test (during the measurement year)
@@ -61,7 +61,7 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     // Check if patient had at least one HbA1c test (during the measurement year)
     val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })

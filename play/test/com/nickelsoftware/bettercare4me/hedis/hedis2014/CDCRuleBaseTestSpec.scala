@@ -40,7 +40,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     c.setEligibleRate(eligibleRate)
     c.setExclusionRate(exclusionRate)
     c.setMeetMeasureRate(meetMeasureRate)
-    val rule = new CDCRuleBaseTest(c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+    val rule = new CDCRuleBaseTest(c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
     val patient = persistenceLayer.createPatient("first", "last", "F", dob)
     val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
@@ -60,7 +60,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
       c.setEligibleRate(100)
       c.setExclusionRate(0)
       c.setMeetMeasureRate(100)
-      val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
+      val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
       val rule = new CDCRuleBaseTest(c, hedisDate)
       val dob = new LocalDate(2014, 9, 12).toDateTimeAtStartOfDay()
       

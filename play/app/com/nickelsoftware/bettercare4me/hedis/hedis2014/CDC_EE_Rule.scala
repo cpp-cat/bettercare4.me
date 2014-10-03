@@ -77,7 +77,7 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
   import CDCEE._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = new Interval(hedisDate.minusYears(1), hedisDate).toDuration().getStandardDays().toInt
+    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
     val dos = hedisDate.minusDays(Random.nextInt(days))
     val splty = pickOne(specialtyCdeA)
 
@@ -96,7 +96,7 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(1), hedisDate)
+    val measurementInterval = getIntervalFromYears(1)
 
     def rules = List[(Scorecard) => Scorecard](
 
