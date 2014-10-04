@@ -50,12 +50,6 @@
 - Completing the implementation of the HEDIS 2014 Rules
 
 ## User Stories Sprint Backlog
-- Childhood Immunization Status by Immunization Type
-- Lead Screening in Children
-- Glaucoma Screening in Older Adults
-- Well-Child Visits in the First 15 Months of Life
-- Well-Child Visits in the 3 - 6 Years of Life
-- Adolescent Well Care Visits
 - Asthma Medication Ratio by Age
 - Cholesterol Management for Patient with Cardiovascular Conditions
 - Annual Monitoring for Patients on Persistent Medication by Medication
@@ -69,8 +63,16 @@
 - Added CDC - Cervical Cancer Screening HEDIS Rule
 - Added Chlamydia Screening by Age HEDIS Rule
 - Added Colorectal Cancer Screening HEDIS Rule
-- Added Chicken Pox Immunization
-- Added DTaP Immunization
+- Added Chicken Pox Immunization HEDIS Rule
+- Added DTaP Immunization HEDIS Rule
+- Added Hep B Immunization HEDIS Rule
+- Added Influenza Type B Immunization HEDIS Rule
+- Added Measles / Mumps / Rubella Immunization HEDIS Rule
+- Added Pneumococcal Conjugate Immunization HEDIS Rule
+- Added Polio Immunization HEDIS Rule
+- Added Well-Child Visits in the First 15 Months of Life HEDIS Rule
+- Added Well-Child Visits in the 3 - 6 Years of Life HEDIS Rule
+- Added Adolescent Well Care Visits HEDIS Rule
 - Fix HEDIS date range
 - Fix CDC and CHL rules where the eligible criteria was also trigering the meet measure and creating false positive
 

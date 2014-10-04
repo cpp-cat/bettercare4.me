@@ -9,6 +9,8 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
 
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.AWC
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.AWC_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCSRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CCS
@@ -32,10 +34,24 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_16_20_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CHL_21_26_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_DTaP
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_DTaP_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_HB
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_HB_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_HiB
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_HiB_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_IPV
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_IPV_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_MMR
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_MMR_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_PC
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_PC_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.W34
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.W34_Rule
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientHistory
@@ -83,7 +99,11 @@ case class RuleCriteriaScore(name: String = "", oride: Option[Boolean] = None, c
     }
   }
 
-  def addScore(predicateName: String, l: List[Claim]): RuleCriteriaScore = RuleCriteriaScore(name, None, add2Map(predicateName, l, criteriaScore))
+  def addScore(predicateName: String, l: List[Claim]): RuleCriteriaScore = {
+    if(criteriaScore.contains(predicateName)) RuleCriteriaScore(name, None, add2Map(predicateName, l, criteriaScore))
+    else RuleCriteriaScore(name, None, Map((predicateName -> l)))
+  }
+  
   def addScore(b: Boolean): RuleCriteriaScore = RuleCriteriaScore(name, Some(b), Map())
 }
 
@@ -171,6 +191,22 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
       val ruleScore = hedisRuleMap.getOrElse(measureName, HEDISRule.emptyRuleScore)
       Scorecard(hedisRuleMap + (measureName -> ruleScore.addScore(criteriaName, predicateName, claims)))
     }
+  }
+
+  /**
+   * Update the scorecard (by returning a new value) for particular predicate
+   *
+   * Special case, no matching claims provided, this case is when a predicate matches but there are no claims to report
+   *
+   * @param measureName is the HEDIS measure name (HEDISRule::name)
+   * @param criteriaName is the criteria being updated for the HEDIS measure (meetDemographic, eligible, excluded, meetMeasure)
+   * @param predicateName is the name of the predicate that was evaluated (Predicate::predicateName)
+   * @throws NickelException for unknown `criteriaName
+   */
+  def addScore(measureName: String, criteriaName: String, predicateName: String): Scorecard = {
+
+    val ruleScore = hedisRuleMap.getOrElse(measureName, HEDISRule.emptyRuleScore)
+    Scorecard(hedisRuleMap + (measureName -> ruleScore.addScore(criteriaName, predicateName, List.empty)))
   }
 
   /**
@@ -521,7 +557,6 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
       else scorePatientMeetMeasure(s2, patient, ph)
     } else s1
   }
-
 }
 
 object HEDISRules {
@@ -542,13 +577,20 @@ object HEDISRules {
     CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) },
     COL.name -> { (c, d) => new COL_Rule(c, d) },
     CIS_VZV.name -> { (c, d) => new CIS_VZV_Rule(c, d) },
-    CIS_DTaP.name -> { (c, d) => new CIS_DTaP_Rule(c, d) })
+    CIS_DTaP.name -> { (c, d) => new CIS_DTaP_Rule(c, d) },
+    CIS_HB.name -> { (c, d) => new CIS_HB_Rule(c, d) },
+    CIS_HiB.name -> { (c, d) => new CIS_HiB_Rule(c, d) },
+    CIS_MMR.name -> { (c, d) => new CIS_MMR_Rule(c, d) },
+    CIS_PC.name -> { (c, d) => new CIS_PC_Rule(c, d) },
+    CIS_IPV.name -> { (c, d) => new CIS_IPV_Rule(c, d) },
+    W15.name -> { (c, d) => new W15_Rule(c, d) },
+    W34.name -> { (c, d) => new W34_Rule(c, d) },
+    AWC.name -> { (c, d) => new AWC_Rule(c, d) })
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)
     else rules(name)(config, hedisDate)
   }
-
 }
 
 class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
