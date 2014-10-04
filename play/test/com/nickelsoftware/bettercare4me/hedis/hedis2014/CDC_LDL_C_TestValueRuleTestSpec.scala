@@ -27,10 +27,10 @@ class CDC_LDL_C_TestValueRuleTestSpec extends PlaySpec with OneAppPerSuite {
 
     "validate patient that does not meet the measure criteria and is not excluded" in {
 
-      val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_LDL_C_Value.name, 100, 0, 0)
-      val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
+      for (i <- 1 to 100) {
+        val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(CDC_LDL_C_Value.name, 100, 0, 0)
+        val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
 
-      for (i <- 1 to 500) {
         rule.isPatientEligible(scorecard) mustBe true
         rule.isPatientExcluded(scorecard) mustBe false
 

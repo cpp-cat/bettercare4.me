@@ -74,25 +74,6 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
 
     val measurementInterval = getIntervalFromYears(1)
 
-    // fnc to return true if the most recent lab claim has a result < 8%
-    def checkMostRecentLabClaim(): Boolean = {
-
-      // get all the claims that match the loinc
-      val allClaims = ph.loinc flatMap {
-        (_: (String, List[LabClaim])) match {
-          case (k, l) =>
-            if (loincAS.contains(k)) l filter { (c: LabClaim) => measurementInterval.contains(c.dos) }
-            else List.empty
-
-          case _ => List.empty
-        }
-      } toList
-
-      // sort the claim by dos, in descending order. The head will be the most recent
-      if (allClaims.isEmpty) false
-      else meetCriteria(allClaims sortWith { (c1: LabClaim, c2: LabClaim) => c1.dos.isAfter(c2.dos) } head)
-    }
-
     def rules = List[(Scorecard) => Scorecard](
 
       // Check if patient has claim with cpt

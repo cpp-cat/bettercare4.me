@@ -23,6 +23,10 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest8Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTest9Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDCHbA1cTestValue
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_BPC
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_BPC_C1_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_BPC_C2_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_BPC_T_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_TestRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CDC_LDL_C_TestValueRule
@@ -572,6 +576,9 @@ object HEDISRules {
     CDC_LDL_C.name -> { (c, d) => new CDC_LDL_C_TestRule(c, d) },
     CDC_LDL_C_Value.name -> { (c, d) => new CDC_LDL_C_TestValueRule(c, d) },
     CDC_MAN.name -> { (c, d) => new CDC_MAN_Rule(c, d) },
+    CDC_BPC.nameTest -> { (c, d) => new CDC_BPC_T_Rule(c, d) },
+    CDC_BPC.nameC1 -> { (c, d) => new CDC_BPC_C1_Rule(c, d) },
+    CDC_BPC.nameC2 -> { (c, d) => new CDC_BPC_C2_Rule(c, d) },
     CCS.name -> { (c, d) => new CCS_Rule(c, d) },
     CHL.name16 -> { (c, d) => new CHL_16_20_Rule(c, d) },
     CHL.name21 -> { (c, d) => new CHL_21_26_Rule(c, d) },

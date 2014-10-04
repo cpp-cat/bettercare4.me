@@ -153,7 +153,7 @@ case class MHead(claimStatus: String = "", pcpFlag: String = "", specialtyCde: S
  *  - icdD Secondary Diagnostic codes (up to 10)
  *  - icdP ICD Procedure codes (up to 10)
  *  - drg Diagnosis Related Group
- *  - cpt CPT (procedure procedure)
+ *  - cpt CPT (procedure code)
  *  - cptMod1 CPT Modifier 1 (2 chars)
  *  - cptMod2 CPT Modifier 2 (2 chars)
  */

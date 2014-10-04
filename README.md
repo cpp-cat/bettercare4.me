@@ -61,6 +61,9 @@
 ## Completed User Stories
 - Added CDC - Diabetes Lipid Test < 100 mg/dL HEDIS Rule
 - Added CDC - Cervical Cancer Screening HEDIS Rule
+- Added CDC - BP Test (Test Performed) HEDIS Rule
+- Added CDC - BP Test (<140/80 mmHg) HEDIS Rule
+- Added CDC - BP Test (<140/90 mmHg) HEDIS Rule
 - Added Chlamydia Screening by Age HEDIS Rule
 - Added Colorectal Cancer Screening HEDIS Rule
 - Added Chicken Pox Immunization HEDIS Rule
