@@ -68,8 +68,8 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
       // Possible set: CPT
       () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
 
-      // Another possible set: LOINC on lab claim
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA)))))()
+      // Another possible set: LOINC on lab claim 
+      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA) )) ))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

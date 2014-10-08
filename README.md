@@ -50,8 +50,6 @@
 - Completing the implementation of the HEDIS 2014 Rules
 
 ## User Stories Sprint Backlog
-- Asthma Medication Ratio by Age
-- Cholesterol Management for Patient with Cardiovascular Conditions
 - Annual Monitoring for Patients on Persistent Medication by Medication
 - Appropriate Testing for Children with Pharyngitis
 - Appropriate Treatment for Children with Upper Repiratory Infection
@@ -76,6 +74,8 @@
 - Added Well-Child Visits in the First 15 Months of Life HEDIS Rule
 - Added Well-Child Visits in the 3 - 6 Years of Life HEDIS Rule
 - Added Adolescent Well Care Visits HEDIS Rule
+- Added Asthma Medication Ratio by Age HEDIS Rule
+- Added Cholesterol Management for Patient with Cardiovascular Conditions HEDIS Rule
 - Fix HEDIS date range
 - Fix CDC and CHL rules where the eligible criteria was also trigering the meet measure and creating false positive
 

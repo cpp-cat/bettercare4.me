@@ -9,6 +9,11 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
 
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_12_18_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_19_50_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_51_64_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_5_11_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.AWC
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.AWC_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.BCS
@@ -50,6 +55,9 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_PC
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_PC_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CIS_VZV_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestRule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestValueRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15
@@ -409,6 +417,15 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
     new Interval(temp.minusDays(days), temp)
   }
 
+  /**
+   * Utility method to get an `Interval` from the `date` to `hedisDate`
+   *
+   * @param date the date to start the interval
+   * @return The calculated interval, including the hedisDate
+   */
+  def getIntervalFromDate(date: DateTime): Interval = new Interval(date, hedisDate.plusDays(1))
+
+  
   def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
@@ -592,7 +609,14 @@ object HEDISRules {
     CIS_IPV.name -> { (c, d) => new CIS_IPV_Rule(c, d) },
     W15.name -> { (c, d) => new W15_Rule(c, d) },
     W34.name -> { (c, d) => new W34_Rule(c, d) },
-    AWC.name -> { (c, d) => new AWC_Rule(c, d) })
+    AWC.name -> { (c, d) => new AWC_Rule(c, d) },
+    ASM.name5 -> { (c, d) => new ASM_5_11_Rule(c, d) },
+    ASM.name12 -> { (c, d) => new ASM_12_18_Rule(c, d) },
+    ASM.name19 -> { (c, d) => new ASM_19_50_Rule(c, d) },
+    ASM.name51 -> { (c, d) => new ASM_51_64_Rule(c, d) },
+    CMC.nameTest -> { (c, d) => new CMC_LDL_C_TestRule(c, d) },
+    CMC.nameTestValue -> { (c, d) => new CMC_LDL_C_TestValueRule(c, d) })
+    
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)

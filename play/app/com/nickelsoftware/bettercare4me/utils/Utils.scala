@@ -14,6 +14,14 @@ object Utils {
   }
   
   /**
+   * @returns an interval in years leading to date
+   */
+  def getIntervalFromYears(years: Int, date: DateTime): Interval = {
+      val temp = date.plusDays(1)
+      new Interval(temp.minusYears(years), temp)
+  }
+  
+  /**
    * @returns an interval in days leading to date
    */
   def getIntervalFromDays(days: Int, date: DateTime): Interval = {
@@ -38,6 +46,10 @@ object Utils {
     }
   }
 
+  //
+  // import com.nickelsoftware.bettercare4me.utils.Utils._
+  // flattenFile("./data/asm.ndc.c.csv", "./data/out.csv")
+  //
   def flattenFile(from: String, to: String): Unit = {
 
     import com.github.tototoshi.csv.CSVReader

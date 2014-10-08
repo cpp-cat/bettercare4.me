@@ -35,16 +35,16 @@ object PatientHistoryFactory {
 
       /*
        * Mapping Medical Claim
- * - medMap: MedMap is the mapping of the codes / info back to medical claims
- * 		- specialtyCde: Map[String, List[MedClaim]],
- * 		- hcfaPOS: Map[String, List[MedClaim]],
- * 		- icdD: Map[String, List[MedClaim]],
- * 		- icdP: Map[String, List[MedClaim]],
- * 		- cpt: Map[String, List[MedClaim]],
- * 		- tob: Map[String, List[MedClaim]],
- * 		- ubRevenue: Map[String, List[MedClaim]],
- * 		- hcpcs: Map[String, List[MedClaim]])
-       */
+       * - medMap: MedMap is the mapping of the codes / info back to medical claims
+       * 		- specialtyCde: Map[String, List[MedClaim]],
+       * 		- hcfaPOS: Map[String, List[MedClaim]],
+       * 		- icdD: Map[String, List[MedClaim]],
+       * 		- icdP: Map[String, List[MedClaim]],
+       * 		- cpt: Map[String, List[MedClaim]],
+       * 		- tob: Map[String, List[MedClaim]],
+       * 		- ubRevenue: Map[String, List[MedClaim]],
+       * 		- hcpcs: Map[String, List[MedClaim]])
+      */
       def medClaim2Map(c: MedClaim): MedMap = {
 
         // Provider specialty

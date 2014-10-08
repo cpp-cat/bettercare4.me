@@ -93,6 +93,8 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     "measurement year or the year prior to the measurement year. This excludes women who had a bilateral mastectomy or two " +
     "unilateral mastectomies."
 
+  import BCS._
+  
   override def isPatientMeetDemographic(patient: Patient): Boolean = {
     val age = patient.age(hedisDate)
     patient.gender == "F" && age >= 42 && age <= 69
@@ -109,21 +111,21 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     pickOne(List(
 
       // One possible set of claims based on ICD Procedure code
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(BCS.icdPA)))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(icdPA)))),
 
       // Another possible set of claims based on CPT codes and modifier being 50
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(BCS.cptA), cptMod1 = "50")),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(BCS.cptA), cptMod2 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod2 = "50")),
 
       // Another possible set of claims based on 2 claims have CPT codes and each have one of the modifier RT and LT
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(BCS.cptA), cptMod1 = "RT"),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(BCS.cptA), cptMod2 = "LT")),
+        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "RT"),
+        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptA), cptMod2 = "LT")),
 
       // Another possible set of claims based on 2 claims on different day with unilateral mastectomy using icdP
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(BCS.icdPC))),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdP = Set(pickOne(BCS.icdPC))))))()
+        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(icdPC))),
+        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdP = Set(pickOne(icdPC))))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -134,30 +136,30 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
 
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, BCS.icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, BCS.bilateralMastectomy, claims)
+        val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
+        s.addScore(name, HEDISRule.excluded, bilateralMastectomy, claims)
       },
 
       // Check if patient had a Unilateral Mastectomy with bilateral modifier (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.cpt, BCS.cptAS, { claim: MedClaim => claimWithMod(claim, "50") })
-        s.addScore(name, HEDISRule.excluded, BCS.unilateralMastectomy50, claims)
+        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "50") })
+        s.addScore(name, HEDISRule.excluded, unilateralMastectomy50, claims)
       },
 
       // Check if patient had a previous right unilateral mastectomy and a previous
       // left unilateral mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claimsRT = filterClaims(ph.cpt, BCS.cptAS, { claim: MedClaim => claimWithMod(claim, "RT") })
-        val claimsLT = filterClaims(ph.cpt, BCS.cptAS, { claim: MedClaim => claimWithMod(claim, "LT") })
+        val claimsRT = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "RT") })
+        val claimsLT = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "LT") })
         if (claimsRT.isEmpty || claimsLT.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, BCS.unilateralMastectomyLR, List.concat(claimsRT, claimsLT))
+        else s.addScore(name, HEDISRule.excluded, unilateralMastectomyLR, List.concat(claimsRT, claimsLT))
       },
 
       // Check if patient had 2 previous unilateral mastectomy on different days based on icdP (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, BCS.icdPCS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
+        val claims = filterClaims(ph.icdP, icdPCS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         if (Claim.twoDifferentDOS(claims)) {
-          s.addScore(name, HEDISRule.excluded, BCS.unilateralMastectomy2, claims)
+          s.addScore(name, HEDISRule.excluded, unilateralMastectomy2, claims)
         } else s
       })
 
@@ -171,43 +173,43 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     pickOne(List(
 
       // One possible set of claims based on cpt
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(BCS.cptB))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptB))),
 
       // Another possible set of claims based on hcpcs
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(BCS.hcpcsA))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(hcpcsA))),
 
       // Another possible set of claims based on ICD Procedure codes
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(BCS.icdPB)))),
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(icdPB)))),
 
       // Another possible set of claims based on UB Revenue Procedure codes
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(BCS.ubA)))))()
+      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA)))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    val measurementInterval = new Interval(hedisDate.minusYears(2), hedisDate)
+    val measurementInterval = getIntervalFromYears(2)
 
     def rules = List[(Scorecard) => Scorecard](
 
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
-        val claims = filterClaims(ph.cpt, BCS.cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, BCS.mammogramCPT, claims)
+        val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.meetMeasure, mammogramCPT, claims)
       },
 
       (s: Scorecard) => {
-        val claims = filterClaims(ph.hcpcs, BCS.hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, BCS.mammogramHCPCS, claims)
+        val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.meetMeasure, mammogramHCPCS, claims)
       },
 
       (s: Scorecard) => {
-        val claims = filterClaims(ph.icdP, BCS.icdPBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, BCS.mammogramICDP, claims)
+        val claims = filterClaims(ph.icdP, icdPBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.meetMeasure, mammogramICDP, claims)
       },
 
       (s: Scorecard) => {
-        val claims = filterClaims(ph.ubRevenue, BCS.ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, BCS.mammogramUB, claims)
+        val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
+        s.addScore(name, HEDISRule.meetMeasure, mammogramUB, claims)
       })
 
     applyRules(scorecard, rules)

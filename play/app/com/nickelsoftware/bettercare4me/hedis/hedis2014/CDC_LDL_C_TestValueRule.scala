@@ -22,21 +22,6 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 object CDC_LDL_C_Value {
 
   val name = "CDC-LDL-C-Value-HEDIS-2014"
-
-  val cptLipidTest = "Lipid Test Claim (CPT)"
-  val loincLipidTest = "Lipid Test Lab Claim (LOINC)"
-
-  /**
-   * CPT codes for Lipid Test
-   */
-  val cptA = List("80061", "83700", "83701", "83704", "83721", "3048F", "3049F", "3050F")
-  val cptAS = cptA.toSet
-
-  /**
-   * LOINC codes for Lipid Test
-   */
-  val loincA = List("2089-1", "12773-8", "13457-7", "18261-8", "18262-6", "22748-8", "39469-2", "49132-4", "55440-2")
-  val loincAS = loincA.toSet
 }
 
 /**
@@ -57,7 +42,7 @@ class CDC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends C
   val fullName = "Diabetes Lipid Test"
   val description = "Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had at least one LDL cholesterol lab result record with a value greater than zero and less than 100 mg/dL."
 
-  import CDC_LDL_C_Value._
+  import CDC_LDL_C._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
     val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
