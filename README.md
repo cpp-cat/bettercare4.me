@@ -78,6 +78,8 @@
 - Added Cholesterol Management for Patient with Cardiovascular Conditions HEDIS Rule
 - Fix HEDIS date range
 - Fix CDC and CHL rules where the eligible criteria was also trigering the meet measure and creating false positive
+- Added parameters to PatientHistory and some refactoring
+- Factored out CDC_LTest and LDL_C_TestValue into separate classes used by CDC_LDL_C and CMC
 
 
 # Sprint 4: Enhanced Rule Framework for HEDIS rules
@@ -128,10 +130,9 @@
 - Added CDC - Diabetes HbA1c Test with values < 7% HEDIS rule
 - Added CDC - Diabetes HbA1c Test with values < 8% HEDIS rule
 - Added CDC - Diabetes HbA1c Test with values > 9% HEDIS rule
+- Added CDC - Diabetes Eye Exam Hedis Rule
 - Added NUCC Provider Specialty to Claim class
 - Refactored Claim class due to excessive number of class parameters.
-- Added parameters to PatientHistory and some refactoring
-- Added CDC - Diabetes Eye Exam Hedis Rule
 
 ## HEDIS Measures Information
 - http://www.bcbstx.com/provider/pdf/diabetes_2014.pdf

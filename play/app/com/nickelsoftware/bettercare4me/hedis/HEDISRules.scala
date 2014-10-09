@@ -4,11 +4,9 @@
 package com.nickelsoftware.bettercare4me.hedis
 
 import scala.util.Random
-
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
-
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_12_18_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_19_50_Rule
@@ -72,6 +70,7 @@ import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 /**
  * Singleton to avoid creating empty object over and over again and other useful names
@@ -390,10 +389,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @param years number of years for the interval, just prior the `hedisDate`
    * @return The calculated interval, including the hedisDate
    */
-  def getIntervalFromYears(years: Int): Interval = {
-    val temp = hedisDate.plusDays(1)
-    new Interval(temp.minusYears(years), temp)
-  }
+  def getIntervalFromYears(years: Int): Interval = Utils.getIntervalFromYears(years, hedisDate)
 
   /**
    * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified months prior to it.
@@ -401,10 +397,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @param months number of months for the interval, just prior the `hedisDate`
    * @return The calculated interval, including the hedisDate
    */
-  def getIntervalFromMonths(months: Int): Interval = {
-    val temp = hedisDate.plusDays(1)
-    new Interval(temp.minusMonths(months), temp)
-  }
+  def getIntervalFromMonths(months: Int): Interval = Utils.getIntervalFromMonths(months, hedisDate)
 
   /**
    * Utility method to get an `Interval` from the `hedisDate` to the nbr of specified days prior to it.
@@ -412,10 +405,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @param days number of days for the interval, just prior the `hedisDate`
    * @return The calculated interval, including the hedisDate
    */
-  def getIntervalFromDays(days: Int): Interval = {
-    val temp = hedisDate.plusDays(1)
-    new Interval(temp.minusDays(days), temp)
-  }
+  def getIntervalFromDays(days: Int): Interval = Utils.getIntervalFromDays(days, hedisDate)
 
   /**
    * Utility method to get an `Interval` from the `date` to `hedisDate`
@@ -493,34 +483,13 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @param f is the filter function applied to claims that have the filtered clinical codes (second level of filtering)
    * @returns All the claims that match both the clinical codes and the filter function f
    */
-  def filterClaims[C](code2Claims: Map[String, List[C]], filterCodes: Set[String], f: (C) => Boolean): List[C] = {
-    def loop(l: List[C], m: Map[String, List[C]]): List[C] = {
-      if (m.isEmpty) l
-      else {
-        val (k, v) = m.head
-        if (filterCodes.contains(k)) loop(List.concat(v.filter(f), l), m.tail)
-        else loop(l, m.tail)
-      }
-    }
-    loop(List.empty, code2Claims)
-  }
+  def filterClaims[C](code2Claims: Map[String, List[C]], filterCodes: Set[String], f: (C) => Boolean): List[C] = Utils.filterClaims(code2Claims, filterCodes, f)
 
   /**
    * @returns true if have nbr claims with different dates in claims
    */
-  def hasDifferentDates(nbr: Int, claims: List[Claim]): Boolean = {
-    def loop(dates: Set[DateTime], c: List[Claim]): Boolean = {
-      if (dates.size == nbr) true
-      else {
-        if (c.isEmpty) false
-        else {
-          if (!dates.contains(c.head.date)) loop(dates + c.head.date, c.tail)
-          else loop(dates, c.tail)
-        }
-      }
-    }
-    loop(Set(), claims)
-  }
+  def hasDifferentDates(nbr: Int, claims: List[Claim]): Boolean = Utils.hasDifferentDates(nbr, claims)
+  
   /**
    * Utility method to increase readability in the HEDIS Rule classes.
    *
@@ -530,7 +499,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
    * @param rules is the list of predicates that adds contributions to the scorecard
    * @returns the build up scorecard
    */
-  def applyRules(scorecard: Scorecard, rules: List[(Scorecard) => Scorecard]): Scorecard = rules.foldLeft(scorecard)({ (s, f) => f(s) })
+  def applyRules(scorecard: Scorecard, rules: List[(Scorecard) => Scorecard]): Scorecard = Utils.applyRules(scorecard, rules)
 
   def isPatientMeetDemographic(scorecard: Scorecard): Boolean = scorecard.isPatientMeetDemographic(name)
   def isPatientEligible(scorecard: Scorecard): Boolean = scorecard.isPatientEligible(name)
@@ -552,7 +521,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   /**
    * Utility method to pick randomly one item from the list
    */
-  def pickOne[A](items: List[A]): A = items(Random.nextInt(items.size))
+  def pickOne[A](items: List[A]): A = Utils.pickOne(items)
 
   /**
    * Apply the rule criteria to patient

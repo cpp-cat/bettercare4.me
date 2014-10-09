@@ -31,7 +31,7 @@ object CDC_LDL_C_Value {
  * This excludes patients with a previous diagnosis of polycystic ovaries, gestational diabetes, or steroid-induced diabetes.
  *
  * NUMERATOR:
- * Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had an eye exam done. NOTE: Through
+ * Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had a lipid test value done. NOTE: Through
  * administrative data there is no way to determine whether a dilated eye exam was performed. Therefore, eye exams provided by
  * eye care professionals are used as a proxy for dilated exams.
  *
@@ -42,40 +42,8 @@ class CDC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends C
   val fullName = "Diabetes Lipid Test"
   val description = "Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had at least one LDL cholesterol lab result record with a value greater than zero and less than 100 mg/dL."
 
-  import CDC_LDL_C._
-  override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
+  private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, config, hedisDate)
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
-    val dos = hedisDate.minusDays(Random.nextInt(days))
-
-    // At least one Lipid Test (during the measurement year)
-    pickOne(List(
-
-      // Possible set: CPT
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
-
-      // Another possible set: Most recent LDL-C test result > 0 and < 100 mg/dL
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA), result=Random.nextDouble*99.0)) ))()
-  }
-
-  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
-
-    val measurementInterval = getIntervalFromYears(1)
-
-    def rules = List[(Scorecard) => Scorecard](
-
-      // Check for patient has CPT
-      (s: Scorecard) => {
-        val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, cptLipidTest, claims)
-      },
-
-      // Check for LOINC on Lab Claim
-      (s: Scorecard) => {
-        val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) && claim.result>0.0 && claim.result<100.0 })
-        s.addScore(name, HEDISRule.meetMeasure, loincLipidTest, claims)
-      })
-
-    applyRules(scorecard, rules)
-  }
+  override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = ldlTestValueRule.generateMeetMeasureClaims(pl, patient, provider)
+  override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldlTestValueRule.scorePatientMeetMeasure(scorecard, patient, ph)
 }
