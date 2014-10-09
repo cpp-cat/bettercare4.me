@@ -204,7 +204,8 @@ abstract class CMC_RuleBase(val name: String, config: RuleConfig, hedisDate: Dat
         else s.addScore(name, HEDISRule.eligible, IVDdiagnosis, List.concat(claims2, claims3))
       })
       
-    applyRules(scorecard, rules)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    else applyRules(scorecard, rules)
   }
 }
 

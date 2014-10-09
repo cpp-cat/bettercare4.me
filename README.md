@@ -76,6 +76,13 @@
 - Added Adolescent Well Care Visits HEDIS Rule
 - Added Asthma Medication Ratio by Age HEDIS Rule
 - Added Cholesterol Management for Patient with Cardiovascular Conditions HEDIS Rule
+- Added Annual Monitoring for Patients on Persistent Medications (ACE/ARB) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Digoxin) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Diuretics) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Carbamazepine) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Phenobarbital) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Phenytoin) HEDIS rule
+- Added Annual Monitoring for Patients on Persistent Medications (Valproic) HEDIS rule
 - Fix HEDIS date range
 - Fix CDC and CHL rules where the eligible criteria was also trigering the meet measure and creating false positive
 - Added parameters to PatientHistory and some refactoring

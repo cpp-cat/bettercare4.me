@@ -116,4 +116,20 @@ object Utils {
     w.writeAll(List(l))
     w.close
   }
+
+  //
+  // import com.nickelsoftware.bettercare4me.utils.Utils._
+  // extractNDC("carbamazepine", "./data/MPM_D_2014_(final).csv", "./data/out.csv")
+  //
+  def extractNDC(name: String, from: String, to: String): Unit = {
+
+    import com.github.tototoshi.csv.CSVReader
+    import com.github.tototoshi.csv.CSVWriter
+    import java.io.File
+    val l = CSVReader.open(new File(from)).all()
+    val f = for(r <- l if(r(2).toLowerCase().startsWith(name))) yield r(0)
+    val w = CSVWriter.open(new File(to))
+    w.writeAll(List(f))
+    w.close
+  }
 }

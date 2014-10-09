@@ -4,9 +4,11 @@
 package com.nickelsoftware.bettercare4me.hedis
 
 import scala.util.Random
+
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
+
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_12_18_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_19_50_Rule
@@ -58,6 +60,15 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestValueRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_ACE_ARB_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_C_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_P1_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_P2_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_V_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_ADD
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_DGX_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_DUT_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W34
@@ -69,8 +80,8 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.NickelException
-import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 import com.nickelsoftware.bettercare4me.utils.Utils
+import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 
 /**
  * Singleton to avoid creating empty object over and over again and other useful names
@@ -584,7 +595,14 @@ object HEDISRules {
     ASM.name19 -> { (c, d) => new ASM_19_50_Rule(c, d) },
     ASM.name51 -> { (c, d) => new ASM_51_64_Rule(c, d) },
     CMC.nameTest -> { (c, d) => new CMC_LDL_C_TestRule(c, d) },
-    CMC.nameTestValue -> { (c, d) => new CMC_LDL_C_TestValueRule(c, d) })
+    CMC.nameTestValue -> { (c, d) => new CMC_LDL_C_TestValueRule(c, d) },
+    MPM_ADD.nameACE -> { (c, d) => new MPM_ACE_ARB_Rule(c, d) },
+    MPM_ADD.nameDGX -> { (c, d) => new MPM_DGX_Rule(c, d) },
+    MPM_ADD.nameDUT -> { (c, d) => new MPM_DUT_Rule(c, d) },
+    MPM_AC.nameC -> { (c, d) => new MPM_AC_C_Rule(c, d) },
+    MPM_AC.nameP1 -> { (c, d) => new MPM_AC_P1_Rule(c, d) },
+    MPM_AC.nameP2 -> { (c, d) => new MPM_AC_P2_Rule(c, d) },
+    MPM_AC.nameV -> { (c, d) => new MPM_AC_V_Rule(c, d) })
     
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
