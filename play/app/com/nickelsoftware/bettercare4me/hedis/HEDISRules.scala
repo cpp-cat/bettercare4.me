@@ -9,6 +9,8 @@ import org.joda.time.DateTime
 import org.joda.time.Interval
 import org.joda.time.LocalDate
 
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.AAB
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.AAB_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_12_18_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.ASM_19_50_Rule
@@ -60,6 +62,10 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.CMC_LDL_C_TestValueRule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.COL_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CWP
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.CWP_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.LBP
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.LBP_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_ACE_ARB_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_C_Rule
@@ -69,6 +75,8 @@ import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_AC_V_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_ADD
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_DGX_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.MPM_DUT_Rule
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.URI
+import com.nickelsoftware.bettercare4me.hedis.hedis2014.URI_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W15_Rule
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.W34
@@ -430,6 +438,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
   def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
   def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
+  def generateFailMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = List.empty
 
   def generateEligibleAndExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider, isExcluded: Boolean): List[Claim] = {
 
@@ -469,7 +478,7 @@ abstract class HEDISRuleBase(config: RuleConfig, hedisDate: DateTime) extends HE
           } else {
 
             // Patient does not meet the measure
-            claims
+            List.concat(claims, generateFailMeasureClaims(pl, patient, provider))
           }
         }
 
@@ -602,7 +611,11 @@ object HEDISRules {
     MPM_AC.nameC -> { (c, d) => new MPM_AC_C_Rule(c, d) },
     MPM_AC.nameP1 -> { (c, d) => new MPM_AC_P1_Rule(c, d) },
     MPM_AC.nameP2 -> { (c, d) => new MPM_AC_P2_Rule(c, d) },
-    MPM_AC.nameV -> { (c, d) => new MPM_AC_V_Rule(c, d) })
+    MPM_AC.nameV -> { (c, d) => new MPM_AC_V_Rule(c, d) },
+    CWP.name -> { (c, d) => new CWP_Rule(c, d) },
+    URI.name -> { (c, d) => new URI_Rule(c, d) },
+    AAB.name -> { (c, d) => new AAB_Rule(c, d) },
+    LBP.name -> { (c, d) => new LBP_Rule(c, d) })
     
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {

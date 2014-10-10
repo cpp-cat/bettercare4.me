@@ -9,6 +9,13 @@ import com.nickelsoftware.bettercare4me.hedis.Scorecard
 object Utils {
   
   /**
+   * @param from date of the start of the interval
+   * @param to date of the end date of the interval
+   * @returns the number of days between from and to dates
+   */
+  def daysBetween(from: DateTime, to: DateTime): Int = new Interval(from, to).toDuration().getStandardDays().toInt
+
+  /**
    * @returns an interval in months leading to date
    */
   def getIntervalFromMonths(months: Int, date: DateTime): Interval = {
