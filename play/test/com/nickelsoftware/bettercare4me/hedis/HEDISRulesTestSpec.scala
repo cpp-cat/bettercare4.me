@@ -16,6 +16,7 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.joda.time.DateTime
 import org.joda.time.Interval
 import com.nickelsoftware.bettercare4me.utils.Utils
+import scala.util.Random
 
 object HEDISRulesTestSpec {
 
@@ -33,7 +34,7 @@ object HEDISRulesTestSpec {
     c.setMeetMeasureRate(meetMeasureRate)
     val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val patient = persistenceLayer.createPatient("first", "last", gender, dob)
-    val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
+    val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"), Random.nextInt(100), Random.nextInt(100), Random.nextInt(100))
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
     (patient, patientHistory, rule)
   }
@@ -95,7 +96,7 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
       rule.description mustBe "This rule is for testing."
       val patient = persistenceLayer.createPatient("M", "D", "M", new LocalDate(1962, 7, 27).toDateTimeAtStartOfDay())
       val provider = persistenceLayer.createProvider("M", "D")
-      val claims = rule.generateClaims(persistenceLayer, patient, provider)
+      val claims = rule.generateClaims(persistenceLayer, patient, provider, Random.nextInt(100), Random.nextInt(100), Random.nextInt(100))
       claims.size mustBe 1
       claims(0) match {
         case claim: MedClaim =>

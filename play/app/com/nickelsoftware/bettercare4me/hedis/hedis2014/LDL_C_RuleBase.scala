@@ -54,7 +54,7 @@ class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) 
   
   def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = Utils.getIntervalFromYears(1, hedisDate).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one Lipid Test (during the measurement year)
@@ -107,7 +107,7 @@ class LDL_C_TestValueRuleBase(name: String, config: RuleConfig, hedisDate: DateT
   
   def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = Utils.getIntervalFromYears(1, hedisDate).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one Lipid Test (during the measurement year)

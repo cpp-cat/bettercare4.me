@@ -5,6 +5,7 @@ import org.joda.time.DateTime
 import scala.util.Random
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
+import org.joda.time.Days
 
 object Utils {
   
@@ -13,7 +14,7 @@ object Utils {
    * @param to date of the end date of the interval
    * @returns the number of days between from and to dates
    */
-  def daysBetween(from: DateTime, to: DateTime): Int = new Interval(from, to).toDuration().getStandardDays().toInt
+  def daysBetween(from: DateTime, to: DateTime): Int = Days.daysBetween(from, to).getDays()
 
   /**
    * @returns an interval in months leading to date

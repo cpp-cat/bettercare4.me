@@ -17,6 +17,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CDCEE {
 
@@ -77,7 +78,7 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
   import CDCEE._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
     val splty = pickOne(specialtyCdeA)
 

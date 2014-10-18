@@ -39,6 +39,26 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 6: Batch Claim Generation and Simulated HEDIS Report
+
+- Version: 0.7.0.00 (v0.7.0.00_10-XX-2014)
+- Start Date: 10/10/2014
+- Target Date: 10/17/2014
+- Actual Date: 10/XX/2014
+
+## Product Features:
+- Batch generation of claims on local file system
+- Testing the integration of all HEDIS 2014 rules.
+
+## User Stories Sprint Backlog.
+- Generating the claims for all rules based on YAML configuration.
+
+## Completed User Stories
+- Testing the integration of the rules to avoid conflics.
+- Define rule dependency to use same random generated numbers to avoid skewing the results.
+
+
+
 # Sprint 5: Completed HEDIS rules Implementation
 
 - Version: 0.6.0.00 (v0.6.0.00_10-10-2014)

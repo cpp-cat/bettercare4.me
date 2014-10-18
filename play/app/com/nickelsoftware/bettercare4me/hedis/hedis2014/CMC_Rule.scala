@@ -124,10 +124,10 @@ abstract class CMC_RuleBase(val name: String, config: RuleConfig, hedisDate: Dat
   override def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
     val d0 = hedisDate.minusYears(2)
-    val days1 = new Interval(d0, d0.plusMonths(10)).toDuration().getStandardDays().toInt
+    val days1 = Utils.daysBetween(d0, d0.plusMonths(10))
     val dos1 = d0.plusDays(Random.nextInt(days1) + 1)
     
-    val days2 = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days2 = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos2 = hedisDate.minusDays(Random.nextInt(days2))
     val dos3 = dos2.minusYears(1)
     

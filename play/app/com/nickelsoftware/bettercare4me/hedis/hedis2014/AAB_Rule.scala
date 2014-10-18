@@ -137,7 +137,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
     // generate an excluding episode within the first 6 months
     val dos1 = hedisDate.minusMonths(12).plusDays(10 + Random.nextInt(60)) // provider visit
     val dos2 = dos1.minusDays(1 + Random.nextInt(28)) // prescribed antibiotics (to make it excluded)
-    val dos3 = dos2.minusDays(30) // prescribed antibiotics (to make it excluded, alternate rule)
+    val dos3 = dos1.minusDays(31+ Random.nextInt(40)) // prescribed antibiotics (to make it excluded, alternate rule)
     val dos4 = dos1.plusDays(7).minusDays(Random.nextInt(20)) // competing diagnosis
     val dos5 = dos1.minusDays(Random.nextInt(364)) // comorbidity
 
@@ -173,18 +173,20 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         pl.createMedClaim(patient.patientID, provider.providerID, dos5, dos5, icdDPri = pickOne(icdDE))),
       () => List(
         pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos5, dos5, icdDPri = pickOne(icdDE)))))()
+        pl.createMedClaim(patient.patientID, provider.providerID, dos5, dos5, icdDPri = pickOne(icdDE)))
+        ))()
 
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
     // get all claims with Antibiotic Medication prior to pharyngitis diagnosis
-    def activeRxPriorDianosis(claim: MedClaim, ph: PatientHistory): List[Claim] = {
+    def activeRxPriorDiagnosis(claim: MedClaim, ph: PatientHistory): List[Claim] = {
 
       // get all claims with Antibiotic Medication prior to AAB diagnosis
-      val prior90 = new Interval(claim.dos.minusMonths(3), claim.dos)
-      filterClaims(ph.ndc, CWP.ndcAS, { rx: RxClaim => prior90.contains(rx.fillD) && ((Utils.daysBetween(rx.fillD, claim.dos) <= 30) || !rx.fillD.plusDays(rx.daysSupply).isBefore(claim.dos)) })
+      val prior90 = new Interval(claim.dos.minusDays(90), claim.dos)
+      
+      filterClaims(ph.ndc, CWP.ndcAS, { rx: RxClaim => prior90.contains(rx.fillD) && (Utils.daysBetween(rx.fillD, claim.dos) <= 30 || !rx.fillD.plusDays(rx.daysSupply).isBefore(claim.dos)) })
     }
 
     // get the episode claims
@@ -194,7 +196,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // get all claims with Antibiotic Medication prior to diagnosis to see if should be excluded
       (s: Scorecard) => {
-        val rxExclusion = activeRxPriorDianosis(claims.head, ph)
+        val rxExclusion = activeRxPriorDiagnosis(claims.head, ph)
         if (rxExclusion.isEmpty) s
         else s.addScore(name, HEDISRule.excluded, antibioticMedication, List.concat(claims, rxExclusion))
       },

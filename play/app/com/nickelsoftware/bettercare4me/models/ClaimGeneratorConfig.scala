@@ -29,7 +29,7 @@ object ClaimGeneratorConfig {
  * @param maleNamesFile file name for male given names used for person generation
  * @param femaleNamesFile file name for female given names used for person generation
  * @param lastNamesFile file name for last names used for person generation
- * @param hedisDate date to used for HEDIS report date for the simulation (use Jan 1 of following year, i.e., use 2015/01/01 for HEDIS 2014 reports
+ * @param hedisDate date to used for HEDIS report date for the simulation (usually Dec 31 of the measurement year)
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
 class ClaimGeneratorConfig {
@@ -54,11 +54,15 @@ class ClaimGeneratorConfig {
  * @param eligibleRate the rate at which the patients are eligible to the  measure
  * @param meetMeasureRate the rate at which the patients meet the measure, in %
  * @param exclusionRate the rate at which patients are excluded from measure, in %
+ * @param simulationParity is the name of the rule to have same simulation scores (isEligible, isExcluded, isMeetMeasure) to avoid conflicts
  */
 class RuleConfig {
   @BeanProperty var name: String = null
   @BeanProperty var eligibleRate: Int = 0
   @BeanProperty var meetMeasureRate: Int = 0
   @BeanProperty var exclusionRate: Int = 0
-  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap() 
+  @BeanProperty var simulationParity: String = null
+  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap()
+  
+  def simParityRuleName = if(simulationParity == null) name else simulationParity
 }

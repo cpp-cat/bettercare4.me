@@ -117,7 +117,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
       val daysSupply = claims.foldLeft(0)({ (daysSupply: Int, claim: RxClaim) =>
         {
           val d = claim.fillD.plusDays(claim.daysSupply)
-          if (d.isAfter(hedisDate)) daysSupply + new Interval(hedisDate, d).toDuration().getStandardDays().toInt
+          if (d.isAfter(hedisDate)) daysSupply + Utils.daysBetween(hedisDate, d)
           else daysSupply + claim.daysSupply
         }
       })
@@ -129,7 +129,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
@@ -158,7 +158,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
   def generateMeetMeasureClaimsADD(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     val dos2 = hedisDate.minusDays(Random.nextInt(days))
 
@@ -195,7 +195,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
   def generateMeetMeasureClaimsA(cptA: List[String], pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA)))

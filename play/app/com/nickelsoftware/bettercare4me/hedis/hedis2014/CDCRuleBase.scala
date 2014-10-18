@@ -20,6 +20,7 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 /**
  * Comprehensive Diabetes Control Base Rule
@@ -53,7 +54,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def generateEligibleAndExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider, isExcluded: Boolean): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
     val dos2 = dos1.minusDays(Random.nextInt(180)+2)
 
@@ -141,7 +142,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
   //
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(2).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(2), hedisDate)
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
 
     // Exclusion based on ICD Diagnostic (anytime prior to or during the measurement year)

@@ -30,8 +30,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
   val claimGeneratorActor = system.actorOf(Props[ClaimGeneratorActor])
 
   def this() = this(ActorSystem("BetterCare4meSpec"))
-  val basePath = "./data/temp-test-"
-  val pathName = basePath + LocalDate.now().toString()
+  val pathName = "./data/temp-test"
 
   override def afterAll {
 
@@ -50,7 +49,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
       val baseFname = "ClaimGenerator"
       val nbrGen = 2
       claimGeneratorActor ! GenerateClaimsRequest("""
-        basePath: """ + basePath + """
+        basePath: """ + pathName + """
         baseFname: """ + baseFname + """
         nbrGen: """ + nbrGen + """
         nbrPatients: 1
@@ -68,7 +67,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
 
       expectMsg(GenerateClaimsCompleted(0))
 
-      (new File(basePath + LocalDate.now().toString())).listFiles() should have length 6
+      (new File(pathName)).listFiles() should have length 6
 
       val fnameBase = pathName + "/" + baseFname
 

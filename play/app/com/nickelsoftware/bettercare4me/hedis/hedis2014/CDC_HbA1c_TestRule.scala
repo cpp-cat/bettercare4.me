@@ -17,6 +17,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CDCHbA1cTest {
 
@@ -52,7 +53,7 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
   import CDCHbA1cTest._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one HbA1c test (during the measurement year)

@@ -27,7 +27,7 @@ class AAB_RuleTestSpec extends PlaySpec with OneAppPerSuite {
 
     "validate patient that is excluded from the criteria" in {
 
-      for (i <- 1 to 25) {
+      for (i <- 1 to 250) {
         val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(AAB.name, 100, 100, 0)
         val scorecard = rule.scoreRule(Scorecard(), patient, patientHistory)
 

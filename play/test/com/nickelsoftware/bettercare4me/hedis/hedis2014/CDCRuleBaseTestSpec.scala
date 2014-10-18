@@ -3,23 +3,20 @@
  */
 package com.nickelsoftware.bettercare4me.hedis.hedis2014;
 
+import scala.util.Random
+
+import org.joda.time.DateTime
 import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
-import com.nickelsoftware.bettercare4me.hedis.HEDISRules
-import com.nickelsoftware.bettercare4me.models.Claim
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
+import com.nickelsoftware.bettercare4me.models.Patient
+import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
-import org.joda.time.DateTime
-import com.nickelsoftware.bettercare4me.models.Patient
-import com.nickelsoftware.bettercare4me.models.PatientHistory
-import com.nickelsoftware.bettercare4me.utils.NickelException
-import com.nickelsoftware.bettercare4me.hedis.HEDISRule
-import CDC.ndcAKey
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
-import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
 
@@ -43,7 +40,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     val rule = new CDCRuleBaseTest(c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
     val patient = persistenceLayer.createPatient("first", "last", "F", dob)
-    val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"))
+    val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"), Random.nextInt(100), Random.nextInt(100), Random.nextInt(100))
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
     (patient, patientHistory, rule)
   }

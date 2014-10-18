@@ -117,8 +117,11 @@ object Claim {
  */
 trait Claim {
 
-  def claimType: String
+  val claimType: String
+  val claimID: String
   def date: DateTime
+  val patientID: String
+  val providerID: String
 
 }
 
@@ -211,8 +214,8 @@ case class MBill(tob: String = "", ubRevenue: String = "", hcpcs: String = "", h
 case class MedClaim(claimID: String, patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
   mHead: MHead = MHead(), mCodes: MCodes = MCodes(), mBill: MBill = MBill()) extends Claim {
 
-  override def claimType = "MD"
-  override def date = dos
+  val claimType = "MD"
+  def date = dos
 
   def claimStatus = mHead.claimStatus
   def pcpFlag = mHead.pcpFlag
@@ -298,8 +301,8 @@ case class RxClaim(
   //9 Supply Flag, "Y" if DME rather than drugs
   supplyF: String = "N") extends Claim {
 
-  override def claimType = "RX"
-  override def date = fillD
+  val claimType = "RX"
+  def date = fillD
 
   def toList: List[String] = List("RX", claimID, patientID, providerID,
     fillD.toLocalDate().toString, claimStatus, ndc, daysSupply.toString(), qty.toString(), supplyF)
@@ -339,8 +342,8 @@ case class LabClaim(
   //9 PosNegResult for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
   posNegResult: String = "") extends Claim {
 
-  override def claimType = "LC"
-  override def date = dos
+  val claimType = "LC"
+  def date = dos
 
   def toList: List[String] = List("LC", claimID, patientID, providerID,
     dos.toLocalDate().toString, claimStatus, cpt, loinc, result.toString(), posNegResult)

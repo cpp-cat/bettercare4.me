@@ -18,6 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CIS {
 
@@ -69,7 +70,7 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromMonths(20).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusMonths(20), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(

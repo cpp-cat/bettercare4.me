@@ -19,6 +19,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 
@@ -145,7 +146,8 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val offset = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+//    val offset = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val offset = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
 	val days = offset/4
     
     // compute dos from a base nbr of days and a variable nbr of days (called ext)
@@ -279,7 +281,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromDate(patient.dob.plusYears(3)).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(patient.dob.plusYears(3), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // exclusion - patients with a diagnosis of emphysema, COPD, cystic fibrosis, or acute respiratory failure
@@ -295,7 +297,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val fillD = hedisDate.minusDays(Random.nextInt(days))
 
     List(pl.createRxClaim(patient.patientID, provider.providerID, fillD, ndc = pickOne(ndcC)))

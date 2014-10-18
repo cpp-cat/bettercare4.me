@@ -18,6 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CCS {
 
@@ -91,7 +92,7 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(15).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(15), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
     pickOne(List(
 
@@ -132,7 +133,7 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(2).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(2), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(180)
     pickOne(List(
 

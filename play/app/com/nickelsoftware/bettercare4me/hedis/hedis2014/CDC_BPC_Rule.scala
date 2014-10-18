@@ -18,6 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CDC_BPC {
 
@@ -84,7 +85,7 @@ class CDC_BPC_Rule(val name: String, tag: String, cptS: List[String], cptD: List
   import CDC_BPC._
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromMonths(5).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusMonths(5), hedisDate)
     val dos1 = hedisDate.minusDays(Random.nextInt(days)).minusDays(days)
     val dos2 = hedisDate.minusDays(Random.nextInt(days)) // will be most recent and should be compliant
 

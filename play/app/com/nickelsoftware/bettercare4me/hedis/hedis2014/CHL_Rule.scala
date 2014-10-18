@@ -19,6 +19,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CHL {
 
@@ -113,7 +114,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     pickOne(List(
@@ -185,7 +186,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateExclusionClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromDays(350).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusDays(350), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days)).minusDays(10)
     val dos2 = dos.plusDays(Random.nextInt(7))
 
@@ -230,7 +231,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
-    val days = getIntervalFromYears(1).toDuration().getStandardDays().toInt
+    val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptD)))

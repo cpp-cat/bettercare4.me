@@ -13,6 +13,7 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import scala.util.Random
 import org.joda.time.Interval
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 class W15_RulesTestSpec extends PlaySpec with OneAppPerSuite {
 
@@ -47,7 +48,7 @@ class W15_RulesTestSpec extends PlaySpec with OneAppPerSuite {
       import W15._
       for (i <- 1 to 20) {
 
-        val days = new Interval(new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay(), new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()).toDuration().getStandardDays().toInt
+        val days = Utils.daysBetween(new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay(), new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
         val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
         val dob = hedisDate.minusDays(Random.nextInt(days)).minusMonths(15)
         val (patient, patientHistory, rule) = HEDISRulesTestSpec.setupTest(name, "M", dob, 100, 0, 100)
@@ -55,7 +56,7 @@ class W15_RulesTestSpec extends PlaySpec with OneAppPerSuite {
 
         rule.isPatientEligible(scorecard) mustBe true
         rule.isPatientExcluded(scorecard) mustBe false
-        
+
         val meetCriteria = scorecard.hedisRuleMap(rule.name).meetMeasure.criteriaScore.keySet
         if (meetCriteria.size != 1) fail("Expecting a single criteria, got: " + meetCriteria)
         else {

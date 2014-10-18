@@ -4,10 +4,8 @@
 package com.nickelsoftware.bettercare4me.hedis.hedis2014
 
 import scala.util.Random
-
 import org.joda.time.DateTime
 import org.joda.time.Interval
-
 import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.Claim
@@ -18,6 +16,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistory
 import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
+import com.nickelsoftware.bettercare4me.utils.Utils
 
 object CIS_VZV {
 
@@ -67,10 +66,8 @@ class CIS_VZV_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
     // after 42 days after birth and before 2 years of age
-    val base = patient.dob.plusDays(42)
-    val interval = new Interval(base, patient.dob.plusMonths(24).plusDays(1))
-    val days = interval.toDuration().getStandardDays().toInt
-    val dos = base.plusDays(Random.nextInt(days))
+    val days = Utils.daysBetween(patient.dob.plusDays(42), patient.dob.plusMonths(20))
+    val dos = patient.dob.plusDays(42 + Random.nextInt(days))
 
     // At least one received at least one chicken pox vaccination
     pickOne(List(
