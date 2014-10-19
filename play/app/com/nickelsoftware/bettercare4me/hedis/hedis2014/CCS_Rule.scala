@@ -77,7 +77,7 @@ object CCS {
  */
 class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  val name = BCS.name
+  val name = CCS.name
   val fullName = "Cervical Cancer Screen"
   val description = "Cervical Cancer Screen indicates whether a women, aged 24 to 64 years, had a Pap test done during the measurement year or the 2 years prior. This excludes women who had a previous hysterectomy with no residual cervix."
 

@@ -32,11 +32,28 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
     val rs = ruleScoreSummaries map {case (k, v) => (k -> v.addScore(scoreSummary.ruleScoreSummaries(k)))}
     HEDISScoreSummary(patientCount+1, rs)
   }
+  
+  override def toString(): String = {
+    
+    val l = "Overall score summary over " + patientCount + " patients" :: (ruleScoreSummaries.values map {_.toString} toList) 
+    l mkString "\n"
+  }
+
+  /**
+   * Provide a description of the Score Summary, presenting the rules in order based on the argument list
+   * 
+   * @param ruleNames ordered list of rules to obtain the score summary
+   */
+  def toString(ruleNames: List[String]): String = {
+    
+    val l = "Overall score summary over " + patientCount + " patients" :: (ruleNames map {ruleScoreSummaries.get(_) map { _.toString } getOrElse "" }) 
+    l mkString "\n"
+  }
 }
 
 
 /**
- * Aggregated rule score, `eligible is same as denominator and `meetMeasure is same as numerator in HEDIS speak
+ * Aggregated rule score, `eligible minus `excluded is same as denominator and `meetMeasure is same as numerator in HEDIS speak
  */
 case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long=0, eligible: Long=0, excluded: Long=0, meetMeasure: Long=0) {
   
@@ -45,6 +62,10 @@ case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long=0, e
   def eligible2MeetDemographics: Double = ratio(eligible, meetDemographics)
   def excluded2eligible: Double = ratio(excluded, eligible)
   def meetMeasure2eligible: Double = ratio(meetMeasure, eligible)
+  
+  def numerator: Long = meetMeasure
+  def denominator: Long = eligible - excluded
+  def scorePct: Double = ratio(numerator, denominator)
   
   def addScore(scorecard: Scorecard) = {
    
@@ -65,6 +86,11 @@ case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long=0, e
         rss.eligible+eligible, 
         rss.excluded+excluded, 
         rss.meetMeasure+meetMeasure)
+  }
+  
+  override def toString(): String = {
+    
+    ruleInfo.name + s": ($eligible2MeetDemographics/$excluded2eligible/$meetMeasure2eligible) -- $numerator/$denominator = $scorePct%"
   }
 }
 

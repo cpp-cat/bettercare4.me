@@ -4,11 +4,11 @@
 package com.nickelsoftware.bettercare4me.actors
 
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
-
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.actorRef2Scala
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 object ClaimGeneratorActor {
 
@@ -92,7 +92,9 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
 
       } else {
 
-        log.error("ClaimGeneratorActor: Received ProcessGenereatedFiles with invalid configuration (nbrGen must be > 0) is: " + config.nbrGen)
+        val msg = "ClaimGeneratorActor: Received ProcessGenereatedFiles with invalid configuration (nbrGen must be > 0) is: " + config.nbrGen
+        log.error(msg)
+        sender ! akka.actor.Status.Failure(NickelException(msg))
       }
   }
 
