@@ -1,0 +1,237 @@
+        basePath: ./data/hedis-2014-test
+        baseFname: claimGenerator
+        nbrGen: 2
+        nbrPatients: 10
+        nbrProviders: 1
+        maleNamesFile: ./data/male-names.csv
+        femaleNamesFile: ./data/female-names.csv
+        lastNamesFile: ./data/last-names.csv
+        hedisDateTxt: 2013-12-31
+        rulesConfig:
+          - name: BCS-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 74
+        
+          - name: CCS-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 10
+            meetMeasureRate: 63
+        
+          - name: CHL-16-20-HEDIS-2014
+            eligibleRate: 80
+            exclusionRate: 15
+            meetMeasureRate: 41
+        
+          - name: CHL-21-24-HEDIS-2014
+            eligibleRate: 97
+            exclusionRate: 18
+            meetMeasureRate: 50
+        
+          - name: COL-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 30
+            meetMeasureRate: 63
+        
+          - name: CIS-VZV-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 92
+        
+          - name: CIS-DTaP-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 87
+        
+          - name: CIS-HB-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 88
+        
+          - name: CIS-HiB-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 94
+        
+          - name: CIS-MMR-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 92
+        
+          - name: CIS-PC-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 87
+        
+          - name: CIS-IPV-C-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 5
+            meetMeasureRate: 92
+        
+          - name: W15-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 0
+            meetMeasureRate: 79
+        
+          - name: W34-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 0
+            meetMeasureRate: 74
+        
+          - name: AWC-HEDIS-2014
+            eligibleRate: 100
+            exclusionRate: 0
+            meetMeasureRate: 46
+        
+          - name: CDC-HbA1c-Test-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 90
+        
+          - name: CDC-HbA1c-Test-LT7-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 40
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-HbA1c-Test-LT8-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 59
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-HbA1c-Test-GT9-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 31
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-EE-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 56
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-LDL-C-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 87
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-LDL-C-Value-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 58
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-MAN-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 85
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-BPC-Test-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 85
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-BPC-C1-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 43
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: CDC-BPC-C2-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 20
+            meetMeasureRate: 65
+            simulationParity: CDC-HbA1c-Test-HEDIS-2014
+        
+          - name: ASM-5-11-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 10
+            meetMeasureRate: 97
+        
+          - name: ASM-12-18-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 10
+            meetMeasureRate: 93
+        
+          - name: ASM-19-50-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 10
+            meetMeasureRate: 88
+        
+          - name: ASM-51-64-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 10
+            meetMeasureRate: 93
+        
+          - name: CMC-LDL-C-Test-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 0
+            meetMeasureRate: 87
+            simulationParity: CDC-LDL-C-HEDIS-2014
+        
+          - name: CMC-LDL-C-Test-Value-HEDIS-2014
+            eligibleRate: 40
+            exclusionRate: 0
+            meetMeasureRate: 58
+            simulationParity: CDC-LDL-C-HEDIS-2014 
+        
+          - name: MPM-ACE-ARB-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 83
+        
+          - name: MPM-Digoxin-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 87
+        
+          - name: MPM-Diuretics-ARB-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 83
+        
+          - name: MPM-AC-Carbamazepine-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 59
+        
+          - name: MPM-AC-Phenobarbital-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 59
+        
+          - name: MPM-AC-Phenytoin-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 59
+        
+          - name: MPM-AC-Valproic-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 5
+            meetMeasureRate: 59
+        
+          - name: CWP-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 5
+            meetMeasureRate: 81
+        
+          - name: URI-HEDIS-2014
+            eligibleRate: 80
+            exclusionRate: 5
+            meetMeasureRate: 85
+        
+          - name: AAB-HEDIS-2014
+            eligibleRate: 35
+            exclusionRate: 20
+            meetMeasureRate: 26
+        
+          - name: LBP-HEDIS-2014
+            eligibleRate: 30
+            exclusionRate: 15
+            meetMeasureRate: 75
+

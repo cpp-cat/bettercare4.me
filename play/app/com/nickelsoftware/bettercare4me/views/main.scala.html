@@ -1,15 +1,54 @@
 @(title: String)(content: Html)
 
 <!DOCTYPE html>
-
 <html>
-    <head>
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/hello.js")" type="text/javascript"></script>
-    </head>
-    <body>
-        @content
-    </body>
+	<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width">
+
+    <title>@title</title>
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+    <link rel="stylesheet" type="text/css" href="@routes.Assets.at("stylesheets/jquery.mobile-1.4.4.css")" />
+    <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery-1.11.1.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.mobile-1.4.4.js")"></script>
+	</head>
+
+	<body>
+        <div data-role="page" id="home" class="ui-responsive-panel" data-theme="a">
+            <div data-role="header">
+                <h1>BetterCare4.me</h1>
+                <a href="#left-menu" data-icon="bars" data-iconpos="notext">Menu</a>
+                <a href="#right-search" data-icon="search" data-iconpos="notext">Search</a>
+            </div><!-- /header -->
+            
+      <div data-role="main" id="home-main" class="ui-content">  
+                <div id="home-default">
+                  @content
+                </div>
+                
+          </div>
+
+            <div data-role="panel" id="left-menu" data-display="push" data-theme="b"> 
+                <h3>Gaps in Health Care</h3>
+                <ul data-role="listview" data-inset="true">
+                    <li data-role="list-divider">Claim Simulator</li>
+                    <li><a href="@com.nickelsoftware.bettercare4me.controllers.routes.Application.claimGenerator("data/hedis-2014-test.yaml")">HEDIS 2014 Test</a></li>
+                    <li><a href="@com.nickelsoftware.bettercare4me.controllers.routes.Application.claimGenerator("data/hedis-2014-bcbs.yaml")">HEDIS 2014 BCBS</a></li>
+                    <li data-role="list-divider">Report Generator</li>
+                    <li><a href="@com.nickelsoftware.bettercare4me.controllers.routes.Application.reportGenerator("data/hedis-2014-test.yaml")">HEDIS 2014 Test</a></li>
+                    <li><a href="@com.nickelsoftware.bettercare4me.controllers.routes.Application.reportGenerator("data/hedis-2014-bcbs.yaml")">HEDIS 2014 BCBS</a></li>
+                    <li data-role="list-divider">Dashboards</li>
+                    <li><a href="#">Claim Simulator</a></li>
+                    <li><a href="#">Report Generator</a></li>
+                </ul>
+                <a href="#home" data-rel="close" class="ui-btn ui-shadow ui-corner-all ui-btn-b ui-icon-delete ui-btn-icon-left">Close</a>
+            </div> 
+          
+            <div data-role="footer" style="font-size:75%; color:DarkGray">
+                <p>&copy; 2014 Nickel Software, LLC</p>
+            </div><!-- /jqm-footer -->        
+        </div>	
+	</body>
 </html>

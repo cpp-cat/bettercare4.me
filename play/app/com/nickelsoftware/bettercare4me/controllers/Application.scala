@@ -23,7 +23,17 @@ object Application extends Controller {
 
   // Really basic, gives you the version of Play on the page
   def index = Action {
-    Ok(com.nickelsoftware.bettercare4me.views.html.index("Your new application is ready."))
+    Ok(com.nickelsoftware.bettercare4me.views.html.index("Select from the menu on the left..."))
+  }
+  
+  // Return the claim generator configuration file for claim generation job submission (claim simulator)
+  def claimGenerator(fname: String) = Action {
+    Ok(com.nickelsoftware.bettercare4me.views.html.index("Claim generation job submission, using: "+fname))
+  }
+  
+  // Return the claim generator configuration file for report generation job submission (hedis report computation)
+  def reportGenerator(fname: String) = Action {
+    Ok(com.nickelsoftware.bettercare4me.views.html.index("Report generation job submission, using: "+fname))
   }
 
   // Using Akka Actor to perform the action

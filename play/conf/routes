@@ -5,6 +5,12 @@
 # Home page
 GET     /                           com.nickelsoftware.bettercare4me.controllers.Application.index
 
+# Claim Generation for HEDIS report simulation
+GET     /claimGenerator/*fname      com.nickelsoftware.bettercare4me.controllers.Application.claimGenerator(fname: String)
+
+# Report Generation for HEDIS report simulation
+GET     /reportGenerator/*fname      com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator(fname: String)
+
 # Akka simple test
 GET     /actor                      com.nickelsoftware.bettercare4me.controllers.Application.actor
 

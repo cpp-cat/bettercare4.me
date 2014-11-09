@@ -39,6 +39,30 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 7: Simulated HEDIS Report using Batch Claim Generation
+
+- Version: 0.8.0.00 (v0.8.0.00_11-XX-2014)
+- Start Date: 11/06/2014
+- Target Date: 11/16/2014
+- Actual Date: 11/XX/2014
+
+## Product Features:
+- Provide an user interface to kicking off the batch jobs
+- Batch generation of claims on local file system using Akka agent supervision
+- Generation of HEDIS 2014 Summary Report using Akka agent supervision.
+
+## User Stories Sprint Backlog.
+- Simple user interface using jQuery Mobile generated from Play Twirl, basic index page
+- User interface for kicking off the claim generator
+- User interface for kicking off the HEDIS report generation
+- Agent supervision for claim generation and report generation
+- Simple web application to kick off the the batch jobs
+
+## Completed User Stories
+- Setup claim generator configuration (yaml configuration) to match the NCQA The State of Health Care Quality 2014 Report for Commercial HMO (http://www.ncqa.org/Portals/0/Newsroom/2014/SOHC-web.pdf)
+
+
+
 # Sprint 6: Batch Claim Generation Ready and Simulated HEDIS Report
 
 - Version: 0.7.0.00 (v0.7.0.00_10-18-2014)
@@ -55,6 +79,8 @@
 ## Completed User Stories
 - Testing the integration of the rules to avoid conflics.
 - Define rule dependency to use same random generated numbers to avoid skewing the results.
+    + Adding optional simulationParity attribute to rule configuration
+    + Rules linked with simulationParity must have same meetMeasureRate
 - Generating the claims for all rules based on YAML configuration --- complete test case.
 
 
