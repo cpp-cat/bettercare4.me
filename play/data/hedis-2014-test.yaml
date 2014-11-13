@@ -1,3 +1,4 @@
+
         basePath: ./data/hedis-2014-test
         baseFname: claimGenerator
         nbrGen: 2
@@ -6,7 +7,7 @@
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2013-12-31
+        hedisDateTxt: 2013-12-31T00:00:00.00-05:00
         rulesConfig:
           - name: BCS-HEDIS-2014
             eligibleRate: 100

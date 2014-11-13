@@ -33,7 +33,7 @@ import akka.testkit.TestKit
 import akka.util.Timeout
 import play.api.test.WithApplication
 
-class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
+class ClaimGeneratorTestSpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
   with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   import ClaimGeneratorActor._
@@ -68,7 +68,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2014-01-01
+        hedisDateTxt: 2014-01-01T00:00:00.00-05:00
         rulesConfig:
           - name: TEST
             eligibleRate: 100
@@ -103,7 +103,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2014-12-31
+        hedisDateTxt: 2014-12-31T00:00:00.00-05:00
         rulesConfig:
           - name: BCS-HEDIS-2014
             eligibleRate: 100
@@ -339,7 +339,7 @@ class EventCrawlerSpec(_system: ActorSystem) extends TestKit(_system) with Impli
       expectMsg(GenerateClaimsCompleted(0))
 
       // get the list of rule names for printing out
-      val ruleNames = ClaimGeneratorConfig.loadConfig(configTxt).rulesConfig map { _.getName } toList
+      val ruleNames = ClaimGeneratorConfig.loadConfig(configTxt).rulesConfig map { _.name } toList
       
       val future = (claimGeneratorActor ? ProcessGenereatedFiles(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
       future onComplete {

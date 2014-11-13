@@ -4,16 +4,20 @@
 package com.nickelsoftware.bettercare4me.models
 
 import scala.beans.BeanProperty
-
 import org.joda.time.LocalDate
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
+import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
+import org.yaml.snakeyaml.constructor.SafeConstructor
+import scala.collection.JavaConversions._
+import org.joda.time.DateTime
 
 object ClaimGeneratorConfig {
 
   def loadConfig(text: String): ClaimGeneratorConfig = {
-    val yaml = new Yaml(new Constructor(classOf[ClaimGeneratorConfig]))
-    yaml.load(text).asInstanceOf[ClaimGeneratorConfig]
+    val yaml = new Yaml(new SafeConstructor());
+    val data  = yaml.load(text).asInstanceOf[java.util.Map[String, Object]]
+    ClaimGeneratorConfig(mapAsScalaMap(data).toMap)
   }
 
 }
@@ -32,19 +36,39 @@ object ClaimGeneratorConfig {
  * @param hedisDate date to used for HEDIS report date for the simulation (usually Dec 31 of the measurement year)
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
-class ClaimGeneratorConfig {
-  @BeanProperty var basePath: String = null
-  @BeanProperty var baseFname: String = null
-  @BeanProperty var nbrGen: Int = 0
-  @BeanProperty var nbrPatients: Int = 0
-  @BeanProperty var nbrProviders: Int = 0
-  @BeanProperty var maleNamesFile: String = null
-  @BeanProperty var femaleNamesFile: String = null
-  @BeanProperty var lastNamesFile: String = null
-  @BeanProperty var hedisDateTxt: String = null
-  @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
+//class ClaimGeneratorConfig {
+//  @BeanProperty var basePath: String = null
+//  @BeanProperty var baseFname: String = null
+//  @BeanProperty var nbrGen: Int = 0
+//  @BeanProperty var nbrPatients: Int = 0
+//  @BeanProperty var nbrProviders: Int = 0
+//  @BeanProperty var maleNamesFile: String = null
+//  @BeanProperty var femaleNamesFile: String = null
+//  @BeanProperty var lastNamesFile: String = null
+//  @BeanProperty var hedisDateTxt: String = null
+//  @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
+//
+//  def hedisDate = LocalDate.parse(hedisDateTxt).toDateTimeAtStartOfDay()
+//}
+case class ClaimGeneratorConfig(config: Map[String, Object]) {
+  def basePath: String = config.getOrElse("basePath", "./data/hedis-data").asInstanceOf[String]
+  def baseFname: String = config.getOrElse("baseFname", "hedis").asInstanceOf[String]
+  def nbrGen: Int = config.getOrElse("nbrGen", 1).asInstanceOf[Int]
+  def nbrPatients: Int = config.getOrElse("nbrPatients", 1).asInstanceOf[Int]
+  def nbrProviders: Int = config.getOrElse("nbrProviders", 1).asInstanceOf[Int]
+  def maleNamesFile: String = config.getOrElse("maleNamesFile", "./data/male-names.csv").asInstanceOf[String]
+  def femaleNamesFile: String = config.getOrElse("femaleNamesFile", "./data/female-names.csv").asInstanceOf[String]
+  def lastNamesFile: String = config.getOrElse("lastNamesFile", "./data/last-names.csv").asInstanceOf[String]
+  def hedisDatejd: java.util.Date = config.getOrElse("hedisDateTxt",  java.text.DateFormat.getInstance().parse("2014-12-31T00:00:00.00-05:00")).asInstanceOf[java.util.Date]
+  def rulesConfig: List[RuleConfig] = {
+    val list = config.getOrElse("rulesConfig", new java.util.ArrayList()).asInstanceOf[java.util.ArrayList[java.util.Map[String, Object]]]
+    val l = list map { m => RuleConfig(mapAsScalaMap(m).toMap) }
+    l.toList
+  }
 
-  def hedisDate = LocalDate.parse(hedisDateTxt).toDateTimeAtStartOfDay()
+  def hedisDate = {
+    new DateTime(hedisDatejd)
+  }
 }
 
 /**
@@ -56,13 +80,26 @@ class ClaimGeneratorConfig {
  * @param exclusionRate the rate at which patients are excluded from measure, in %
  * @param simulationParity is the name of the rule to have same simulation scores (isEligible, isExcluded, isMeetMeasure) to avoid conflicts
  */
-class RuleConfig {
-  @BeanProperty var name: String = null
-  @BeanProperty var eligibleRate: Int = 0
-  @BeanProperty var meetMeasureRate: Int = 0
-  @BeanProperty var exclusionRate: Int = 0
-  @BeanProperty var simulationParity: String = null
-  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap()
+//class RuleConfig {
+//  @BeanProperty var name: String = null
+//  @BeanProperty var eligibleRate: Int = 0
+//  @BeanProperty var meetMeasureRate: Int = 0
+//  @BeanProperty var exclusionRate: Int = 0
+//  @BeanProperty var simulationParity: String = null
+//  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap()
+//  
+//  def simParityRuleName = if(simulationParity == null) name else simulationParity
+//}
+case class RuleConfig(config: Map[String, Object]) {
+  def name: String = config.getOrElse("name", "ruleName").asInstanceOf[String]
+  def eligibleRate: Int = config.getOrElse("eligibleRate", 100).asInstanceOf[Int]
+  def meetMeasureRate: Int = config.getOrElse("meetMeasureRate", 100).asInstanceOf[Int]
+  def exclusionRate: Int = config.getOrElse("exclusionRate", 0).asInstanceOf[Int]
+  def simulationParity: String = config.getOrElse("simulationParity", "").asInstanceOf[String]
+  def otherParams: Map[String, String] = {
+    val m = mapAsScalaMap(config.getOrElse("otherParams", new java.util.HashMap()).asInstanceOf[java.util.HashMap[String, String]])
+    m.toMap
+  }
   
-  def simParityRuleName = if(simulationParity == null) name else simulationParity
+  def simParityRuleName = if(simulationParity == "") name else simulationParity
 }

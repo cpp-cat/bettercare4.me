@@ -61,7 +61,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2014-01-01
+        hedisDateTxt: 2014-01-01T00:00:00.00-05:00
         rulesConfig:
           - name: TEST
             eligibleRate: 100
@@ -105,7 +105,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2014-01-01
+        hedisDateTxt: 2014-01-01T00:00:00.00-05:00
         rulesConfig:
           - name: TEST
             eligibleRate: 100
@@ -137,7 +137,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
         maleNamesFile: ./data/male-names.csv
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
-        hedisDateTxt: 2014-12-31
+        hedisDateTxt: 2014-12-31T00:00:00.00-05:00
         rulesConfig:
           - name: CDC-LDL-C-HEDIS-2014
             eligibleRate: 50
@@ -180,7 +180,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestF
 
       // create and configure the rules to use for the simulation
       val hedisDate = config.hedisDate
-      val rules: List[HEDISRule] = config.getRulesConfig().map { c => HEDISRules.createRuleByName(c.name, c, hedisDate) }.toList
+      val rules: List[HEDISRule] = config.rulesConfig.map { c => HEDISRules.createRuleByName(c.name, c, hedisDate) }.toList
 
       // compute the scorecard for each patient
       val patientScorecards = for {

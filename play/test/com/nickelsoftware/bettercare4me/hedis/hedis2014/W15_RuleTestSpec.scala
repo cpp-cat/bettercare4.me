@@ -22,13 +22,9 @@ class W15_RulesTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient's demographics correctly" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName(W15.name)
-      c.setEligibleRate(100)
-      c.setExclusionRate(0)
-      c.setMeetMeasureRate(100)
+      val c = new RuleConfig(Map("name" -> W15.name, "eligibleRate" -> new java.lang.Integer(100), "exclusionRate" -> new java.lang.Integer(0), "meetMeasureRate" -> new java.lang.Integer(100)))
       val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
-      val rule = HEDISRules.createRuleByName(c.getName, c, hedisDate)
+      val rule = HEDISRules.createRuleByName(c.name, c, hedisDate)
       val dob = hedisDate.minusMonths(15)
 
       rule.isPatientMeetDemographic(persistenceLayer.createPatient("first", "last", "M", dob)) mustBe true

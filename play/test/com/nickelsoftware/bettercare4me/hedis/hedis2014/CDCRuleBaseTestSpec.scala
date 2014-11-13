@@ -30,13 +30,9 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
   }
 
   // override to use CDCRuleBaseTest
-  def setupTest(name: String, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
+  def setupTest(name: String, eligibleRate: java.lang.Integer, exclusionRate: java.lang.Integer, meetMeasureRate: java.lang.Integer): (Patient, PatientHistory, HEDISRule) = {
     val persistenceLayer = new SimplePersistenceLayer(88)
-    val c = new RuleConfig
-    c.setName(name)
-    c.setEligibleRate(eligibleRate)
-    c.setExclusionRate(exclusionRate)
-    c.setMeetMeasureRate(meetMeasureRate)
+    val c = new RuleConfig(Map("name" -> name, "eligibleRate" -> eligibleRate, "exclusionRate" -> exclusionRate, "meetMeasureRate" -> meetMeasureRate))
     val rule = new CDCRuleBaseTest(c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
     val patient = persistenceLayer.createPatient("first", "last", "F", dob)
@@ -52,11 +48,7 @@ class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient's demographics correctly" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName("TEST")
-      c.setEligibleRate(100)
-      c.setExclusionRate(0)
-      c.setMeetMeasureRate(100)
+      val c = new RuleConfig(Map("name" -> "TEST", "eligibleRate" -> new java.lang.Integer(100), "exclusionRate" -> new java.lang.Integer(0), "meetMeasureRate" -> new java.lang.Integer(100)))
       val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
       val rule = new CDCRuleBaseTest(c, hedisDate)
       val dob = new LocalDate(2014, 9, 12).toDateTimeAtStartOfDay()

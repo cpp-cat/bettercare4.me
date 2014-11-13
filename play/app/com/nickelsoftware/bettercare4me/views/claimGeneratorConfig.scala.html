@@ -1,0 +1,16 @@
+@(generatorConfigForm: Form[com.nickelsoftware.bettercare4me.controllers.GeneratorConfigData])
+
+@import com.nickelsoftware.bettercare4me.controllers.GeneratorConfigData
+@import play.api.data.Form
+
+@main("BetterCare4.me") {
+
+  
+  @helper.form(action = com.nickelsoftware.bettercare4me.controllers.routes.Application.claimGeneratorSubmit()) {
+    <label for="configTxt">Claim Generator Configuration:</label>
+    <br>
+    @helper.textarea(generatorConfigForm("configTxt"), 'name -> "configTxt", 'id -> "configTxt")
+    <input type="submit" id="submit" name="submit" value="Submit">
+  }
+ 
+}

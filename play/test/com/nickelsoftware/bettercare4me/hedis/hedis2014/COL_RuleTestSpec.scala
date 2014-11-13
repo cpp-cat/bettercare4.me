@@ -19,12 +19,8 @@ class COL_RulesTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient's demographics correctly" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName(COL.name)
-      c.setEligibleRate(100)
-      c.setExclusionRate(0)
-      c.setMeetMeasureRate(100)
-      val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
+      val c = new RuleConfig(Map("name" -> COL.name, "eligibleRate" -> new java.lang.Integer(100), "exclusionRate" -> new java.lang.Integer(0), "meetMeasureRate" -> new java.lang.Integer(100)))
+      val rule = HEDISRules.createRuleByName(c.name, c, new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay())
       val dob = new LocalDate(2014, 9, 12).toDateTimeAtStartOfDay()
 
       rule.isPatientMeetDemographic(persistenceLayer.createPatient("first", "last", "M", dob)) mustBe false

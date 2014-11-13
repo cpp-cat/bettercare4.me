@@ -29,13 +29,9 @@ class CIS_RuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
       scorecard.addScore("TEST", HEDISRule.meetMeasure, true)
   }
 
-  def setupTest(exclusionRate: Int): (Patient, PatientHistory, HEDISRule) = {
+  def setupTest(exclusionRate: java.lang.Integer): (Patient, PatientHistory, HEDISRule) = {
     val persistenceLayer = new SimplePersistenceLayer(88)
-    val c = new RuleConfig
-    c.setName("TEST")
-    c.setEligibleRate(100)
-    c.setExclusionRate(exclusionRate)
-    c.setMeetMeasureRate(100)
+    val c = new RuleConfig(Map("name" -> "TEST", "eligibleRate" -> new java.lang.Integer(100), "exclusionRate" -> exclusionRate, "meetMeasureRate" -> new java.lang.Integer(100)))
     val rule = new CIS_RuleBaseTest(c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val dob = new LocalDate(2012, 9, 12).toDateTimeAtStartOfDay()
     val patient = persistenceLayer.createPatient("first", "last", "F", dob)
@@ -51,11 +47,7 @@ class CIS_RuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
     "validate patient's demographics correctly" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName("TEST")
-      c.setEligibleRate(100)
-      c.setExclusionRate(0)
-      c.setMeetMeasureRate(100)
+      val c = new RuleConfig(Map("name" -> "TEST", "eligibleRate" -> new java.lang.Integer(100), "exclusionRate" -> new java.lang.Integer(0), "meetMeasureRate" -> new java.lang.Integer(100)))
       val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
       val rule = new CIS_RuleBaseTest(c, hedisDate)
       

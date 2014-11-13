@@ -9,6 +9,7 @@ import akka.actor.ActorLogging
 import akka.actor.actorRef2Scala
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import scala.io.Source
 
 object ClaimGeneratorActor {
 
@@ -63,8 +64,9 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
     // ------------------------------------
     case GenerateClaimsRequest(configTxt) =>
 
-      //      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
+//      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
 
+      //Source.fromFile(fname)
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
       //TODO Use a pool of actors to generate the simulation files

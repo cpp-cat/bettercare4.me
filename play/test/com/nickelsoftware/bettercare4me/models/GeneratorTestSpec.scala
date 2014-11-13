@@ -87,7 +87,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
           maleNamesFile: ./data/male-names.csv
           femaleNamesFile: ./data/female-names.csv
           lastNamesFile: ./data/last-names.csv
-          hedisDateTxt: 2014-01-01
+          hedisDateTxt: 2014-01-01T00:00:00.00-05:00
           """)
 
       config.basePath mustBe "./data/ClaimGenerator"
@@ -99,7 +99,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
       config.femaleNamesFile mustBe "./data/female-names.csv"
       config.lastNamesFile mustBe "./data/last-names.csv"
       config.hedisDate mustBe new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
-      config.rulesConfig mustBe new java.util.ArrayList()
+      config.rulesConfig mustBe List()
     }
 
     "load configuration from YAML text including HEDISRule config" in {
@@ -113,7 +113,7 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
           maleNamesFile: ./data/male-names.csv
           femaleNamesFile: ./data/female-names.csv
           lastNamesFile: ./data/last-names.csv
-          hedisDateTxt: 2014-01-01
+          hedisDateTxt: 2014-01-01T00:00:00.00-05:00
           rulesConfig:
               - name: CDC1
                 eligibleRate: 40
@@ -145,15 +145,15 @@ class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
           ruleConfig.eligibleRate mustBe 40
           ruleConfig.meetMeasureRate mustBe 92
           ruleConfig.exclusionRate mustBe 5
-          ruleConfig.otherParams.size() mustBe 0
+          ruleConfig.otherParams.size mustBe 0
 
         case "Rule2" =>
           ruleConfig.eligibleRate mustBe 60
           ruleConfig.meetMeasureRate mustBe 85
           ruleConfig.exclusionRate mustBe 13
-          ruleConfig.otherParams.size() mustBe 2
-          ruleConfig.otherParams.get("key1") mustBe "val1"
-          ruleConfig.otherParams.get("key2") mustBe "val2"
+          ruleConfig.otherParams.size mustBe 2
+          ruleConfig.otherParams.get("key1") mustBe Some("val1")
+          ruleConfig.otherParams.get("key2") mustBe Some("val2")
 
         case _ => fail("Oops, unexpected rule name: " + ruleConfig.name)
       }

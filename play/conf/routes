@@ -3,13 +3,16 @@
 # ~~~~
 
 # Home page
-GET     /                           com.nickelsoftware.bettercare4me.controllers.Application.index
+GET     /                           com.nickelsoftware.bettercare4me.controllers.Application.index(msg: String ?= "Select from the menu on the left...")
 
 # Claim Generation for HEDIS report simulation
 GET     /claimGenerator/*fname      com.nickelsoftware.bettercare4me.controllers.Application.claimGenerator(fname: String)
 
+# Claim Generation for HEDIS report simulation
+POST    /claimGeneratorSubmit       com.nickelsoftware.bettercare4me.controllers.Application.claimGeneratorSubmit
+
 # Report Generation for HEDIS report simulation
-GET     /reportGenerator/*fname      com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator(fname: String)
+GET     /reportGenerator/*fname     com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator(fname: String)
 
 # Akka simple test
 GET     /actor                      com.nickelsoftware.bettercare4me.controllers.Application.actor

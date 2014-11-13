@@ -56,10 +56,13 @@
 - User interface for kicking off the claim generator
 - User interface for kicking off the HEDIS report generation
 - Agent supervision for claim generation and report generation
-- Simple web application to kick off the the batch jobs
 
 ## Completed User Stories
 - Setup claim generator configuration (yaml configuration) to match the NCQA The State of Health Care Quality 2014 Report for Commercial HMO (http://www.ncqa.org/Portals/0/Newsroom/2014/SOHC-web.pdf)
+- Simple web application to kick off the the batch jobs
+- Refactor YAML ClaimGeneratorConfig object to read simple java collections and basic data type to prevent security vulnerability
+- Refactor all test classes to be organized using a TestSuite class in each package with a MainTestSuite, use this command in activator:
+	[bettercare4.me] $ test-only com.nickelsoftware.bettercare4me.MainTestSuite
 
 
 

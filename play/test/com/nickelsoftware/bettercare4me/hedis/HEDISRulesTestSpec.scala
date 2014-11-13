@@ -20,19 +20,15 @@ import scala.util.Random
 
 object HEDISRulesTestSpec {
 
-  def setupTest(name: String, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
+  def setupTest(name: String, eligibleRate: java.lang.Integer, exclusionRate: java.lang.Integer, meetMeasureRate: java.lang.Integer): (Patient, PatientHistory, HEDISRule) = {
     val dob = new LocalDate(1960, 9, 12).toDateTimeAtStartOfDay()
     setupTest(name, "F", dob, eligibleRate, exclusionRate, meetMeasureRate)
   }
 
-  def setupTest(name: String, gender: String, dob: DateTime, eligibleRate: Int, exclusionRate: Int, meetMeasureRate: Int): (Patient, PatientHistory, HEDISRule) = {
+  def setupTest(name: String, gender: String, dob: DateTime, eligibleRate: java.lang.Integer, exclusionRate: java.lang.Integer, meetMeasureRate: java.lang.Integer): (Patient, PatientHistory, HEDISRule) = {
     val persistenceLayer = new SimplePersistenceLayer(88)
-    val c = new RuleConfig
-    c.setName(name)
-    c.setEligibleRate(eligibleRate)
-    c.setExclusionRate(exclusionRate)
-    c.setMeetMeasureRate(meetMeasureRate)
-    val rule = HEDISRules.createRuleByName(c.getName, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
+    val c = new RuleConfig(Map("name" -> name, "eligibleRate" -> eligibleRate, "exclusionRate" -> exclusionRate, "meetMeasureRate" -> meetMeasureRate))
+    val rule = HEDISRules.createRuleByName(c.name, c, new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay())
     val patient = persistenceLayer.createPatient("first", "last", gender, dob)
     val claims = rule.generateClaims(persistenceLayer, patient, persistenceLayer.createProvider("first", "last"), Random.nextInt(100), Random.nextInt(100), Random.nextInt(100))
     val patientHistory = PatientHistoryFactory.createPatientHistory(patient, claims)
@@ -82,14 +78,10 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
     "create a TestRule properly from config" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName("TEST")
-      c.setEligibleRate(40)
-      c.setMeetMeasureRate(92)
-      c.setExclusionRate(5)
+      val c = new RuleConfig(Map("name" -> "TEST", "eligibleRate" -> new java.lang.Integer(40), "exclusionRate" -> new java.lang.Integer(5), "meetMeasureRate" -> new java.lang.Integer(92)))
       
       val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
-      val rule = HEDISRules.createRuleByName(c.getName, c, hedisDate)
+      val rule = HEDISRules.createRuleByName(c.name, c, hedisDate)
       
       rule.name mustBe "TEST"
       rule.fullName mustBe "Test Rule"
@@ -108,11 +100,7 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
     
     "contains a date withing a specified interval" in {
       
-      val c = new RuleConfig
-      c.setName("TEST")
-      c.setEligibleRate(40)
-      c.setMeetMeasureRate(92)
-      c.setExclusionRate(5)
+      val c = new RuleConfig(Map("name" -> "TEST", "eligibleRate" -> new java.lang.Integer(40), "exclusionRate" -> new java.lang.Integer(5), "meetMeasureRate" -> new java.lang.Integer(92)))
       
       val hedisDate = new LocalDate(2014, 12, 31).toDateTimeAtStartOfDay()
       val rule = new TestRule(c, hedisDate)
@@ -128,15 +116,11 @@ class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
     "throw NickelException when try to create a rule with an unknown name" in {
 
       val persistenceLayer = new SimplePersistenceLayer(88)
-      val c = new RuleConfig
-      c.setName("Unknown Name")
-      c.setEligibleRate(40)
-      c.setMeetMeasureRate(92)
-      c.setExclusionRate(5)      
+      val c = new RuleConfig(Map("name" -> "Unknown Name", "eligibleRate" -> new java.lang.Integer(40), "exclusionRate" -> new java.lang.Integer(5), "meetMeasureRate" -> new java.lang.Integer(92)))
       val hedisDate = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
       
       a[NickelException] should be thrownBy {
-        HEDISRules.createRuleByName(c.getName, c, hedisDate)
+        HEDISRules.createRuleByName(c.name, c, hedisDate)
       }
     }
     
