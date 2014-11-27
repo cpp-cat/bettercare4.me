@@ -33,15 +33,14 @@ object Application extends Controller {
     mapping(
       "configTxt" -> text)(GeneratorConfigData.apply)(GeneratorConfigData.unapply))
 
-  // Really basic, gives you the version of Play on the page
+  // Really basic, gives you the index page
+  // ---------------------------------------
   def index(msg: String) = Action {
-    //*
-    com.nickelsoftware.bettercare4me.utils.Yaml.test
-    
     Ok(com.nickelsoftware.bettercare4me.views.html.index(msg))
   }
 
   // Return the claim generator configuration file for claim generation job submission (claim simulator)
+  // ---------------------------------------------------------------------------------------------------
   def claimGenerator(fname: String) = Action {
 
     // Open file, making sure it exists
@@ -78,6 +77,7 @@ object Application extends Controller {
   implicit val timeout = Timeout(10 seconds)
 
   // Claim generator job submission
+  // -------------------------------
   def claimGeneratorSubmit = Action.async { implicit request =>
 
     generatorConfigForm.bindFromRequest.fold(
@@ -88,27 +88,87 @@ object Application extends Controller {
       },
       generatorConfigData => {
         //**** Kick off the job here
-        val fresponse: Future[GenerateClaimsCompleted] = ask(claimGeneratorActor, GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
-        fresponse map { 
+//        val fresponse: Future[GenerateClaimsCompleted] = ask(claimGeneratorActor, GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
+        val fresponse: Future[GenerateClaimsCompleted] = (claimGeneratorActor ? GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
+        fresponse map {
           case GenerateClaimsCompleted(0) => Redirect(routes.Application.index("Claim Generation Job Returned OK"))
-          case GenerateClaimsCompleted(e) => Redirect(routes.Application.index("Claim Generation Job Returned ERROR "+e))
+          case GenerateClaimsCompleted(e) => Redirect(routes.Application.index("Claim Generation Job Returned ERROR " + e))
         }
       })
   }
 
-  // Return the claim generator configuration file for report generation job submission (hedis report computation)
-  def reportGenerator(fname: String) = Action {
-    Ok(com.nickelsoftware.bettercare4me.views.html.index("Report generation job submission, using: " + fname))
+  // Action to ask the user to provide a claim generator configuration file that was used
+  // to generate claims. This configuration file will be used for hedis report generation
+  // from the simulation data
+  // -------------------------------------------------------------------------------------
+  def reportGenerator = Action {
+    Ok(com.nickelsoftware.bettercare4me.views.html.reportGenerator("bogus message"))
   }
 
+  // Generate the report using the uploaded configuration file, which defines claim simulator data
+  // --------------------------------------------------------------------------------------------
+  def reportGeneratorSubmit = Action.async(parse.multipartFormData) { implicit request =>
+
+    val result = request.body.file("configTxt").map { file =>
+
+      val filename = file.filename
+      val contentType = file.contentType
+      //**
+      println(s"file name: $filename")
+      println(s"content type: $contentType")
+
+      contentType match {
+        
+        case Some("application/x-yaml") =>
+          val configTxt = Source.fromFile(file.ref.file).mkString
+//          Ok(com.nickelsoftware.bettercare4me.views.html.index(configTxt))
+          (Some(configTxt), None)
+//          Redirect(routes.Application.index(s"Ok, got file $filename"))
+          
+        case _ =>
+          (None, Some("Error, File with invalid content type, must be YAML configuration file"))
+//          Redirect(routes.Application.index("Error, File with invalid content type, must be YAML configuration file"))
+      }
+    }
+    
+    result match {
+      
+      case Some((Some(configTxt), _)) =>
+//        future {
+//          Ok(com.nickelsoftware.bettercare4me.views.html.index(configTxt))
+//        }
+        val fresponse: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedFiles(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
+        fresponse map { processGenereatedFilesCompleted =>
+          Ok(com.nickelsoftware.bettercare4me.views.html.index(processGenereatedFilesCompleted.ss.toString))
+        }        
+        
+      case Some((None, Some(err))) =>
+        future {
+          Redirect(routes.Application.index(err))
+        }
+        
+      case None =>
+        future {
+          Redirect(routes.Application.index("Error, Missing File"))
+        }
+        
+      case Some(_) =>
+        future {
+          Redirect(routes.Application.index("humm, unknown error!"))
+        }
+    }
+    
+  }
+
+  // ---------------- SIMPLE TEST STUFF ----------------------------------------------------
   // Using Akka Actor to perform the action
   import SimpleActor._
   val simpleActor = Akka.system.actorOf(Props[SimpleActor], name = "simpleActor")
 
   def actor = Action.async {
 
-    // Next line would be simpleActor ? SimpleRequest("Hello World") but this return Future[Any]
-    val futureSimpleResponse: Future[SimpleResponse] = ask(simpleActor, SimpleRequest("Hello World")).mapTo[SimpleResponse]
+    // ask the actor. . .
+    val futureSimpleResponse = (simpleActor ? SimpleRequest("Hello World")).mapTo[SimpleResponse]
     futureSimpleResponse map { simpleResponse => Ok(simpleResponse.data) }
   }
 

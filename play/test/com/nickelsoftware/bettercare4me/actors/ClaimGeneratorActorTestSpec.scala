@@ -78,7 +78,7 @@ class ClaimGeneratorTestSpec(_system: ActorSystem) extends TestKit(_system) with
 
       expectMsg(GenerateClaimsCompleted(0))
 
-      (new File(pathName)).listFiles() should have length 6
+      (new File(pathName)).listFiles() should have length 7
 
       val fnameBase = pathName + "/" + baseFname
 
@@ -93,7 +93,7 @@ class ClaimGeneratorTestSpec(_system: ActorSystem) extends TestKit(_system) with
     "generate ALL HEDIS measures simulation data and process the measures to return an overall score summary result" in new WithApplication {
 
       val baseFname = "ClaimGenerator"
-      val nbrGen = 1
+      val nbrGen = 2
       val configTxt = """
         basePath: """ + pathName + """
         baseFname: """ + baseFname + """
@@ -107,8 +107,8 @@ class ClaimGeneratorTestSpec(_system: ActorSystem) extends TestKit(_system) with
         rulesConfig:
           - name: BCS-HEDIS-2014
             eligibleRate: 100
-            exclusionRate: 10
-            meetMeasureRate: 95
+            exclusionRate: 0
+            meetMeasureRate: 100
         
           - name: CCS-HEDIS-2014
             eligibleRate: 100
@@ -339,11 +339,16 @@ class ClaimGeneratorTestSpec(_system: ActorSystem) extends TestKit(_system) with
       expectMsg(GenerateClaimsCompleted(0))
 
       // get the list of rule names for printing out
-      val ruleNames = ClaimGeneratorConfig.loadConfig(configTxt).rulesConfig map { _.name } toList
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
+      val ruleNames = config.rulesConfig map { _.name } toList
       
       val future = (claimGeneratorActor ? ProcessGenereatedFiles(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
       future onComplete {
-        case Success(ProcessGenereatedFilesCompleted(scoreSummary)) => info(scoreSummary.toString(ruleNames))
+        
+        case Success(ProcessGenereatedFilesCompleted(scoreSummary)) => 
+          info(scoreSummary.toString(ruleNames))
+          scoreSummary.patientCount should be (config.nbrGen * config.nbrPatients)
+          
         case Failure(NickelException(msg)) => fail(msg)
         case Failure(_) => fail("Unknown error")
       }

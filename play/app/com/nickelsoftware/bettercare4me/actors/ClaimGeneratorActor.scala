@@ -3,13 +3,19 @@
  */
 package com.nickelsoftware.bettercare4me.actors
 
+import java.io.BufferedWriter
+import java.io.File
+import java.io.FileNotFoundException
+import java.io.FileWriter
+import java.io.IOException
+
+import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+import com.nickelsoftware.bettercare4me.utils.NickelException
+
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.actorRef2Scala
-import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
-import com.nickelsoftware.bettercare4me.utils.NickelException
-import scala.io.Source
 
 object ClaimGeneratorActor {
 
@@ -64,15 +70,37 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
     // ------------------------------------
     case GenerateClaimsRequest(configTxt) =>
 
-//      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
+      //      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
+      try {
+        val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
-      //Source.fromFile(fname)
-      val config = ClaimGeneratorConfig.loadConfig(configTxt)
+        // save configuration to file in claim simulation directory
+        val path = new File(config.basePath)
+        path.mkdir()
+        val f = new File(path, "claimSimulatorConfig.yaml")
+        val fout = new BufferedWriter(new FileWriter(f))
+        fout.write(configTxt)
+        fout.close
 
-      //TODO Use a pool of actors to generate the simulation files
-      for (igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
+        //TODO Use a pool of actors to generate the simulation files
+        for (igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
 
-      sender ! GenerateClaimsCompleted(0)
+        sender ! GenerateClaimsCompleted(0)
+        
+      } catch {
+        case ex: FileNotFoundException => {
+          log.error("FileNotFoundException, cannot save claim generator config "+ex.getMessage())
+          sender ! GenerateClaimsCompleted(1)
+        }
+        case ex: IOException => {
+          log.error("IOException, "+ex.getMessage())
+          sender ! GenerateClaimsCompleted(1)
+        }
+        case ex: NickelException => {
+          log.error("NickelException, "+ex.message)
+          sender ! GenerateClaimsCompleted(1)
+        }
+      }
 
     // Process local file generated from simulation
     // ------------------------------------
@@ -83,7 +111,8 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
       def loop(scoreSummary: HEDISScoreSummary, igen: Int): HEDISScoreSummary = {
         if (igen == 0) scoreSummary
         else {
-          loop(ClaimFileGeneratorHelper.processGeneratedFiles(igen, config), igen - 1)
+          // Must combine with scoreSummary
+          scoreSummary.addHEDISScoreSummary(loop(ClaimFileGeneratorHelper.processGeneratedFiles(igen, config), igen - 1))
         }
       }
 

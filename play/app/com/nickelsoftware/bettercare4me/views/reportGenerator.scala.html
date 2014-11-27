@@ -1,0 +1,16 @@
+@(message: String)
+
+@import play.api.data.Form
+
+@main("BetterCare4.me") {
+
+  <form action="/reportGeneratorSubmit" method="POST" data-ajax="false" enctype="multipart/form-data">
+    
+    <label for="configTxt">Select a configuration file to submit:</label>
+    <br>
+    <input type="file" id="configTxt" name="configTxt">
+    <input type="submit" id="submit" name="submit" value="Submit">
+  
+  </form>
+  
+}

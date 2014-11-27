@@ -43,7 +43,7 @@ object CWP {
 
   // UB for ED visit type
   //@TODO expand codes
-  val ubA = List("045*, 0981")
+  val ubA = List("045*", "0981")
   val ubAS = ubA.toSet
 
   // POS for ED visit type (to exclude claims that has these POS)

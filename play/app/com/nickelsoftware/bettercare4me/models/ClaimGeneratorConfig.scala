@@ -19,7 +19,6 @@ object ClaimGeneratorConfig {
     val data  = yaml.load(text).asInstanceOf[java.util.Map[String, Object]]
     ClaimGeneratorConfig(mapAsScalaMap(data).toMap)
   }
-
 }
 
 /**
@@ -36,20 +35,6 @@ object ClaimGeneratorConfig {
  * @param hedisDate date to used for HEDIS report date for the simulation (usually Dec 31 of the measurement year)
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
-//class ClaimGeneratorConfig {
-//  @BeanProperty var basePath: String = null
-//  @BeanProperty var baseFname: String = null
-//  @BeanProperty var nbrGen: Int = 0
-//  @BeanProperty var nbrPatients: Int = 0
-//  @BeanProperty var nbrProviders: Int = 0
-//  @BeanProperty var maleNamesFile: String = null
-//  @BeanProperty var femaleNamesFile: String = null
-//  @BeanProperty var lastNamesFile: String = null
-//  @BeanProperty var hedisDateTxt: String = null
-//  @BeanProperty var rulesConfig: java.util.ArrayList[RuleConfig] = new java.util.ArrayList()
-//
-//  def hedisDate = LocalDate.parse(hedisDateTxt).toDateTimeAtStartOfDay()
-//}
 case class ClaimGeneratorConfig(config: Map[String, Object]) {
   def basePath: String = config.getOrElse("basePath", "./data/hedis-data").asInstanceOf[String]
   def baseFname: String = config.getOrElse("baseFname", "hedis").asInstanceOf[String]
@@ -80,16 +65,6 @@ case class ClaimGeneratorConfig(config: Map[String, Object]) {
  * @param exclusionRate the rate at which patients are excluded from measure, in %
  * @param simulationParity is the name of the rule to have same simulation scores (isEligible, isExcluded, isMeetMeasure) to avoid conflicts
  */
-//class RuleConfig {
-//  @BeanProperty var name: String = null
-//  @BeanProperty var eligibleRate: Int = 0
-//  @BeanProperty var meetMeasureRate: Int = 0
-//  @BeanProperty var exclusionRate: Int = 0
-//  @BeanProperty var simulationParity: String = null
-//  @BeanProperty var otherParams: java.util.HashMap[String, String] = new java.util.HashMap()
-//  
-//  def simParityRuleName = if(simulationParity == null) name else simulationParity
-//}
 case class RuleConfig(config: Map[String, Object]) {
   def name: String = config.getOrElse("name", "ruleName").asInstanceOf[String]
   def eligibleRate: Int = config.getOrElse("eligibleRate", 100).asInstanceOf[Int]

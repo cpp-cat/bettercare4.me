@@ -30,7 +30,7 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
   def addHEDISScoreSummary(scoreSummary: HEDISScoreSummary): HEDISScoreSummary = {
     
     val rs = ruleScoreSummaries map {case (k, v) => (k -> v.addScore(scoreSummary.ruleScoreSummaries(k)))}
-    HEDISScoreSummary(patientCount+1, rs)
+    HEDISScoreSummary(patientCount + scoreSummary.patientCount, rs)
   }
   
   override def toString(): String = {
@@ -82,10 +82,10 @@ case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long=0, e
     
     RuleScoreSummary(
         ruleInfo, 
-        rss.meetDemographics+meetDemographics, 
-        rss.eligible+eligible, 
-        rss.excluded+excluded, 
-        rss.meetMeasure+meetMeasure)
+        rss.meetDemographics + meetDemographics, 
+        rss.eligible + eligible, 
+        rss.excluded + excluded, 
+        rss.meetMeasure + meetMeasure)
   }
   
   override def toString(): String = {

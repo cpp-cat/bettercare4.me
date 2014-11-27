@@ -11,8 +11,11 @@ GET     /claimGenerator/*fname      com.nickelsoftware.bettercare4me.controllers
 # Claim Generation for HEDIS report simulation
 POST    /claimGeneratorSubmit       com.nickelsoftware.bettercare4me.controllers.Application.claimGeneratorSubmit
 
-# Report Generation for HEDIS report simulation
-GET     /reportGenerator/*fname     com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator(fname: String)
+# Report Generation form for HEDIS report simulation
+GET     /reportGenerator           com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator
+
+# Report Generation config file posting for HEDIS report simulation
+POST    /reportGeneratorSubmit     com.nickelsoftware.bettercare4me.controllers.Application.reportGeneratorSubmit
 
 # Akka simple test
 GET     /actor                      com.nickelsoftware.bettercare4me.controllers.Application.actor

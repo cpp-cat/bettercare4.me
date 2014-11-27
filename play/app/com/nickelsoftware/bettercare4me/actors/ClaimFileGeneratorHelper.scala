@@ -112,6 +112,8 @@ object ClaimFileGeneratorHelper {
       ph = PatientHistoryFactory.createPatientHistory(patient, claims)
     } yield { rules.foldLeft(Scorecard())({ (scorecard, rule) => rule.scoreRule(scorecard, patient, ph) }) }
     
+    //*** Save each patient scorecard
+    
     // fold the scorecards into a HEDISScoreSummary and return it
     patientScorecards.foldLeft(HEDISScoreSummary(rules))({ (scoreSummary, scorecard) => scoreSummary.addScoreCard(scorecard) })
   }

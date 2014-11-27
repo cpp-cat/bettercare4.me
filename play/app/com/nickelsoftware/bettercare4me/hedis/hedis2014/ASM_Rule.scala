@@ -68,7 +68,7 @@ object ASM {
   
   // UB for ED visit type
   //@TODO expand codes
-  val ubA = List("045*, 0981")
+  val ubA = List("045*", "0981")
   val ubAS = ubA.toSet
   
   // CPT for Acute Inpatient visit type
