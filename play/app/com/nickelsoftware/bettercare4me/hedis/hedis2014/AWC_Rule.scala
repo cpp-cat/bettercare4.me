@@ -48,7 +48,7 @@ object AWC {
 class AWC_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
   val name = AWC.name
-  val fullName = "Well-Child Visits in the Third, Fourth, Fifth and Sixth Years of Life"
+  val fullName = "Adolescent Well-Care Visits"
   val description = "The percentage of enrolled members 12–21 years of age who had at least one comprehensive well-care visit " +
     "with a PCP or an OB/GYN practitioner during the measurement year."
 

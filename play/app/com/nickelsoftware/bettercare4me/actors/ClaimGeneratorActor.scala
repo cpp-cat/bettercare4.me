@@ -107,7 +107,7 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
     case ProcessGenereatedFiles(configTxt) =>
 
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
-
+      
       def loop(scoreSummary: HEDISScoreSummary, igen: Int): HEDISScoreSummary = {
         if (igen == 0) scoreSummary
         else {

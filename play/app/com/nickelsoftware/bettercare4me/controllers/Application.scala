@@ -22,6 +22,7 @@ import java.io.IOException
 import play.Logger
 import play.api.data.Form
 import play.api.data.Forms._
+import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -74,7 +75,7 @@ object Application extends Controller {
   // Using Akka Actor to perform the action
   import ClaimGeneratorActor._
   val claimGeneratorActor = Akka.system.actorOf(Props[ClaimGeneratorActor], name = "claimGeneratorActor")
-  implicit val timeout = Timeout(10 seconds)
+  implicit val timeout = Timeout(240 seconds)
 
   // Claim generator job submission
   // -------------------------------
@@ -113,9 +114,6 @@ object Application extends Controller {
 
       val filename = file.filename
       val contentType = file.contentType
-      //**
-      println(s"file name: $filename")
-      println(s"content type: $contentType")
 
       contentType match {
         
@@ -139,7 +137,9 @@ object Application extends Controller {
 //        }
         val fresponse: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedFiles(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
         fresponse map { processGenereatedFilesCompleted =>
-          Ok(com.nickelsoftware.bettercare4me.views.html.index(processGenereatedFilesCompleted.ss.toString))
+          val config = ClaimGeneratorConfig.loadConfig(configTxt)
+          //*** use report view with config and ss
+          Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, processGenereatedFilesCompleted.ss))
         }        
         
       case Some((None, Some(err))) =>

@@ -249,4 +249,4 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 }
 
 class CHL_16_20_Rule(config: RuleConfig, hedisDate: DateTime) extends CHL_Rule(CHL.name16, "16 - 20", 16, 20, config, hedisDate)
-class CHL_21_26_Rule(config: RuleConfig, hedisDate: DateTime) extends CHL_Rule(CHL.name21, "21 - 26", 21, 26, config, hedisDate)
+class CHL_21_26_Rule(config: RuleConfig, hedisDate: DateTime) extends CHL_Rule(CHL.name21, "21 - 24", 21, 24, config, hedisDate)

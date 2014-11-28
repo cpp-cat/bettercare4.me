@@ -41,21 +41,17 @@
 
 # Sprint 7: Simulated HEDIS Report using Batch Claim Generation
 
-- Version: 0.8.0.00 (v0.8.0.00_11-XX-2014)
+- Version: 0.8.0.00 (v0.8.0.00_11-27-2014)
 - Start Date: 11/06/2014
 - Target Date: 11/16/2014
-- Actual Date: 11/XX/2014
+- Actual Date: 11/27/2014
 
 ## Product Features:
 - Provide an user interface to kicking off the batch jobs
-- Batch generation of claims on local file system using Akka agent supervision
-- Generation of HEDIS 2014 Summary Report using Akka agent supervision.
+- Batch generation of claims on local file system using Akka agent
+- Generation of HEDIS 2014 Summary Report using Akka agent
 
 ## User Stories Sprint Backlog.
-- Simple user interface using jQuery Mobile generated from Play Twirl, basic index page
-- User interface for kicking off the claim generator
-- User interface for kicking off the HEDIS report generation
-- Agent supervision for claim generation and report generation
 
 ## Completed User Stories
 - Setup claim generator configuration (yaml configuration) to match the NCQA The State of Health Care Quality 2014 Report for Commercial HMO (http://www.ncqa.org/Portals/0/Newsroom/2014/SOHC-web.pdf)
@@ -63,6 +59,10 @@
 - Refactor YAML ClaimGeneratorConfig object to read simple java collections and basic data type to prevent security vulnerability
 - Refactor all test classes to be organized using a TestSuite class in each package with a MainTestSuite, use this command in activator:
 	[bettercare4.me] $ test-only com.nickelsoftware.bettercare4me.MainTestSuite
+- Simple user interface using jQuery Mobile generated from Play Twirl, basic index page
+- User interface for kicking off the claim generator
+- User interface for kicking off the HEDIS report generation
+- User interface using jQuery Mobile to present the report
 
 
 

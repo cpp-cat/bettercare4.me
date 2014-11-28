@@ -8,6 +8,60 @@
         femaleNamesFile: ./data/female-names.csv
         lastNamesFile: ./data/last-names.csv
         hedisDateTxt: 2013-12-31T00:00:00.00-05:00
+
+        populationHealthMeasures:
+          - BCS-HEDIS-2014
+          - CCS-HEDIS-2014
+          - CHL-16-20-HEDIS-2014
+          - CHL-21-24-HEDIS-2014
+          - COL-HEDIS-2014
+          - CIS-VZV-C-HEDIS-2014
+          - CIS-DTaP-C-HEDIS-2014
+          - CIS-HB-C-HEDIS-2014
+          - CIS-HiB-C-HEDIS-2014
+          - CIS-MMR-C-HEDIS-2014
+          - CIS-PC-HEDIS-2014
+          - CIS-IPV-C-HEDIS-2014
+
+        wellChildVisits:
+          - W15-HEDIS-2014
+          - W34-HEDIS-2014
+          - AWC-HEDIS-2014
+
+        comprehensiveDiabetesCare:
+          - CDC-HbA1c-Test-HEDIS-2014
+          - CDC-HbA1c-Test-LT7-HEDIS-2014
+          - CDC-HbA1c-Test-LT8-HEDIS-2014
+          - CDC-HbA1c-Test-GT9-HEDIS-2014
+          - CDC-EE-HEDIS-2014
+          - CDC-LDL-C-HEDIS-2014
+          - CDC-LDL-C-Value-HEDIS-2014
+          - CDC-MAN-HEDIS-2014
+          - CDC-BPC-Test-HEDIS-2014
+          - CDC-BPC-C1-HEDIS-2014
+          - CDC-BPC-C2-HEDIS-2014
+
+        additionalChronicCareMeasures:
+          - ASM-5-11-HEDIS-2014
+          - ASM-12-18-HEDIS-2014
+          - ASM-19-50-HEDIS-2014
+          - ASM-51-64-HEDIS-2014
+          - CMC-LDL-C-Test-HEDIS-2014
+          - CMC-LDL-C-Test-Value-HEDIS-2014
+          - MPM-ACE-ARB-HEDIS-2014
+          - MPM-Digoxin-HEDIS-2014
+          - MPM-Diuretics-ARB-HEDIS-2014
+          - MPM-AC-Carbamazepine-HEDIS-2014
+          - MPM-AC-Phenobarbital-HEDIS-2014
+          - MPM-AC-Phenytoin-HEDIS-2014
+          - MPM-AC-Valproic-HEDIS-2014
+
+        otherMeasures:
+          - CWP-HEDIS-2014
+          - URI-HEDIS-2014
+          - AAB-HEDIS-2014
+          - LBP-HEDIS-2014
+
         rulesConfig:
           - name: BCS-HEDIS-2014
             eligibleRate: 100

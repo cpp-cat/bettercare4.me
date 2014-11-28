@@ -1,0 +1,48 @@
+@(config: com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig, ss: com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary)
+
+@import com.nickelsoftware.bettercare4me.controllers.GeneratorConfigData
+
+@displayRow(rss: com.nickelsoftware.bettercare4me.hedis.RuleScoreSummary) = {
+<li><a href="#">
+<h3>@rss.ruleInfo.fullName</h3>
+<p><strong>Numerator: @rss.numerator / Denominator: @rss.denominator</strong></p>
+<p>[ @rss.eligible2MeetDemographics.round : @rss.excluded2eligible.round : @rss.meetMeasure2eligible.round ]</p>
+<p class="ui-li-aside"><strong>@("%.1f".format(rss.scorePct))</strong>%</p>
+</a></li>
+}
+
+
+@main("BetterCare4.me") {
+  
+<h2>Primary Care HEDIS Measures 2014 Report</h2>
+<p> HEDIS report based on @ss.patientCount patients</p>
+  
+<ul data-role="listview" data-inset="true">
+    
+<li data-role="list-divider">Population Health Measures</li>
+@for(rss <- ss.filterMeasures(config.populationHealthMeasures)) {
+  @displayRow(rss)
+}
+    
+<li data-role="list-divider">Well Child Visits</li>
+@for(rss <- ss.filterMeasures(config.wellChildVisits)) {
+  @displayRow(rss)
+}
+
+<li data-role="list-divider">Comprehensive Diabetes Care</li>
+@for(rss <- ss.filterMeasures(config.comprehensiveDiabetesCare)) {
+  @displayRow(rss)
+}
+    
+<li data-role="list-divider">Additional Chronic Care Measures</li>
+@for(rss <- ss.filterMeasures(config.additionalChronicCareMeasures)) {
+  @displayRow(rss)
+}
+    
+<li data-role="list-divider">Other Measures</li>
+@for(rss <- ss.filterMeasures(config.otherMeasures)) {
+  @displayRow(rss)
+}
+
+</ul>
+}

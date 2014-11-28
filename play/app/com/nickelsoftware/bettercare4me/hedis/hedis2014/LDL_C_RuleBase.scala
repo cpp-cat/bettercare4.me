@@ -37,7 +37,7 @@ object LDL_C {
 }
 
 /**
- * Diabetes Lipid Test Base Class
+ * Lipid Test Base Class
  *
  * This class is used to factor out Lipid Test condition (Meet Criteria) of HEDIS rules. 
  * This is used as part of CDC_LDL_C_Test and CMC HEDIS rules.
@@ -90,7 +90,7 @@ class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) 
 }
 
 /**
- * Diabetes Lipid Test Value Base Class
+ * Lipid Test Value Base Class
  *
  * This class is used to factor out Lipid Test Value condition (Meet Criteria) of HEDIS rules. 
  * This is used as part of CDC_LDL_C_Test and CMC HEDIS rules.

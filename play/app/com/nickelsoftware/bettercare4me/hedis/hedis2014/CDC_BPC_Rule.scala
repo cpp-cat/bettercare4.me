@@ -26,8 +26,8 @@ object CDC_BPC {
   val nameC1 = "CDC-BPC-C1-HEDIS-2014"
   val nameC2 = "CDC-BPC-C2-HEDIS-2014"
 
-  val c1Tag = "<140/80 mmHg"
-  val c2Tag = "<140/90 mmHg"
+  val c1Tag = "< 140/80 mmHg"
+  val c2Tag = "< 140/90 mmHg"
 
   val bpTest = "BP Test Performed"
   val bpTestC1 = "BP Test " + c1Tag

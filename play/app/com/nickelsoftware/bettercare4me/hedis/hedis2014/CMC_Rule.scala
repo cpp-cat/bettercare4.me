@@ -24,6 +24,9 @@ object CMC {
   val nameTest = "CMC-LDL-C-Test-HEDIS-2014"
   val nameTestValue = "CMC-LDL-C-Test-Value-HEDIS-2014"
 
+  val fullNameTest = "CAD Event Cholesterol Test"
+  val fullNameTestValue = "CAD Event Cholesterol Test (< 100 mg/dL)"
+
   val AMIorCABG = "AMI or CABG"
   val CPIprocedure = "CPI procedure"
   val IVDdiagnosis = "IVD Diagnosis"
@@ -103,9 +106,8 @@ object CMC {
  * had a diagnosis of IVD during both the measurement year and the year prior, and had at least one LDL cholesterol screening test done.
  *
  */
-abstract class CMC_RuleBase(val name: String, config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
+abstract class CMC_RuleBase(val name: String, val fullName: String, config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(config, hedisDate) {
 
-  val fullName = "CAD Event Cholesterol Test"
   val description = "CAD Event Cholesterol Test indicates whether a patient, aged 18 to 75 years, who either had a cardiovascular event during the " +
     "year prior to the measurement year, or had a diagnosis of ischemic vascular disease (IVD) during both the measurement year " +
     "and the year prior, had at least one LDL cholesterol screening test done."
@@ -209,7 +211,7 @@ abstract class CMC_RuleBase(val name: String, config: RuleConfig, hedisDate: Dat
   }
 }
 
-class CMC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTest, config, hedisDate) {
+class CMC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTest, CMC.fullNameTest, config, hedisDate) {
 
   private val ldlTestRule = new LDL_C_TestRuleBase(name, config, hedisDate)
   
@@ -217,7 +219,7 @@ class CMC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CMC_Ru
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldlTestRule.scorePatientMeetMeasure(scorecard, patient, ph)
 }
 
-class CMC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTestValue, config, hedisDate) {
+class CMC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTestValue, CMC.fullNameTestValue, config, hedisDate) {
 
   private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, config, hedisDate)
   

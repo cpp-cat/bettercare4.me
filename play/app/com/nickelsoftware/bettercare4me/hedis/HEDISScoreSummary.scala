@@ -33,6 +33,16 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
     HEDISScoreSummary(patientCount + scoreSummary.patientCount, rs)
   }
   
+  /**
+   * Return the list of rule score summary based on a list of measure names, 
+   * filtering out those who are not in this analysis.
+   * May return an empty list
+   */
+  def filterMeasures(selectMeasures: List[String]): List[RuleScoreSummary] = {
+    val l = for(key <- selectMeasures) yield ruleScoreSummaries.get(key)
+    l.flatten
+  }
+  
   override def toString(): String = {
     
     val l = "Overall score summary over " + patientCount + " patients" :: (ruleScoreSummaries.values map {_.toString} toList) 

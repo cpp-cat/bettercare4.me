@@ -47,7 +47,7 @@ object CIS_HiB {
 class CIS_HiB_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(config, hedisDate) {
 
   val name = CIS_HiB.name
-  val fullName = "Hepatitis B Vaccine"
+  val fullName = "H Influenza Type B Vaccine"
   val description = "H Influenza Type B (HiB) Vaccine indicates whether a child, who turned 2 years old during the measurement year, received three " +
     "(3) H. influenzae type B vaccinations. This excludes children who had a previous adverse reaction to a vaccine, as well as those " +
     " with a vaccine contraindication such as immunodeficiency syndrome, HIV, lymphoreticular or histiocytic tissue cancer, multiple " +

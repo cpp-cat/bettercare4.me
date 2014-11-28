@@ -39,7 +39,7 @@ object CDC_LDL_C_Value {
 class CDC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(config, hedisDate) {
 
   val name = CDC_LDL_C_Value.name
-  val fullName = "Diabetes Lipid Test"
+  val fullName = "Diabetes Lipid Test (< 100 mg/dL)"
   val description = "Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had at least one LDL cholesterol lab result record with a value greater than zero and less than 100 mg/dL."
 
   private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, config, hedisDate)

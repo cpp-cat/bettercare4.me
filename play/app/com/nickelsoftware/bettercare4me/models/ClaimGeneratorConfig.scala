@@ -33,6 +33,7 @@ object ClaimGeneratorConfig {
  * @param femaleNamesFile file name for female given names used for person generation
  * @param lastNamesFile file name for last names used for person generation
  * @param hedisDate date to used for HEDIS report date for the simulation (usually Dec 31 of the measurement year)
+ * @param populationHealthMeasures list of measures name in the population health category (for reporting categorization)
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
 case class ClaimGeneratorConfig(config: Map[String, Object]) {
@@ -50,6 +51,17 @@ case class ClaimGeneratorConfig(config: Map[String, Object]) {
     val l = list map { m => RuleConfig(mapAsScalaMap(m).toMap) }
     l.toList
   }
+  
+  private def selectedMeasures(name: String): List[String] = {
+    val list = config.getOrElse(name, new java.util.ArrayList()).asInstanceOf[java.util.ArrayList[String]]
+    list.toList
+  }
+  
+  def populationHealthMeasures: List[String] = selectedMeasures("populationHealthMeasures")
+  def wellChildVisits: List[String] = selectedMeasures("wellChildVisits")
+  def comprehensiveDiabetesCare: List[String] = selectedMeasures("comprehensiveDiabetesCare")
+  def additionalChronicCareMeasures: List[String] = selectedMeasures("additionalChronicCareMeasures")
+  def otherMeasures: List[String] = selectedMeasures("otherMeasures")
 
   def hedisDate = {
     new DateTime(hedisDatejd)
