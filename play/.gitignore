@@ -15,3 +15,4 @@ dist
 /.settings
 /bin
 /.cache
+data/hedis-2014-test*

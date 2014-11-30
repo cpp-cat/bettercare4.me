@@ -23,6 +23,7 @@ import play.Logger
 import play.api.data.Form
 import play.api.data.Forms._
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+import com.nickelsoftware.bettercare4me.actors.ClaimFileGeneratorHelper
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -92,8 +93,8 @@ object Application extends Controller {
 //        val fresponse: Future[GenerateClaimsCompleted] = ask(claimGeneratorActor, GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
         val fresponse: Future[GenerateClaimsCompleted] = (claimGeneratorActor ? GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
         fresponse map {
-          case GenerateClaimsCompleted(0) => Redirect(routes.Application.index("Claim Generation Job Returned OK"))
-          case GenerateClaimsCompleted(e) => Redirect(routes.Application.index("Claim Generation Job Returned ERROR " + e))
+          case GenerateClaimsCompleted(ClaimFileGeneratorHelper.ClaimGeneratorCounts(pa, pr, c), 0) => Redirect(routes.Application.index(s"Claim Generation Job Returned OK, generated $pa patients, $pr providers, and $c claims"))
+          case GenerateClaimsCompleted(_, e) => Redirect(routes.Application.index("Claim Generation Job Returned ERROR " + e))
         }
       })
   }

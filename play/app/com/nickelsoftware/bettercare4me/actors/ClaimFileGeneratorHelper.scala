@@ -27,6 +27,11 @@ import com.nickelsoftware.bettercare4me.hedis.Scorecard
  * @param config Simulation parameters
  */
 object ClaimFileGeneratorHelper {
+  
+  case class ClaimGeneratorCounts(nbrPatients: Long, nbrProviders: Long, nbrClaims: Long) {
+    
+    def +(rhs: ClaimGeneratorCounts) = ClaimGeneratorCounts(nbrPatients+rhs.nbrPatients, nbrProviders+rhs.nbrProviders, nbrClaims+rhs.nbrClaims)
+  }
 
   def getOne[A](items: IndexedSeq[A]): A = items(Random.nextInt(items.size))
 
@@ -39,7 +44,7 @@ object ClaimFileGeneratorHelper {
    * @param igen Generation number
    * @param config the generator's configuration parameters
    */
-  def generateClaims(igen: Int, config: ClaimGeneratorConfig): Unit = {
+  def generateClaims(igen: Int, config: ClaimGeneratorConfig): ClaimGeneratorCounts = {
 
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)
@@ -74,6 +79,7 @@ object ClaimFileGeneratorHelper {
 
     // generate the claims
     var simScores = HashMap[String, (Int, Int, Int)]()
+    var nbrClaims = 0L
     for {
       patient <- patients
       provider = getOne(providers)
@@ -83,13 +89,15 @@ object ClaimFileGeneratorHelper {
         rule <- rules
         simScoreTpl = simScores.getOrElseUpdate(rule.config.simParityRuleName, (Random.nextInt(100), Random.nextInt(100), Random.nextInt(100)))
         claim <- rule.generateClaims(persistenceLayer, patient, provider, simScoreTpl._1, simScoreTpl._2, simScoreTpl._3)
-      } claimsWriter.writeRow(ClaimParser.toList(claim))
+      } {claimsWriter.writeRow(ClaimParser.toList(claim)); nbrClaims = nbrClaims + 1}
     }
 
     // that's it, close all files
     patientsWriter.close
     providersWriter.close
     claimsWriter.close
+    
+    ClaimGeneratorCounts(patients.size.toLong, providers.size.toLong, nbrClaims)
   }
   
   

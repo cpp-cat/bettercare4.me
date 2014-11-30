@@ -36,9 +36,10 @@ object ClaimGeneratorActor {
   /**
    * Response to indicate the claim generation is completed
    *
+   * @param counts indicates the total number of patients, providers, and claims generated
    * @param status: 0: OK, -1: Error (?)
    */
-  case class GenerateClaimsCompleted(status: Int)
+  case class GenerateClaimsCompleted(counts: ClaimFileGeneratorHelper.ClaimGeneratorCounts, status: Int)
 
   /**
    * Process all claims, patient and provider files
@@ -62,6 +63,7 @@ object ClaimGeneratorActor {
  */
 class ClaimGeneratorActor() extends Actor with ActorLogging {
 
+  import ClaimFileGeneratorHelper._
   import ClaimGeneratorActor._
 
   def receive = {
@@ -83,22 +85,25 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
         fout.close
 
         //TODO Use a pool of actors to generate the simulation files
-        for (igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
+//        for (igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
+        
+        // Using spark to parallelize the tasks
+        val counts = ClaimGeneratorSparkHelper.generateClaims(config)
 
-        sender ! GenerateClaimsCompleted(0)
+        sender ! GenerateClaimsCompleted(counts, 0)
         
       } catch {
         case ex: FileNotFoundException => {
           log.error("FileNotFoundException, cannot save claim generator config "+ex.getMessage())
-          sender ! GenerateClaimsCompleted(1)
+          sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: IOException => {
           log.error("IOException, "+ex.getMessage())
-          sender ! GenerateClaimsCompleted(1)
+          sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: NickelException => {
           log.error("NickelException, "+ex.message)
-          sender ! GenerateClaimsCompleted(1)
+          sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
       }
 

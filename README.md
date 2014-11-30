@@ -39,6 +39,31 @@
 - Make recommendations based on content-based search criteria.
 
 
+# Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
+
+- Version: 0.9.0.00 (v0.9.0.00_12-XX-2014)
+- Start Date: 11/29/2014
+- Target Date: 12/27/2014
+- Actual Date: 12/XX/2014
+
+## Product Features:
+- Paralleling claim generation and HEDIS report using Spark
+- Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
+
+## User Stories Sprint Backlog.
+- Adding Cassandra to project
+- Creating Cassandra schema and local database
+- Persisting patients, providers, claims in Cassandra
+- Persisting Patient HEDIS scorecard in Cassandra
+- Creating UI for displaying patient gaps-in-care / HEDIS scorecard
+- Provide search capability to find patients based on gaps
+- Parallelize HEDIS report generation using Spark
+- Add capability to submit job (claims or report generation) from web application async and query job status
+
+## Completed User Stories
+- Parallelizing patients, providers and claims generation using Spark
+
+
 # Sprint 7: Simulated HEDIS Report using Batch Claim Generation
 
 - Version: 0.8.0.00 (v0.8.0.00_11-27-2014)
@@ -63,7 +88,6 @@
 - User interface for kicking off the claim generator
 - User interface for kicking off the HEDIS report generation
 - User interface using jQuery Mobile to present the report
-
 
 
 # Sprint 6: Batch Claim Generation Ready and Simulated HEDIS Report
