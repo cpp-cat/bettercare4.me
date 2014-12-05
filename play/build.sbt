@@ -17,6 +17,7 @@ libraryDependencies ++= Seq(
   "com.github.tototoshi" %% "scala-csv" % "1.0.0",
   "joda-time" % "joda-time" % "2.4",
   "org.yaml" % "snakeyaml" % "1.14",
+  "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.3",
   "org.scalactic" %% "scalactic" % "2.2.0" % "test",
   "org.scalatest" %% "scalatest" % "2.2.0" % "test",
   "org.scalatestplus" %% "play" % "1.2.0" % "test",

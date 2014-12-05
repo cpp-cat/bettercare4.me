@@ -51,8 +51,6 @@
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Adding Cassandra to project
-- Creating Cassandra schema and local database
 - Persisting patients, providers, claims in Cassandra
 - Persisting Patient HEDIS scorecard in Cassandra
 - Creating UI for displaying patient gaps-in-care / HEDIS scorecard
@@ -61,6 +59,11 @@
 - Add capability to submit job (claims or report generation) from web application async and query job status
 
 ## Completed User Stories
+- Added simple /cassanda route to test reading the database
+- Added cassandra object to access database for bettercare4me keyspace
+- added ./data/cassandra.yaml configuration file for database configuration parameters
+- Adding Cassandra to project
+- Creating Cassandra schema and local database
 - Parallelizing patients, providers and claims generation using Spark
 
 

@@ -6,7 +6,7 @@ package com.nickelsoftware.bettercare4me.actors
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
-import play.Logger
+import play.api.Logger
 
 /**
  * Helper object to distribute the workload of generating the patients, providers and claims

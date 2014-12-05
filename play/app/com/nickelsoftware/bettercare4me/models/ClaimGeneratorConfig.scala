@@ -6,8 +6,6 @@ package com.nickelsoftware.bettercare4me.models
 import scala.beans.BeanProperty
 import org.joda.time.LocalDate
 import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import org.yaml.snakeyaml.constructor.CustomClassLoaderConstructor
 import org.yaml.snakeyaml.constructor.SafeConstructor
 import scala.collection.JavaConversions._
 import org.joda.time.DateTime

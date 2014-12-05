@@ -1,29 +1,40 @@
 package com.nickelsoftware.bettercare4me.controllers
 
-import scala.concurrent._
+import java.io.FileNotFoundException
+import java.io.IOException
+import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
+import scala.concurrent.future
+import scala.io.Source
 import scala.language.postfixOps
+import com.nickelsoftware.bettercare4me.actors.ClaimFileGeneratorHelper
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor
+import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsCompleted
+import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsRequest
+import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.ProcessGenereatedFiles
+import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.ProcessGenereatedFilesCompleted
 import com.nickelsoftware.bettercare4me.actors.SimpleActor
 import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleRequest
 import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleResponse
 import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleSparkRequest
+import com.nickelsoftware.bettercare4me.cassandra.SimpleClient
+import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+import com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig
+import com.nickelsoftware.bettercare4me.views.html.hedisReport
+import com.nickelsoftware.bettercare4me.views.html.patientList
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
+import play.Logger
 import play.api.Play.current
+import play.api.data.Form
+import play.api.data.Forms.mapping
+import play.api.data.Forms.text
 import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import scala.io.Source
-import java.io.FileNotFoundException
-import java.io.IOException
-import play.Logger
-import play.api.data.Form
-import play.api.data.Forms._
-import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
-import com.nickelsoftware.bettercare4me.actors.ClaimFileGeneratorHelper
+import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -59,7 +70,7 @@ object Application extends Controller {
     sourceOpt match {
       case Some(source) => try {
         val configTxt = source.mkString
-        Ok(com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig(generatorConfigForm.fill(GeneratorConfigData(configTxt))))
+        Ok(claimGeneratorConfig(generatorConfigForm.fill(GeneratorConfigData(configTxt))))
       } catch {
         case ex: IOException => {
           Logger.error("Oops, IOException while reading file: " + fname)
@@ -85,12 +96,12 @@ object Application extends Controller {
     generatorConfigForm.bindFromRequest.fold(
       formWithErrors => {
         future {
-          BadRequest(com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig(formWithErrors))
+          BadRequest(claimGeneratorConfig(formWithErrors))
         }
       },
       generatorConfigData => {
         //**** Kick off the job here
-//        val fresponse: Future[GenerateClaimsCompleted] = ask(claimGeneratorActor, GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
+        //        val fresponse: Future[GenerateClaimsCompleted] = ask(claimGeneratorActor, GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
         val fresponse: Future[GenerateClaimsCompleted] = (claimGeneratorActor ? GenerateClaimsRequest(generatorConfigData.configTxt)).mapTo[GenerateClaimsCompleted]
         fresponse map {
           case GenerateClaimsCompleted(ClaimFileGeneratorHelper.ClaimGeneratorCounts(pa, pr, c), 0) => Redirect(routes.Application.index(s"Claim Generation Job Returned OK, generated $pa patients, $pr providers, and $c claims"))
@@ -117,48 +128,48 @@ object Application extends Controller {
       val contentType = file.contentType
 
       contentType match {
-        
+
         case Some("application/x-yaml") =>
           val configTxt = Source.fromFile(file.ref.file).mkString
-//          Ok(com.nickelsoftware.bettercare4me.views.html.index(configTxt))
+          //          Ok(index(configTxt))
           (Some(configTxt), None)
-//          Redirect(routes.Application.index(s"Ok, got file $filename"))
-          
+        //          Redirect(routes.Application.index(s"Ok, got file $filename"))
+
         case _ =>
           (None, Some("Error, File with invalid content type, must be YAML configuration file"))
-//          Redirect(routes.Application.index("Error, File with invalid content type, must be YAML configuration file"))
+        //          Redirect(routes.Application.index("Error, File with invalid content type, must be YAML configuration file"))
       }
     }
-    
+
     result match {
-      
+
       case Some((Some(configTxt), _)) =>
-//        future {
-//          Ok(com.nickelsoftware.bettercare4me.views.html.index(configTxt))
-//        }
+        //        future {
+        //          Ok(index(configTxt))
+        //        }
         val fresponse: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedFiles(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
         fresponse map { processGenereatedFilesCompleted =>
           val config = ClaimGeneratorConfig.loadConfig(configTxt)
           //*** use report view with config and ss
-          Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, processGenereatedFilesCompleted.ss))
-        }        
-        
+          Ok(hedisReport(config, processGenereatedFilesCompleted.ss))
+        }
+
       case Some((None, Some(err))) =>
         future {
           Redirect(routes.Application.index(err))
         }
-        
+
       case None =>
         future {
           Redirect(routes.Application.index("Error, Missing File"))
         }
-        
+
       case Some(_) =>
         future {
           Redirect(routes.Application.index("humm, unknown error!"))
         }
     }
-    
+
   }
 
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------
@@ -179,5 +190,15 @@ object Application extends Controller {
     // Basically the same as above, only change the message sent to the actor
     val futureSimpleResponse = simpleActor ? SimpleSparkRequest("conf/application.conf")
     futureSimpleResponse.mapTo[SimpleResponse] map { simpleResponse => Ok(simpleResponse.data) }
+  }
+
+  // --Simple Cassandra test ----------------------------------------------------------------------
+  // Assumes we ran the ./data/bettercare4me.cql already and the database is running on localhost
+  def cassandra = Action.async {
+
+//    val patients = future { new SimpleClient("127.0.0.1").queryPatients }
+//    patients map { p => Ok(patientList(p)) }
+    
+    Bettercare4me.queryPatients map { patients => Ok(patientList(patients)) }
   }
 }
