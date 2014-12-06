@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class AWC_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class AWC_RuleTestSpec extends PlaySpec {
   
     "The AWC_Rule class representing Adolescent Well-Care Visits HEDIS rule" must {
     

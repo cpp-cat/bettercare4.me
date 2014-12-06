@@ -46,7 +46,7 @@ trait TestFileGenerator extends SuiteMixin { this: Suite =>
   }
 }
 
-class ClaimFileGeneratorTestSpec extends PlaySpec with OneAppPerSuite with TestFileGenerator {
+class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
 
   "The ClaimFileGeneratorHelper class" must {
 

@@ -20,50 +20,71 @@ DROP KEYSPACE IF EXISTS bettercare4me;
 CREATE KEYSPACE bettercare4me WITH replication = {'class':'SimpleStrategy','replication_factor':1};
 
 USE bettercare4me;
+/////////////////////////////////////////////////////////////////////////////////////////////
 
 // Patients table
+//   batch_id is the load batch id (should have batch_id >> nbr of nodes)
+//   id is patient id
+//   data is patient data serialized as a list of string
 //--------------
 CREATE TABLE patients (
+  batch_id INT,
   id TEXT,
   data LIST<TEXT>,
-  PRIMARY KEY (id)
+  PRIMARY KEY (batch_id, id)
 );
 
 // Providers table
+//   batch_id is the load batch id (should have batch_id >> nbr of nodes)
+//   id is provider id
+//   data is provider data serialized as a list of string
 //--------------
 CREATE TABLE providers (
+  batch_id INT,
   id TEXT,
   data LIST<TEXT>,
-  PRIMARY KEY (id)
+  PRIMARY KEY (batch_id, id)
 );
 
 // Claims table
 //--------------
-// person_id can be either patient.id or provider.id, both are maintained so claims can be retreived by
-// patients and also by provider.
-CREATE TABLE claims (
+//   batch_id is the load batch id (should have batch_id >> nbr of nodes)
+//   id is the claim id
+//   patient_id / provider_id
+//   dos is claim date of service
+//   data is claim data serialized as a list of string
+CREATE TABLE claims_patients (
+  batch_id INT,
   id TEXT,
-  person_id TEXT,
+  patient_id TEXT,
   dos TIMESTAMP,
   data LIST<TEXT>,
-PRIMARY KEY (person_id, dos, id)
+  PRIMARY KEY (batch_id, patient_id, dos, id)
+);
+CREATE TABLE claims_providers (
+  batch_id INT,
+  id TEXT,
+  provider_id TEXT,
+  dos TIMESTAMP,
+  data LIST<TEXT>,
+  PRIMARY KEY (batch_id, provider_id, dos, id)
 );
 
 // Test Data
-INSERT INTO patients (id, data) VALUES ('patient-1-0', ['patient-1-0','MARCIA','COOPER','F','1964-09-30']);
-INSERT INTO patients (id, data) VALUES ('patient-1-1', ['patient-1-1','COURTNEY','HUDSON','M','1959-01-31']);
-INSERT INTO patients (id, data) VALUES ('patient-1-2', ['patient-1-2','CECELIA','LLOYD','F','1962-10-31']);
+INSERT INTO patients (batch_id, id, data) VALUES (991, 'patient-1-0', ['patient-1-0','MARCIA','COOPER','F','1964-09-30']);
+INSERT INTO patients (batch_id, id, data) VALUES (992, 'patient-1-1', ['patient-1-1','COURTNEY','HUDSON','M','1959-01-31']);
+INSERT INTO patients (batch_id, id, data) VALUES (993, 'patient-1-2', ['patient-1-2','CECELIA','LLOYD','F','1962-10-31']);
 
-INSERT INTO providers (id, data) VALUES ('provider-1-0', ['provider-1-0','MIREYA','MADDOX']);
-INSERT INTO providers (id, data) VALUES ('provider-1-1', ['provider-1-1','SHERIKA','MEJIA']);
-INSERT INTO providers (id, data) VALUES ('provider-1-2', ['provider-1-2','HERMELINDA','KIRKLAND']);
+INSERT INTO providers (batch_id, id, data) VALUES (991, 'provider-1-0', ['provider-1-0','MIREYA','MADDOX']);
+INSERT INTO providers (batch_id, id, data) VALUES (992, 'provider-1-1', ['provider-1-1','SHERIKA','MEJIA']);
+INSERT INTO providers (batch_id, id, data) VALUES (991, 'provider-1-2', ['provider-1-2','HERMELINDA','KIRKLAND']);
 
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-0', 'patient-1-0', '2013-02-25T00:00:00.00-05:00', ['c-md-1-0','patient-1-0','provider-1-2','2013-02-25','2013-02-25','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0225','']);
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-0', 'provider-1-2', '2013-02-25T00:00:00.00-05:00', ['c-md-1-0','patient-1-0','provider-1-2','2013-02-25','2013-02-25','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0225','']);
+INSERT INTO claims_patients  (batch_id, id, patient_id, dos, data) VALUES (991, 'c-md-1-0', 'patient-1-0', '2013-02-25T00:00:00.00-05:00', ['c-md-1-0','patient-1-0','provider-1-2','2013-02-25','2013-02-25','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0225','']);
+INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (991, 'c-md-1-0', 'provider-1-2', '2013-02-25T00:00:00.00-05:00', ['c-md-1-0','patient-1-0','provider-1-2','2013-02-25','2013-02-25','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0225','']);
 
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-1', 'patient-1-0', '2013-03-15T00:00:00.00-05:00', ['c-md-1-1','patient-1-0','provider-1-2','2013-03-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0315','']);
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-1', 'provider-1-2', '2013-03-15T00:00:00.00-05:00', ['c-md-1-1','patient-1-0','provider-1-2','2013-03-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0315','']);
+INSERT INTO claims_patients  (batch_id, id, patient_id, dos, data) VALUES (991, 'c-md-1-1', 'patient-1-0', '2013-03-15T00:00:00.00-05:00', ['c-md-1-1','patient-1-0','provider-1-2','2013-03-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0315','']);
+INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (991, 'c-md-1-1', 'provider-1-2', '2013-03-15T00:00:00.00-05:00', ['c-md-1-1','patient-1-0','provider-1-2','2013-03-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0315','']);
 
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-2', 'patient-1-0', '2013-04-15T00:00:00.00-05:00', ['c-md-1-2','patient-1-0','provider-1-1','2013-04-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0415','']);
-INSERT INTO claims (id, person_id, dos, data) VALUES ('c-md-1-2', 'provider-1-1', '2013-04-15T00:00:00.00-05:00', ['c-md-1-2','patient-1-0','provider-1-1','2013-04-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0415','']);
+INSERT INTO claims_patients  (batch_id, id, patient_id, dos, data) VALUES (991, 'c-md-1-2', 'patient-1-0', '2013-04-15T00:00:00.00-05:00', ['c-md-1-2','patient-1-0','provider-1-1','2013-04-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0415','']);
+INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (991, 'c-md-1-2', 'provider-1-1', '2013-04-15T00:00:00.00-05:00', ['c-md-1-2','patient-1-0','provider-1-1','2013-04-15','2013-03-15','','','','','','0','N','','','','','','','','','','','','','','','','','','','','','','','','','','','','G0415','']);
 

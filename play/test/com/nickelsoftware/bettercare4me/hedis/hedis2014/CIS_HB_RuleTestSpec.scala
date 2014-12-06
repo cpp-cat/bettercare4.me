@@ -10,7 +10,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CIS_HB_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_HB_RuleTestSpec extends PlaySpec {
 
   "The CIS_HB_Rule class representing Hep B Vaccine HEDIS rule" must {
 

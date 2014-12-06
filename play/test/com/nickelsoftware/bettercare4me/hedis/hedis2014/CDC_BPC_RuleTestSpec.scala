@@ -9,7 +9,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CDC_BPC_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CDC_BPC_RuleTestSpec extends PlaySpec {
 
   "The CDC_BPC_T_Rule class representing Diabetes BP Test Performed HEDIS rule" must {
 

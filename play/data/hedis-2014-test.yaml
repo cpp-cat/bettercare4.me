@@ -1,6 +1,7 @@
 
         basePath: ./data/hedis-2014-test
         baseFname: claimGenerator
+        generator: file
         nbrGen: 2
         nbrPatients: 10
         nbrProviders: 1

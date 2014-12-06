@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class MPM_AC_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class MPM_AC_RuleTestSpec extends PlaySpec {
 
   "The MPM_AC_C_Rule class representing Annual Monitoring for Patients on Persistent Medications (Carbamazepine) HEDIS rule" must {
 

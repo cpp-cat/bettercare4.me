@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class MPM_ADD_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class MPM_ADD_RuleTestSpec extends PlaySpec {
 
   "The MPM_ACE_ARB_Rule class representing Annual Monitoring for Patients on Persistent Medications (ACE/ARB) HEDIS rule" must {
 

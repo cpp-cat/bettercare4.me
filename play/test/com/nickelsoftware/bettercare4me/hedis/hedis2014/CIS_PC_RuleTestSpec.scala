@@ -10,7 +10,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CIS_PC_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_PC_RuleTestSpec extends PlaySpec {
 
   "The CIS_PC_Rule class representing Pneumococcal Conjugate Vaccine HEDIS rule" must {
 

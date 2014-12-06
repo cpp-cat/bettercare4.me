@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class ASM_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class ASM_RuleTestSpec extends PlaySpec {
 
   "The ASM_Rule class representing Asthma Medication Management (5 - 11) HEDIS rule" must {
 

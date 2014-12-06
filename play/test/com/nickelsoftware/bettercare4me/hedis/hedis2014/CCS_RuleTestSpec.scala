@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CCS_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CCS_RuleTestSpec extends PlaySpec {
   
     "The CCS_Rule class representing Cervical Cancer Screen HEDIS rule" must {
     

@@ -14,7 +14,7 @@ import CDC.ndcAKey
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CDCHbA1cTestRuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CDCHbA1cTestRuleTestSpec extends PlaySpec {
   
     "The CDC_HbA1c_TestRule class representing Diabetes HbA1c Test HEDIS rule" must {
     

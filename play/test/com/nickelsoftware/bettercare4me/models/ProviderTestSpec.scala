@@ -7,7 +7,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
-class ProviderTestSpec extends PlaySpec with OneAppPerSuite {
+class ProviderTestSpec extends PlaySpec {
 
   "The Provider class" must {
 

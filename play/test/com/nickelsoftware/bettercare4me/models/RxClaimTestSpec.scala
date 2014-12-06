@@ -7,7 +7,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
-class RxClaimTestSpec extends PlaySpec with OneAppPerSuite {
+class RxClaimTestSpec extends PlaySpec {
 
   "The RxClaim class" must {
 

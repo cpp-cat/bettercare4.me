@@ -18,7 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 
-class CIS_RuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_RuleBaseTestSpec extends PlaySpec {
 
   class CIS_RuleBaseTest(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(config, hedisDate) {
     val name = "TEST"

@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class CIS_DTaP_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_DTaP_RuleTestSpec extends PlaySpec {
   
     "The CIS_DTaP_Rule class representing DTaP Vaccination HEDIS rule" must {
     

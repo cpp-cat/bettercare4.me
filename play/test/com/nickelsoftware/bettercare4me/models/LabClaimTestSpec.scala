@@ -9,7 +9,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
-class LabClaimTestSpec extends PlaySpec with OneAppPerSuite {
+class LabClaimTestSpec extends PlaySpec {
 
   "The LabClaim class" must {
 

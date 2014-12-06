@@ -15,7 +15,7 @@ import scala.util.Random
 import org.joda.time.Interval
 import com.nickelsoftware.bettercare4me.utils.Utils
 
-class W15_RulesTestSpec extends PlaySpec with OneAppPerSuite {
+class W15_RulesTestSpec extends PlaySpec {
 
   "The W15_Rule class representing Well-Child Visits in the First 15 Months of Life HEDIS rule" must {
 

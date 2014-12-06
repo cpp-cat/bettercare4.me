@@ -7,7 +7,7 @@ import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
 
-class PatientTestSpec extends PlaySpec with OneAppPerSuite {
+class PatientTestSpec extends PlaySpec {
 
   "The Patient class" must {
 

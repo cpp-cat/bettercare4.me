@@ -47,20 +47,19 @@
 - Actual Date: 12/XX/2014
 
 ## Product Features:
-- Paralleling claim generation and HEDIS report using Spark
+- Paralleling claim generation and HEDIS report using Spark and Cassandra
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Persisting patients, providers, claims in Cassandra
 - Persisting Patient HEDIS scorecard in Cassandra
 - Creating UI for displaying patient gaps-in-care / HEDIS scorecard
 - Provide search capability to find patients based on gaps
-- Parallelize HEDIS report generation using Spark
-- Add capability to submit job (claims or report generation) from web application async and query job status
 
 ## Completed User Stories
+- Persisting patients, providers, claims in Cassandra
+- Parallelize HEDIS report generation using Spark and Cassandra
 - Added simple /cassanda route to test reading the database
-- Added cassandra object to access database for bettercare4me keyspace
+- Added Cassandra data access layer to access database for bettercare4me keyspace
 - added ./data/cassandra.yaml configuration file for database configuration parameters
 - Adding Cassandra to project
 - Creating Cassandra schema and local database

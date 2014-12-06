@@ -26,14 +26,7 @@ import com.nickelsoftware.bettercare4me.hedis.Scorecard
  *
  * @param config Simulation parameters
  */
-object ClaimFileGeneratorHelper {
-  
-  case class ClaimGeneratorCounts(nbrPatients: Long, nbrProviders: Long, nbrClaims: Long) {
-    
-    def +(rhs: ClaimGeneratorCounts) = ClaimGeneratorCounts(nbrPatients+rhs.nbrPatients, nbrProviders+rhs.nbrProviders, nbrClaims+rhs.nbrClaims)
-  }
-
-  def getOne[A](items: IndexedSeq[A]): A = items(Random.nextInt(items.size))
+case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
 
   /**
    * Generate claims using simulation parameters from `config
@@ -82,7 +75,7 @@ object ClaimFileGeneratorHelper {
     var nbrClaims = 0L
     for {
       patient <- patients
-      provider = getOne(providers)
+      provider = getOne(providers.toList)
     } {
       simScores.clear
       for {
@@ -101,7 +94,7 @@ object ClaimFileGeneratorHelper {
   }
   
   
-  def processGeneratedFiles(igen: Int, config: ClaimGeneratorConfig): HEDISScoreSummary = {
+  def processGeneratedClaims(igen: Int, config: ClaimGeneratorConfig): HEDISScoreSummary = {
 
     val fnameBase = config.basePath + "/" + config.baseFname
     val allPatients = CSVReader.open(new File(fnameBase + "_patients_" + igen.toString + ".csv")).all() map { PatientParser.fromList(_) }

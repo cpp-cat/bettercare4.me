@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class CWP_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CWP_RuleTestSpec extends PlaySpec {
 
   "The CWP_Rule class representing Pharyngitis Treatment for Children HEDIS rule" must {
 

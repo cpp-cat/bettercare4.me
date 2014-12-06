@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.joda.time.LocalDate
 import com.nickelsoftware.bettercare4me.models.MedClaim
 
-class ScorecardTestSpec extends PlaySpec with OneAppPerSuite {
+class ScorecardTestSpec extends PlaySpec {
 
   "The Scorecard class" must {
 

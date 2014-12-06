@@ -10,7 +10,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CIS_IPV_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_IPV_RuleTestSpec extends PlaySpec {
 
   "The CIS_IPV_Rule class representing Polio (IPV) Vaccine HEDIS rule" must {
 

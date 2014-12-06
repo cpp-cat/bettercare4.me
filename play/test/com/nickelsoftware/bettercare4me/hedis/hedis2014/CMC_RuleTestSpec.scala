@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CMC_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CMC_RuleTestSpec extends PlaySpec {
 
   "The CMC_LDL_C_TestRule class representing Lipid Test for Cardiovascular Patients HEDIS rule" must {
 

@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import org.joda.time.DateTime
 import org.joda.time.LocalDate
 
-class UtilsTestSpec extends PlaySpec with OneAppPerSuite {
+class UtilsTestSpec extends PlaySpec {
 
   "The Utils class" must {
 

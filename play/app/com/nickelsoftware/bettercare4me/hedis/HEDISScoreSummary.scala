@@ -32,6 +32,8 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
     val rs = ruleScoreSummaries map {case (k, v) => (k -> v.addScore(scoreSummary.ruleScoreSummaries(k)))}
     HEDISScoreSummary(patientCount + scoreSummary.patientCount, rs)
   }
+
+  def +(rhs: HEDISScoreSummary) = addHEDISScoreSummary(rhs)
   
   /**
    * Return the list of rule score summary based on a list of measure names, 

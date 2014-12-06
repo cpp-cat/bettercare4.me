@@ -24,6 +24,7 @@ object ClaimGeneratorConfig {
  *
  * @param basePath base path for the output file. Simulator may add date to path and create new directory.
  * @param baseFname Base file name for the output files (claims, patients, and providers)
+ * @param generator indicate which ClaimGeneratorHelper to use ('file', 'file-spark', 'cassandra')
  * @param nGen number of generation to simulate
  * @param nPatients number of patients to simulate per generation
  * @param nProviders number of providers to simulate per generation
@@ -37,6 +38,7 @@ object ClaimGeneratorConfig {
 case class ClaimGeneratorConfig(config: Map[String, Object]) {
   def basePath: String = config.getOrElse("basePath", "./data/hedis-data").asInstanceOf[String]
   def baseFname: String = config.getOrElse("baseFname", "hedis").asInstanceOf[String]
+  def generator: String = config.getOrElse("generator", "file").asInstanceOf[String]
   def nbrGen: Int = config.getOrElse("nbrGen", 1).asInstanceOf[Int]
   def nbrPatients: Int = config.getOrElse("nbrPatients", 1).asInstanceOf[Int]
   def nbrProviders: Int = config.getOrElse("nbrProviders", 1).asInstanceOf[Int]

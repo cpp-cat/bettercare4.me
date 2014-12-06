@@ -20,7 +20,7 @@ object MedClaimTestSpecHelper {
 
 }
 
-class MedClaimTestSpec extends PlaySpec with OneAppPerSuite {
+class MedClaimTestSpec extends PlaySpec {
 
   import MedClaimTestSpecHelper._
 

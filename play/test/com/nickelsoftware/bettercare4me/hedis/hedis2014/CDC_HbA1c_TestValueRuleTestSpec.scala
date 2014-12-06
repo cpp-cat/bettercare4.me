@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CDCHbA1cTest8RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CDCHbA1cTest8RuleTestSpec extends PlaySpec {
 
     "The CDC_HbA1c_TestValue_Rule class representing Diabetes HbA1c Test with value (less than 7%, less than 8%, more than 9%) HEDIS rule" must {
     

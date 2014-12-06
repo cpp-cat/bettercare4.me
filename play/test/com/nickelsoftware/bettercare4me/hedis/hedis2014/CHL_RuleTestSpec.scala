@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class CHL_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CHL_RuleTestSpec extends PlaySpec {
 
   "The CHL_Rule class representing Chlamydia Screen (16 - 20) HEDIS rule" must {
 

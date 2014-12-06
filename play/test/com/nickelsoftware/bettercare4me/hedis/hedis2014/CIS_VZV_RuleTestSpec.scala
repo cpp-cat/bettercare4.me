@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class CIS_VZV_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_VZV_RuleTestSpec extends PlaySpec {
   
     "The CIS_VZV_Rule class representing Chicken Pox Vaccination HEDIS rule" must {
     

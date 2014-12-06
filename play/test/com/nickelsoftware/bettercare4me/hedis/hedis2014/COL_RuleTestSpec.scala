@@ -12,7 +12,7 @@ import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class COL_RulesTestSpec extends PlaySpec with OneAppPerSuite {
+class COL_RulesTestSpec extends PlaySpec {
 
   "The COL_Rule class representing Breast Cancer Screening HEDIS rule" must {
 

@@ -8,7 +8,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CDC_MAN_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CDC_MAN_RuleTestSpec extends PlaySpec {
 
   "The CDC_MAN_Rule class representing Diabetes Urine Microalbumin Test HEDIS rule" must {
 

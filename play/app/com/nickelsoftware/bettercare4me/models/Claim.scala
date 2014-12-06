@@ -84,14 +84,7 @@ object ClaimParser {
     else throw NickelException("ClaimParser.fromList - Unknown claim type (1st attribute) should be 'MD', 'RX', or 'LC', have " + l(0))
   }
 
-  def toList(claim: Claim): List[String] = {
-    claim match {
-      case medClaim: MedClaim => medClaim.toList
-      case rxClaim: RxClaim => rxClaim.toList
-      case labClaim: LabClaim => labClaim.toList
-      case _ => throw NickelException("ClaimParser.toList - Unknown claim type")
-    }
-  }
+  def toList(claim: Claim): List[String] = claim.toList
 }
 
 /**
@@ -123,6 +116,7 @@ trait Claim {
   val patientID: String
   val providerID: String
 
+  def toList: List[String]
 }
 
 /**

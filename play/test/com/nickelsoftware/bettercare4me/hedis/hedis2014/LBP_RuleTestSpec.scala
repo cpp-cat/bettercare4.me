@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class LBP_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class LBP_RuleTestSpec extends PlaySpec {
 
   "The LBP_Rule class representing Low Back Pain Imaging Studies HEDIS rule" must {
 

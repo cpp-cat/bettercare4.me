@@ -8,14 +8,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.FileWriter
 import java.io.IOException
-
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.utils.NickelException
-
 import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.actorRef2Scala
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 object ClaimGeneratorActor {
 
@@ -39,14 +38,14 @@ object ClaimGeneratorActor {
    * @param counts indicates the total number of patients, providers, and claims generated
    * @param status: 0: OK, -1: Error (?)
    */
-  case class GenerateClaimsCompleted(counts: ClaimFileGeneratorHelper.ClaimGeneratorCounts, status: Int)
+  case class GenerateClaimsCompleted(counts: ClaimGeneratorCounts, status: Int)
 
   /**
    * Process all claims, patient and provider files
    *
    * @param configText the YAML configuration for setting up the HEDIS rules
    */
-  case class ProcessGenereatedFiles(configTxt: String)
+  case class ProcessGenereatedClaims(configTxt: String)
 
   /**
    * Response to 'ProcessGenereatedFiles with the summary of the metrics
@@ -63,17 +62,17 @@ object ClaimGeneratorActor {
  */
 class ClaimGeneratorActor() extends Actor with ActorLogging {
 
-  import ClaimFileGeneratorHelper._
   import ClaimGeneratorActor._
 
   def receive = {
 
-    // Generate local file for simulation
+    // Generate clinical data for simulation
     // ------------------------------------
     case GenerateClaimsRequest(configTxt) =>
 
       //      log.info(s"ClaimGeneratorActor: Received GenerateClaimsRequest, configuration is:\n $configTxt")
       try {
+        val t1 = System.currentTimeMillis()
         val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
         // save configuration to file in claim simulation directory
@@ -84,53 +83,78 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
         fout.write(configTxt)
         fout.close
 
-        //TODO Use a pool of actors to generate the simulation files
-//        for (igen <- 1 to config.nbrGen) ClaimFileGeneratorHelper.generateClaims(igen, config)
-        
-        // Using spark to parallelize the tasks
-        val counts = ClaimGeneratorSparkHelper.generateClaims(config)
+        val counts = config.generator match {
+          case "file" =>
+            //TODO Use a pool of actors to generate the simulation files
+            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.generateClaims(igen, config)
+            c.reduce((c1, c2) => c1 + c2)
+
+          case "file-spark" => ClaimGeneratorSparkHelper.generateClaims(ClaimFileGeneratorHelper, config)
+
+          case "cassandra" => ClaimGeneratorSparkHelper.generateClaims(ClaimCassandraGeneratorHelper, config)
+
+          case _ => throw NickelException(s"ClaimGeneratorActor: Message GenerateClaimsRequest, unknown generator in config: ${config.generator}")
+        }
+
+        val t2 = System.currentTimeMillis() - t1
+        log.info(s"GenerateClaimsRequest $counts completed in $t2 msec using ${config.generator}.")
 
         sender ! GenerateClaimsCompleted(counts, 0)
-        
+
       } catch {
         case ex: FileNotFoundException => {
-          log.error("FileNotFoundException, cannot save claim generator config "+ex.getMessage())
+          log.error("FileNotFoundException, cannot save claim generator config " + ex.getMessage())
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: IOException => {
-          log.error("IOException, "+ex.getMessage())
+          log.error("IOException, " + ex.getMessage())
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: NickelException => {
-          log.error("NickelException, "+ex.message)
+          log.error("NickelException, " + ex.message)
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
       }
 
     // Process local file generated from simulation
     // ------------------------------------
-    case ProcessGenereatedFiles(configTxt) =>
+    case ProcessGenereatedClaims(configTxt) =>
 
-      val config = ClaimGeneratorConfig.loadConfig(configTxt)
-      
-      def loop(scoreSummary: HEDISScoreSummary, igen: Int): HEDISScoreSummary = {
-        if (igen == 0) scoreSummary
-        else {
-          // Must combine with scoreSummary
-          scoreSummary.addHEDISScoreSummary(loop(ClaimFileGeneratorHelper.processGeneratedFiles(igen, config), igen - 1))
+      try {
+        val t1 = System.currentTimeMillis()
+        val config = ClaimGeneratorConfig.loadConfig(configTxt)
+
+        val hedisScoreSummary = config.generator match {
+          case "file" =>
+            //TODO Use a pool of actors to generate the simulation files
+            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.processGeneratedClaims(igen, config)
+            c.reduce((c1, c2) => c1 + c2)
+
+          case "file-spark" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimFileGeneratorHelper, config)
+
+          case "cassandra" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimCassandraGeneratorHelper, config)
+
+          case _ => throw NickelException(s"ClaimGeneratorActor: Message ProcessGenereatedClaims, unknown generator in config: ${config.generator}")
         }
-      }
 
-      if (config.nbrGen > 0) {
+        val t2 = System.currentTimeMillis() - t1
+        log.info(s"ProcessGenereatedClaims completed in $t2 msec using ${config.generator}.")
 
-        val ss = loop(ClaimFileGeneratorHelper.processGeneratedFiles(config.nbrGen, config), config.nbrGen - 1)
-        sender ! ProcessGenereatedFilesCompleted(ss)
+        sender ! ProcessGenereatedFilesCompleted(hedisScoreSummary)
 
-      } else {
-
-        val msg = "ClaimGeneratorActor: Received ProcessGenereatedFiles with invalid configuration (nbrGen must be > 0) is: " + config.nbrGen
-        log.error(msg)
-        sender ! akka.actor.Status.Failure(NickelException(msg))
+      } catch {
+        case ex: FileNotFoundException => {
+          log.error("FileNotFoundException, cannot save claim generator config " + ex.getMessage())
+          sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
+        }
+        case ex: IOException => {
+          log.error("IOException, " + ex.getMessage())
+          sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
+        }
+        case ex: NickelException => {
+          log.error("NickelException, " + ex.message)
+          sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
+        }
       }
   }
 

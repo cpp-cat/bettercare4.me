@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class W34_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class W34_RuleTestSpec extends PlaySpec {
   
     "The W34_Rule class representing Well-Child Visits in the Third, Fourth, Fifth and Sixth Years of Life HEDIS rule" must {
     

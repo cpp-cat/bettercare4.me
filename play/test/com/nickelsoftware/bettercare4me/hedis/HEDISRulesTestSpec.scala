@@ -36,7 +36,7 @@ object HEDISRulesTestSpec {
   }
 }
 
-class HEDISRulesTestSpec extends PlaySpec with OneAppPerSuite {
+class HEDISRulesTestSpec extends PlaySpec {
 
   "The DateTime class" must {
     

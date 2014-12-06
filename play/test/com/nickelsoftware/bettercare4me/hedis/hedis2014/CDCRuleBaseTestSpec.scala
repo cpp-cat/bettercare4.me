@@ -18,7 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 
-class CDCRuleBaseTestSpec extends PlaySpec with OneAppPerSuite {
+class CDCRuleBaseTestSpec extends PlaySpec {
 
   class CDCRuleBaseTest(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(config, hedisDate) {
     val name = "TEST"

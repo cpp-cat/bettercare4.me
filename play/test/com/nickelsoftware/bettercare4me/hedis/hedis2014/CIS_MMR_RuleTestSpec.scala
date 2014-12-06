@@ -10,7 +10,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CIS_MMR_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CIS_MMR_RuleTestSpec extends PlaySpec {
 
   "The CIS_MMR_Rule class representing Measles-Mumps-Rubella (MMR) Vaccine HEDIS rule" must {
 

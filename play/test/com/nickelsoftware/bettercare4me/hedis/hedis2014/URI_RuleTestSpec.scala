@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class URI_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class URI_RuleTestSpec extends PlaySpec {
 
   "The URI_Rule class representing URI Treatment Without Antibiotics for Children HEDIS rule" must {
 

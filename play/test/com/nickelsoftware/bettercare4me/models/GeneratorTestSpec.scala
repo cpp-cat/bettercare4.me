@@ -19,7 +19,7 @@ import com.github.tototoshi.csv.CSVReader
 // ModelsTestSpec Class: Testing models classes
 // -----------------------------------------------------------------------------------------------------------
 
-class GeneratorTestSpec extends PlaySpec with OneAppPerSuite {
+class GeneratorTestSpec extends PlaySpec {
 
   def fixture =
     new {

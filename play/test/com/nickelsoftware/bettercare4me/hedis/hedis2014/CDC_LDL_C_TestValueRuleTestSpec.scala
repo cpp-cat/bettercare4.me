@@ -9,7 +9,7 @@ import org.scalatestplus.play.PlaySpec
 import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
-class CDC_LDL_C_TestValueRuleTestSpec extends PlaySpec with OneAppPerSuite {
+class CDC_LDL_C_TestValueRuleTestSpec extends PlaySpec {
 
   "The CDC_LDL_C_TestValueRule class representing Diabetes Lipid Test < 100 mg/dL HEDIS rule" must {
 

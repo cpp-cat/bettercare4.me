@@ -9,7 +9,7 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRulesTestSpec
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.LocalDate
 
-class AAB_RuleTestSpec extends PlaySpec with OneAppPerSuite {
+class AAB_RuleTestSpec extends PlaySpec {
 
   "The AAB_Rule class representing Acute Bronchitis Treatment Without Antibiotics HEDIS rule" must {
 
