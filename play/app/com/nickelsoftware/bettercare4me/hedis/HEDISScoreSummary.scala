@@ -45,8 +45,14 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
     l.flatten
   }
   
+  /**
+   * Function to persist using collections of Strings - to simply save to Cassandra 
+   */
+  def persist: (Long, List[String]) = {
+    (patientCount, ruleScoreSummaries.toList map { case (_, rs) => rs.toParseString })
+  }
+  
   override def toString(): String = {
-    
     val l = "Overall score summary over " + patientCount + " patients" :: (ruleScoreSummaries.values map {_.toString} toList) 
     l mkString "\n"
   }
@@ -100,8 +106,15 @@ case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long=0, e
         rss.meetMeasure + meetMeasure)
   }
   
+  def toParseString: String = {
+    new StringBuilder(ruleInfo.name).
+      append(",").append(meetDemographics).
+      append(",").append(eligible).
+      append(",").append(excluded).
+      append(",").append(meetMeasure).toString
+  }
+  
   override def toString(): String = {
-    
     ruleInfo.name + s": ($eligible2MeetDemographics/$excluded2eligible/$meetMeasure2eligible) -- $numerator/$denominator = $scorePct%"
   }
 }

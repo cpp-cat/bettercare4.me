@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.4",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.4" % "test",
   "org.apache.spark"  %% "spark-core"    % "1.1.0-SNAPSHOT",
-  "com.github.tototoshi" %% "scala-csv" % "1.0.0",
+  "com.github.tototoshi" %% "scala-csv" % "1.2.0-SNAPSHOT",
   "joda-time" % "joda-time" % "2.4",
   "org.yaml" % "snakeyaml" % "1.14",
   "com.datastax.cassandra" % "cassandra-driver-core" % "2.1.3",
@@ -24,5 +24,8 @@ libraryDependencies ++= Seq(
   "org.mockito" % "mockito-core" % "1.9.5" % "test"
 )
 
-resolvers += "Local Maven Repository" at "file:///home/michel/.m2/repository/"
+resolvers ++= Seq(
+  "Local Maven Repository" at "file:///home/michel/.m2/repository/",
+  "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+)
 

@@ -58,6 +58,7 @@
 ## Completed User Stories
 - Persisting patients, providers, claims in Cassandra
 - Parallelize HEDIS report generation using Spark and Cassandra
+- Parallelize claim, patient, and provider generation using Spark and Cassandra
 - Added simple /cassanda route to test reading the database
 - Added Cassandra data access layer to access database for bettercare4me keyspace
 - added ./data/cassandra.yaml configuration file for database configuration parameters

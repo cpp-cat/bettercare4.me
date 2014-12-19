@@ -25,7 +25,7 @@ USE bettercare4me;
 // Patients table
 //   batch_id is the load batch id (should have batch_id >> nbr of nodes)
 //   id is patient id
-//   data is patient data serialized as a list of string
+//   data is patient demographic data serialized as a list of strings
 //--------------
 CREATE TABLE patients (
   batch_id INT,
@@ -69,6 +69,41 @@ CREATE TABLE claims_providers (
   data LIST<TEXT>,
   PRIMARY KEY (batch_id, provider_id, dos, id)
 );
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+// HEDISScoreSummary Table - top level dashboard at population level
+//   name is HEDIS run name
+//   hedis_date is end date of evaluation period
+//   patient_count is number of patient in population
+//   score_summary is a list of RuleScoreSummary.toParseString
+//   rule_config is the yaml rule configuration
+CREATE TABLE hedis_summary (
+  name TEXT,
+  hedis_date TIMESTAMP,
+  patient_count INT,
+  score_summaries LIST<TEXT>,
+  rule_config TEXT,
+  PRIMARY KEY (name, hedis_date)
+);
+
+// Patient Scorecard Table - patient scorecard
+//   batch_id batch partition
+//   patient_id id of patient
+//   rule_name rule identifier
+//   criteria_name: one of (eligible, excluded, meetMeasure)
+//   is_criteria_met indicates whether the criteria is met or not (RuleCriteriaScore.isCriteriaMet)
+//   criteria_score represent RuleCriteriaScore.criteriaScore; list of [(claim_id, provider_last_name, provider_first_name, dos, reason).mkString]
+CREATE TABLE patient_scorecard (
+  batch_id INT,
+  patient_id TEXT,
+  rule_name TEXT,
+  criteria_name TEXT,
+  is_criteria_met BOOLEAN,
+  criteria_score LIST<TEXT>,
+  PRIMARY KEY (batch_id, patient_id, rule_name, criteria_name)
+);
+
 
 // Test Data
 INSERT INTO patients (batch_id, id, data) VALUES (991, 'patient-1-0', ['patient-1-0','MARCIA','COOPER','F','1964-09-30']);
