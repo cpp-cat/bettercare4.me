@@ -38,6 +38,7 @@
 - Make recommendations using Collaborative Filtering
 - Make recommendations based on content-based search criteria.
 
+######################################################################################################
 
 # Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
 
@@ -56,6 +57,7 @@
 - Provide search capability to find patients based on gaps
 
 ## Completed User Stories
+- Upgraded to Spark 1.2.0, no need for custom fork anymore since Spark 1.2 uses Akka 2.3.4!! Yay!
 - Persisting patients, providers, claims in Cassandra
 - Parallelize HEDIS report generation using Spark and Cassandra
 - Parallelize claim, patient, and provider generation using Spark and Cassandra
