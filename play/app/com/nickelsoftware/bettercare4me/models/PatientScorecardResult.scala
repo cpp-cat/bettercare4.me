@@ -8,6 +8,8 @@ import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.joda.time.LocalDate
 import com.github.tototoshi.csv.CSVParser
+import com.github.tototoshi.csv.CSVWriter
+import java.io.StringWriter
 
 
 /**
@@ -68,4 +70,13 @@ object CriteriaResultDetail {
 /**
  * Particular details of a criteria result, ties to the claims meeting the conditions of that criteria
  */
-case class CriteriaResultDetail(claimId: String, providerLName: String, providerFName: String, dos: DateTime, reason: String)
+case class CriteriaResultDetail(claimId: String, providerLName: String, providerFName: String, dos: DateTime, reason: String) {
+  
+  def toCSVString: String = {
+    var strWriter = new StringWriter()
+    val writer = CSVWriter.open(strWriter)
+    writer.writeRow(List(claimId, providerLName, providerFName, dos.toLocalDate().toString, reason))
+    writer.flush
+    strWriter.toString()
+  }
+}

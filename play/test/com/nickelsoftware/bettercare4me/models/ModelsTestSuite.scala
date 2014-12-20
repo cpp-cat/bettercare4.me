@@ -7,6 +7,7 @@ class ModelsTestSuite extends Suites(
     new LabClaimTestSpec,
     new MedClaimTestSpec,
     new PatientTestSpec,
+    new PatientScorecardResultTestSpec,
     new ProviderTestSpec,
     new RxClaimTestSpec
     )
