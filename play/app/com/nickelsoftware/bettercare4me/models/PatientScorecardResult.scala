@@ -25,7 +25,12 @@ object PatientScorecardResult {
    */
   def apply(patient: Patient, scorecard: Scorecard) : PatientScorecardResult = {
     val scorecardResult = scorecard.hedisRuleMap map { case (name, ruleScore) => (name, RuleResult(ruleScore))}
-    PatientScorecardResult(patient, scorecardResult)
+    
+    // filter the eligible measure only
+    val sr = scorecardResult filter { 
+      case (name, ruleResult) => ruleResult.eligibleResult.isCriteriaMet
+    }
+    PatientScorecardResult(patient, sr)
   }
   
 }

@@ -83,30 +83,32 @@ CREATE TABLE claims_providers (
 CREATE TABLE hedis_summary (
   name TEXT,
   hedis_date TIMESTAMP,
-  patient_count INT,
+  patient_count BIGINT,
   score_summaries LIST<TEXT>,
-  rule_config TEXT,
+  claim_generator_config TEXT,
   PRIMARY KEY (name, hedis_date)
-);
+)
+WITH CLUSTERING ORDER BY (hedis_date DESC);
 
 
 // Rule Scorecard Table - rule scorecard summaries
 //------------------------------------------------
-//   batch_id batch partition
 //   rule_name rule identifier
+//   hedis_date is end date of evaluation period
 //   patient_id patient identifier (only patients that are eligible are included)
 //   patient_data patient demographics
 //   is_excluded is patient excluded from measure
 //   is_meet_measure indicates if patient meets the rule measure
 CREATE TABLE rule_scorecards (
-  batch_id INT,
   rule_name TEXT,
+  hedis_date TIMESTAMP,
   patient_id TEXT,
   patient_data LIST<TEXT>,
   is_excluded BOOLEAN,
   is_meet_criteria BOOLEAN,
-  PRIMARY KEY (batch_id, rule_name, patient_id)
-);
+  PRIMARY KEY (rule_name, hedis_date, patient_id)
+)
+WITH CLUSTERING ORDER BY (hedis_date DESC);
 
 // Patient Scorecard Table - patient scorecard
 //--------------------------------------------
@@ -119,6 +121,7 @@ CREATE TABLE rule_scorecards (
 //   XXX_score represent RuleCriteriaScore.criteriaScore; list of [(claim_id, provider_last_name, provider_first_name, dos, reason).mkString]
 CREATE TABLE patient_scorecards (
   batch_id INT,
+  hedis_date TIMESTAMP,
   patient_id TEXT,
   patient_data LIST<TEXT>,
   rule_name TEXT,
@@ -128,8 +131,9 @@ CREATE TABLE patient_scorecards (
   excluded_score LIST<TEXT>,
   is_meet_criteria BOOLEAN,
   meet_criteria_score LIST<TEXT>,
-  PRIMARY KEY (batch_id, patient_id, rule_name)
-);
+  PRIMARY KEY (batch_id, hedis_date, patient_id, rule_name)
+)
+WITH CLUSTERING ORDER BY (hedis_date DESC);
 
 
 // Test Data

@@ -37,8 +37,10 @@ case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
    * @param igen Generation number
    * @param config the generator's configuration parameters
    */
-  def generateClaims(igen: Int, config: ClaimGeneratorConfig): ClaimGeneratorCounts = {
+  def generateClaims(igen: Int, configTxt: String): ClaimGeneratorCounts = {
 
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)
 
@@ -94,8 +96,10 @@ case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
   }
   
   
-  def processGeneratedClaims(igen: Int, config: ClaimGeneratorConfig): HEDISScoreSummary = {
+  def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary = {
 
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    
     val fnameBase = config.basePath + "/" + config.baseFname
     val allPatients = CSVReader.open(new File(fnameBase + "_patients_" + igen.toString + ".csv")).all() map { PatientParser.fromList(_) }
     

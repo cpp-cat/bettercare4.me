@@ -30,12 +30,12 @@ import com.datastax.driver.core.BatchStatement
 import org.joda.time.DateTime
 import com.datastax.driver.core.PreparedStatement
 import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
-
+import com.nickelsoftware.bettercare4me.models.CriteriaResult
 
 /**
- * Class managing a connection to Cassandra cluster and 
+ * Class managing a connection to Cassandra cluster and
  * session to keyspace using configuration file
- * 
+ *
  * Default config file name: "data/cassandra.yaml"
  */
 class Cassandra(fname: String = "data/cassandra.yaml") {
@@ -45,7 +45,7 @@ class Cassandra(fname: String = "data/cassandra.yaml") {
 
   val cluster = Cluster.builder().addContactPoint(node).build()
   log(cluster.getMetadata)
-  
+
   val session = cluster.connect(config.getOrElse("keyspace", "bettercare4me").asInstanceOf[String])
   Logger.info(s"Session connected to keyspace: ${session.getLoggedKeyspace()}")
 
@@ -63,9 +63,9 @@ class Cassandra(fname: String = "data/cassandra.yaml") {
 }
 
 /**
- * Class to handle Bettercare4me data access, 
+ * Class to handle Bettercare4me data access,
  * wrapper class around Cassandra connection class
- * 
+ *
  * Local class that manage the data access.
  */
 protected[cassandra] class Bc4me(cassandra: Cassandra) {
@@ -79,23 +79,28 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   private val insertProvidersStmt = cassandra.session.prepare("INSERT INTO providers (batch_id, id, data) VALUES (?, ?, ?)")
   private val insertClaims1Stmt = cassandra.session.prepare("INSERT INTO claims_patients (batch_id, id, patient_id, dos, data) VALUES (?, ?, ?, ?, ?)")
   private val insertClaims2Stmt = cassandra.session.prepare("INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (?, ?, ?, ?, ?)")
-  
+
+  // Summary tables
+  private val insertHEDISSummaryStmt = cassandra.session.prepare("INSERT INTO hedis_summary (name, hedis_date, patient_count, score_summaries, claim_generator_config) VALUES (?, ?, ?, ?, ?)")
+  private val insertRuleScorecardsStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?)")
+  private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+
   /**
    * execute provided query, can be used for testing to initialize database
    */
   def execute(s: String) = {
     cassandra.session.execute(s)
   }
-  
+
   /**
    * Get all patients by batch_id
    */
   def queryPatients(batchId: Int): Future[Iterable[Patient]] = {
     val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryPatientsStmt).bind(batchId: java.lang.Integer))
-    
+
     // use the implicit conversion of ResultSetFuture into Future[ResultSet] using the import cassandra.resultser._ above
     // the convert the ResultSet into List[Row] using ResultSet.all()
-    future.map(_.all().map( row => PatientParser.fromList(row.getList("data", classOf[String]).toList)))
+    future.map(_.all().map(row => PatientParser.fromList(row.getList("data", classOf[String]).toList)))
   }
 
   /**
@@ -103,7 +108,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    */
   def queryProviders(batchId: Int): Future[Iterable[Provider]] = {
     val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryProvidersStmt).bind(batchId: java.lang.Integer))
-    future.map(_.all().map( row => ProviderParser.fromList(row.getList("data", classOf[String]).toList)))
+    future.map(_.all().map(row => ProviderParser.fromList(row.getList("data", classOf[String]).toList)))
   }
 
   /**
@@ -111,46 +116,80 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    */
   def queryClaims(batchId: Int): Future[Iterable[Claim]] = {
     val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryClaimsStmt).bind(batchId: java.lang.Integer))
-    future.map(_.all().map( row => ClaimParser.fromList(row.getList("data", classOf[String]).toList)))
+    future.map(_.all().map(row => ClaimParser.fromList(row.getList("data", classOf[String]).toList)))
   }
-  
+
   /**
    * Batch insert into patients table
    * Turns out it's better to loop on each items than to batch them
-   * 
+   *
    * INSERT INTO patients (batch_id, id, data) VALUES (?, ?, ?)
    */
   def batchPatients(batchId: Int, patients: List[Patient]) = {
     patients foreach { p => cassandra.session.executeAsync(insertPatientsStmt.bind(batchId: java.lang.Integer, p.patientID, p.toList: java.util.List[String])) }
   }
-  
+
   /**
    * Batch insert into providers table
-   * 
+   *
    * INSERT INTO providers (batch_id, id, data) VALUES (?, ?, ?)
    */
   def batchProviders(batchId: Int, providers: List[Provider]) = {
     providers foreach { p => cassandra.session.executeAsync(insertProvidersStmt.bind(batchId: java.lang.Integer, p.providerID, p.toList: java.util.List[String])) }
   }
-  
+
   /**
    * Batch insert into claims by patient table
-   * 
+   *
    * INSERT INTO claims_patients (batch_id, id, patient_id, dos, data) VALUES (?, ?, ?, ?, ?)
    */
   def batchClaimsByPatients(batchId: Int, claims: List[Claim]) = {
     claims foreach { c => cassandra.session.executeAsync(insertClaims1Stmt.bind(batchId: java.lang.Integer, c.claimID, c.patientID, c.date.toDate(), c.toList: java.util.List[String])) }
   }
-  
+
   /**
    * Batch insert into claims by provider table
-   * 
+   *
    * INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (?, ?, ?, ?, ?)
    */
   def batchClaimsByProviders(batchId: Int, claims: List[Claim]) = {
     claims foreach { c => cassandra.session.executeAsync(insertClaims2Stmt.bind(batchId: java.lang.Integer, c.claimID, c.providerID, c.date.toDate(), c.toList: java.util.List[String])) }
   }
   
+  /**
+   * HEDIS report summary
+   */
+  def insertHEDISSummary(name: String, hedisDate: DateTime, patientCount: Long, scoreSummaries: List[String], claimGeneratorConfig: String) = {
+    cassandra.session.executeAsync(insertHEDISSummaryStmt.bind(name, hedisDate.toDate(), patientCount: java.lang.Long, scoreSummaries: java.util.List[String], claimGeneratorConfig))
+  }
+
+  /**
+   * Insert a rule summary for patient
+   */
+  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
+    cassandra.session.executeAsync(insertRuleScorecardsStmt.bind(ruleName, hedisDate.toDate(), patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean))
+  }
+
+  /**
+   * Saving PatientScorecardResult, populating patient_scorecard table
+   */
+  def insertPatientScorecardResult(batchID: Int, hedisDate: DateTime, patientScorecardResult: PatientScorecardResult) = {
+    def toList(cr: CriteriaResult): List[String] = cr.criteriaResultReasons map { _.toCSVString }
+
+    val p = patientScorecardResult.patient
+    patientScorecardResult.scorecardResult foreach {
+      case (ruleName, rr) =>
+        val el = rr.eligibleResult
+        val ex = rr.excludedResult
+        val mm = rr.meetMeasureResult
+        cassandra.session.executeAsync(insertPatientScorecardResultStmt.bind(
+          batchID: java.lang.Integer, hedisDate.toDate(), p.patientID, p.toList: java.util.List[String], ruleName,
+          el.isCriteriaMet: java.lang.Boolean, toList(el): java.util.List[String],
+          ex.isCriteriaMet: java.lang.Boolean, toList(ex): java.util.List[String],
+          mm.isCriteriaMet: java.lang.Boolean, toList(mm): java.util.List[String]))
+    }
+  }
+
   def close = {
     cassandra.session.close()
     cassandra.cluster.close()
@@ -161,22 +200,22 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
  * Object to maintain single connection to Cassandra for the current application
  */
 object Bettercare4me {
-  
+
   private var bc4me: Option[Bc4me] = None
-  
+
   /**
    * Connect to Cassandra cluster and open session to keyspace
    * based on config file
-   * 
-   * This is called *only* by Global.onStart at application start. 
+   *
+   * This is called *only* by Global.onStart at application start.
    * Therefore the fact that it is no thread safe should not be an issue.
-   * 
+   *
    * Default config file name: "data/cassandra.yaml"
    */
   def connect(fname: String = "data/cassandra.yaml") = {
     bc4me = Some(new Bc4me(new Cassandra(fname)))
   }
-  
+
   /**
    * Get all patients by batch_id
    */
@@ -206,7 +245,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Batch insert into patients table
    */
@@ -216,7 +255,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Batch insert into providers table
    */
@@ -226,7 +265,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Batch insert into claims_patients table
    */
@@ -236,7 +275,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Batch insert into claims_providers table
    */
@@ -248,15 +287,38 @@ object Bettercare4me {
   }
   
   /**
+   * HEDIS report summary
+   */
+  def insertHEDISSummary(name: String, hedisDate: DateTime, patientCount: Long, scoreSummaries: List[String], claimGeneratorConfig: String) = {
+    bc4me match {
+      case Some(c) => c.insertHEDISSummary(name, hedisDate, patientCount, scoreSummaries, claimGeneratorConfig)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+
+  /**
+   * Insert a rule summary for a patient
+   */
+  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
+    bc4me match {
+      case Some(c) => c.insertRuleScorecards(ruleName, hedisDate, patient, isExcluded, isMeetCriteria)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+
+  /**
    * Saving PatientScorecardResult, populating patient_scorecard table
    */
-  def savePatientScorecardResult(batchID: Int, patientScorecardResult: PatientScorecardResult) = {
-    XXX
+  def insertPatientScorecardResult(batchID: Int, hedisDate: DateTime, patientScorecardResult: PatientScorecardResult) = {
+    bc4me match {
+      case Some(c) => c.insertPatientScorecardResult(batchID, hedisDate, patientScorecardResult)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
   }
   /**
    * Closing the connection with Cassandra cluster
-   * 
-   * This is called *only* by Global.onStop at application shutdown. 
+   *
+   * This is called *only* by Global.onStop at application shutdown.
    * Therefore the fact that it is no thread safe should not be an issue.
    */
   def close = {

@@ -15,6 +15,7 @@ import akka.actor.Actor
 import akka.actor.ActorLogging
 import akka.actor.actorRef2Scala
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 
 object ClaimGeneratorActor {
 
@@ -86,12 +87,12 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
         val counts = config.generator match {
           case "file" =>
             //TODO Use a pool of actors to generate the simulation files
-            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.generateClaims(igen, config)
+            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.generateClaims(igen, configTxt)
             c.reduce((c1, c2) => c1 + c2)
 
-          case "file-spark" => ClaimGeneratorSparkHelper.generateClaims(ClaimFileGeneratorHelper, config)
+          case "file-spark" => ClaimGeneratorSparkHelper.generateClaims(ClaimFileGeneratorHelper, configTxt)
 
-          case "cassandra" => ClaimGeneratorSparkHelper.generateClaims(ClaimCassandraGeneratorHelper, config)
+          case "cassandra" => ClaimGeneratorSparkHelper.generateClaims(ClaimCassandraGeneratorHelper, configTxt)
 
           case _ => throw NickelException(s"ClaimGeneratorActor: Message GenerateClaimsRequest, unknown generator in config: ${config.generator}")
         }
@@ -127,12 +128,18 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
         val hedisScoreSummary = config.generator match {
           case "file" =>
             //TODO Use a pool of actors to generate the simulation files
-            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.processGeneratedClaims(igen, config)
+            val c = for (igen <- 1 to config.nbrGen) yield ClaimFileGeneratorHelper.processGeneratedClaims(igen, configTxt)
             c.reduce((c1, c2) => c1 + c2)
 
-          case "file-spark" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimFileGeneratorHelper, config)
+          case "file-spark" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimFileGeneratorHelper, configTxt)
 
-          case "cassandra" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimCassandraGeneratorHelper, config)
+          case "cassandra" => 
+            val result = ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimCassandraGeneratorHelper, configTxt)
+
+		    // insert the HEDISScoreSummary into Cassandra
+			val p = result.persist
+			Bettercare4me.insertHEDISSummary(config.runName, config.hedisDate, p._1, p._2, configTxt)
+			result
 
           case _ => throw NickelException(s"ClaimGeneratorActor: Message ProcessGenereatedClaims, unknown generator in config: ${config.generator}")
         }

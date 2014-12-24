@@ -13,7 +13,7 @@ import com.nickelsoftware.bettercare4me.hedis.RuleCriteriaScore
 
 
 /**
- * Summary class for HEDIS rules, listing all patients meeting demographic criteria
+ * Summary class for HEDIS rules, listing all eligible patients
  */
 case class RuleScorecardSummary(ruleName: String, patients: List[PatientRuleSummary]=List()) {
   

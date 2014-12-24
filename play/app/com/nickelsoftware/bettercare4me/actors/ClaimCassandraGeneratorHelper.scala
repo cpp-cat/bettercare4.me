@@ -8,7 +8,6 @@ import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.util.Random
-
 import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.HEDISRules
@@ -18,6 +17,7 @@ import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.PersonGenerator
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
+import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
 
 /**
  * Class for generating patients, providers, and claims for a given \c igen generation
@@ -35,8 +35,10 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
    * @param igen Generation number (batch ID)
    * @param config the generator's configuration parameters
    */
-  def generateClaims(igen: Int, config: ClaimGeneratorConfig): ClaimGeneratorCounts = {
+  def generateClaims(igen: Int, configTxt: String): ClaimGeneratorCounts = {
 
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)
 
@@ -82,10 +84,11 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     ClaimGeneratorCounts(patients.size.toLong, providers.size.toLong, nbrClaims)
   }
 
-  def processGeneratedClaims(igen: Int, config: ClaimGeneratorConfig): HEDISScoreSummary = {
+  def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary = {
 
     val patientsFuture = Bettercare4me.queryPatients(igen)
     val claimsMapFuture = Bettercare4me.queryClaims(igen) map { c => c groupBy { _.patientID } }
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
     // create and configure the rules to use for the simulation
     val hedisDate = config.hedisDate
@@ -99,12 +102,22 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     val scorecardsFuture = patientsHistoryFuture map (_ map {
       case (p, ph) =>
         val scorecard = rules.foldLeft(Scorecard())({ (scorecard, rule) => rule.scoreRule(scorecard, p, ph) })
-        //** save patient scorecard to cassandra here
+
+        // insert into rule_scorecards the rule summary for this patient
+        scorecard.hedisRuleMap foreach {
+          case (n, rs) =>
+            if (rs.meetDemographic.isCriteriaMet && rs.eligible.isCriteriaMet) Bettercare4me.insertRuleScorecards(n, hedisDate, p, rs.excluded.isCriteriaMet, rs.meetMeasure.isCriteriaMet)
+        }
+
+        // save patient scorecard to cassandra here, keep only the measure that the patient is eligible to
+        val patientScorecardResult = PatientScorecardResult(p, scorecard)
+        Bettercare4me.insertPatientScorecardResult(igen, hedisDate, patientScorecardResult)
         scorecard
     })
 
     // fold all the patients scorecards into a HEDISScoreSummary and return it
     val f = scorecardsFuture map { _.foldLeft(HEDISScoreSummary(rules))({ (scoreSummary, scorecard) => scoreSummary.addScoreCard(scorecard) }) }
+
     Await.result(f, Duration.Inf)
   }
 }

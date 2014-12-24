@@ -22,6 +22,7 @@ object ClaimGeneratorConfig {
 /**
  * Class holding the parameters of the simulation
  *
+ * @param runName Name for the HEDIS run, should be unique (used as primary key in Cassandra).
  * @param basePath base path for the output file. Simulator may add date to path and create new directory.
  * @param baseFname Base file name for the output files (claims, patients, and providers)
  * @param generator indicate which ClaimGeneratorHelper to use ('file', 'file-spark', 'cassandra')
@@ -36,6 +37,7 @@ object ClaimGeneratorConfig {
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
  */
 case class ClaimGeneratorConfig(config: Map[String, Object]) {
+  def runName: String = config.getOrElse("runName", "HEDIS Simulator").asInstanceOf[String]
   def basePath: String = config.getOrElse("basePath", "./data/hedis-data").asInstanceOf[String]
   def baseFname: String = config.getOrElse("baseFname", "hedis").asInstanceOf[String]
   def generator: String = config.getOrElse("generator", "file").asInstanceOf[String]

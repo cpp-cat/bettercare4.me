@@ -21,7 +21,7 @@ object ClaimGeneratorSparkHelper {
    * @param config is the claim generator configuration
    * @returns triple with (nbr of patients, nbr providers, nbr claims) generated
    */
-  def generateClaims(generator: ClaimGeneratorHelper, config: ClaimGeneratorConfig): ClaimGeneratorCounts = {
+  def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
     val conf = new SparkConf()
       .setMaster("local[3]")
@@ -29,17 +29,22 @@ object ClaimGeneratorSparkHelper {
     val sc = new SparkContext(conf)
 
     // broadcast the config so it is available to each node of the cluster
-    val broadcastConfig = sc.broadcast(config)
+    val broadcastConfigTxt = sc.broadcast(configTxt)
     val broadcastGenerator = sc.broadcast(generator)
+    
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
     // create the nbrGen jobs to run, ensuring the rdd is sliced with one job per slice, ie nbrGen slices
-    val rdd = sc.parallelize(1 to config.nbrGen, config.nbrGen) map { igen => broadcastGenerator.value.generateClaims(igen, broadcastConfig.value) }
+    val rdd = sc.parallelize(1 to config.nbrGen, config.nbrGen) map { igen => broadcastGenerator.value.generateClaims(igen, broadcastConfigTxt.value) }
 
     // combine the result of each job to get the total count of patients, providers and claims
-    rdd reduce { (a, b) => a + b }
+    val result = rdd reduce { (a, b) => a + b }
+    
+    sc.stop
+    result
   }
 
-  def processGeneratedClaims(generator: ClaimGeneratorHelper, config: ClaimGeneratorConfig): HEDISScoreSummary = {
+  def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
     val conf = new SparkConf()
       .setMaster("local[3]")
@@ -47,13 +52,18 @@ object ClaimGeneratorSparkHelper {
     val sc = new SparkContext(conf)
 
     // broadcast the config so it is available to each node of the cluster
-    val broadcastConfig = sc.broadcast(config)
+    val broadcastConfigTxt = sc.broadcast(configTxt)
     val broadcastGenerator = sc.broadcast(generator)
 
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    
     // create the nbrGen jobs to run, ensuring the rdd is sliced with one job per slice, ie nbrGen slices
-    val rdd = sc.parallelize(1 to config.nbrGen, config.nbrGen) map { igen => broadcastGenerator.value.processGeneratedClaims(igen, broadcastConfig.value) }
+    val rdd = sc.parallelize(1 to config.nbrGen, config.nbrGen) map { igen => broadcastGenerator.value.processGeneratedClaims(igen, broadcastConfigTxt.value) }
 
     // combine the result of each job to get the total count of patients, providers and claims
-    rdd reduce { (a, b) => a + b }
+    val result = rdd reduce { (a, b) => a + b }
+    
+    sc.stop
+    result
   }
 }

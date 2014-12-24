@@ -5,7 +5,6 @@ package com.nickelsoftware.bettercare4me.actors
 
 import scala.util.Random
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
-import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 
 case class ClaimGeneratorCounts(nbrPatients: Long, nbrProviders: Long, nbrClaims: Long) {
 
@@ -27,10 +26,10 @@ trait ClaimGeneratorHelper {
    * @param igen Generation number
    * @param config the generator's configuration parameters
    */
-  def generateClaims(igen: Int, config: ClaimGeneratorConfig): ClaimGeneratorCounts
+  def generateClaims(igen: Int, configTxt: String): ClaimGeneratorCounts
 
   /**
    * Compute the HEDIS score and patient gaps
    */
-  def processGeneratedClaims(igen: Int, config: ClaimGeneratorConfig): HEDISScoreSummary
+  def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary
 }

@@ -52,11 +52,13 @@
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Persisting Patient HEDIS scorecard in Cassandra
 - Creating UI for displaying patient gaps-in-care / HEDIS scorecard
 - Provide search capability to find patients based on gaps
 
 ## Completed User Stories
+- Persisting Patient HEDIS scorecard in Cassandra
+- Persisting Rule and Patient HEDIS scorecard summary in Cassandra
+- Persisting HEDIS summary in Cassandra
 - Upgraded to Spark 1.2.0, no need for custom fork anymore since Spark 1.2 uses Akka 2.3.4!! Yay!
 - Persisting patients, providers, claims in Cassandra
 - Parallelize HEDIS report generation using Spark and Cassandra
