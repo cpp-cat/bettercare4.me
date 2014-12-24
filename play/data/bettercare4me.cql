@@ -23,10 +23,10 @@ USE bettercare4me;
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 // Patients table
+//--------------
 //   batch_id is the load batch id (should have batch_id >> nbr of nodes)
 //   id is patient id
 //   data is patient demographic data serialized as a list of strings
-//--------------
 CREATE TABLE patients (
   batch_id INT,
   id TEXT,
@@ -35,10 +35,10 @@ CREATE TABLE patients (
 );
 
 // Providers table
+//--------------
 //   batch_id is the load batch id (should have batch_id >> nbr of nodes)
 //   id is provider id
 //   data is provider data serialized as a list of string
-//--------------
 CREATE TABLE providers (
   batch_id INT,
   id TEXT,
@@ -61,6 +61,7 @@ CREATE TABLE claims_patients (
   data LIST<TEXT>,
   PRIMARY KEY (batch_id, patient_id, dos, id)
 );
+
 CREATE TABLE claims_providers (
   batch_id INT,
   id TEXT,
@@ -73,6 +74,7 @@ CREATE TABLE claims_providers (
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 // HEDISScoreSummary Table - top level dashboard at population level
+//-----------------------------------------------------------------
 //   name is HEDIS run name
 //   hedis_date is end date of evaluation period
 //   patient_count is number of patient in population
@@ -87,21 +89,46 @@ CREATE TABLE hedis_summary (
   PRIMARY KEY (name, hedis_date)
 );
 
+
+// Rule Scorecard Table - rule scorecard summaries
+//------------------------------------------------
+//   batch_id batch partition
+//   rule_name rule identifier
+//   patient_id patient identifier (only patients that are eligible are included)
+//   patient_data patient demographics
+//   is_excluded is patient excluded from measure
+//   is_meet_measure indicates if patient meets the rule measure
+CREATE TABLE rule_scorecards (
+  batch_id INT,
+  rule_name TEXT,
+  patient_id TEXT,
+  patient_data LIST<TEXT>,
+  is_excluded BOOLEAN,
+  is_meet_criteria BOOLEAN,
+  PRIMARY KEY (batch_id, rule_name, patient_id)
+);
+
 // Patient Scorecard Table - patient scorecard
+//--------------------------------------------
 //   batch_id batch partition
 //   patient_id id of patient
+//   patient_data patient demographics
 //   rule_name rule identifier
-//   criteria_name: one of (eligible, excluded, meetMeasure)
-//   is_criteria_met indicates whether the criteria is met or not (RuleCriteriaScore.isCriteriaMet)
-//   criteria_score represent RuleCriteriaScore.criteriaScore; list of [(claim_id, provider_last_name, provider_first_name, dos, reason).mkString]
-CREATE TABLE patient_scorecard (
+//   XXX: one of (eligible, excluded, meetMeasure)
+//   is_XXX indicates whether the XXX criteria is met or not (RuleCriteriaScore.isCriteriaMet)
+//   XXX_score represent RuleCriteriaScore.criteriaScore; list of [(claim_id, provider_last_name, provider_first_name, dos, reason).mkString]
+CREATE TABLE patient_scorecards (
   batch_id INT,
   patient_id TEXT,
+  patient_data LIST<TEXT>,
   rule_name TEXT,
-  criteria_name TEXT,
-  is_criteria_met BOOLEAN,
-  criteria_score LIST<TEXT>,
-  PRIMARY KEY (batch_id, patient_id, rule_name, criteria_name)
+  is_eligible BOOLEAN,
+  eligible_score LIST<TEXT>,
+  is_excluded BOOLEAN,
+  excluded_score LIST<TEXT>,
+  is_meet_criteria BOOLEAN,
+  meet_criteria_score LIST<TEXT>,
+  PRIMARY KEY (batch_id, patient_id, rule_name)
 );
 
 
