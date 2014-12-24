@@ -19,8 +19,7 @@ import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.PatientParser
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import play.api.Logger
-//import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import scala.concurrent.ExecutionContext.Implicits.global 
+import scala.concurrent.ExecutionContext.Implicits.global
 import com.datastax.driver.core.BoundStatement
 import com.nickelsoftware.bettercare4me.utils.cassandra.resultset._
 import com.nickelsoftware.bettercare4me.models.Provider
@@ -30,6 +29,7 @@ import com.nickelsoftware.bettercare4me.models.ClaimParser
 import com.datastax.driver.core.BatchStatement
 import org.joda.time.DateTime
 import com.datastax.driver.core.PreparedStatement
+import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
 
 
 /**
@@ -168,6 +168,9 @@ object Bettercare4me {
    * Connect to Cassandra cluster and open session to keyspace
    * based on config file
    * 
+   * This is called *only* by Global.onStart at application start. 
+   * Therefore the fact that it is no thread safe should not be an issue.
+   * 
    * Default config file name: "data/cassandra.yaml"
    */
   def connect(fname: String = "data/cassandra.yaml") = {
@@ -244,6 +247,18 @@ object Bettercare4me {
     }
   }
   
+  /**
+   * Saving PatientScorecardResult, populating patient_scorecard table
+   */
+  def savePatientScorecardResult(batchID: Int, patientScorecardResult: PatientScorecardResult) = {
+    XXX
+  }
+  /**
+   * Closing the connection with Cassandra cluster
+   * 
+   * This is called *only* by Global.onStop at application shutdown. 
+   * Therefore the fact that it is no thread safe should not be an issue.
+   */
   def close = {
     bc4me match {
       case Some(c) => c.close

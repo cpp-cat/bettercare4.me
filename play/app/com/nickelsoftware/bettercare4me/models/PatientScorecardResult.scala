@@ -10,6 +10,25 @@ import org.joda.time.LocalDate
 import com.github.tototoshi.csv.CSVParser
 import com.github.tototoshi.csv.CSVWriter
 import java.io.StringWriter
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
+import com.nickelsoftware.bettercare4me.hedis.RuleScore
+import com.nickelsoftware.bettercare4me.hedis.RuleCriteriaScore
+
+
+/**
+ * Object to create PatientScorecardResult from Patient and Scorecard
+ */
+object PatientScorecardResult {
+  
+  /**
+   * Mapping (Patient, Scorecard) to PatientScorecardResult
+   */
+  def apply(patient: Patient, scorecard: Scorecard) : PatientScorecardResult = {
+    val scorecardResult = scorecard.hedisRuleMap map { case (name, ruleScore) => (name, RuleResult(ruleScore))}
+    PatientScorecardResult(patient, scorecardResult)
+  }
+  
+}
 
 
 /**
@@ -21,7 +40,7 @@ case class PatientScorecardResult(patient: Patient, scorecardResult: Map[String,
   
   def addRuleResult(ruleName: String, criteriaName: String, isCriteriaMet: Boolean, criteriaScore: List[String]): PatientScorecardResult = {
     val ruleResult = scorecardResult.getOrElse(ruleName, RuleResult.emptyRuleResult)
-    PatientScorecardResult(patient, scorecardResult + (ruleName -> ruleResult))
+    PatientScorecardResult(patient, scorecardResult + (ruleName -> ruleResult.addCriteriaResult(criteriaName, isCriteriaMet, criteriaScore)))
   }
 }
 
@@ -30,6 +49,13 @@ case class PatientScorecardResult(patient: Patient, scorecardResult: Map[String,
  */
 object RuleResult {
   val emptyRuleResult = RuleResult(CriteriaResult.emptyCriteriaResult, CriteriaResult.emptyCriteriaResult, CriteriaResult.emptyCriteriaResult)
+  
+  /**
+   * Mapping from RuleScore (which came from Scorecard) to RuleResult
+   */
+  def apply(ruleScore: RuleScore): RuleResult = {
+    RuleResult(CriteriaResult(ruleScore.eligible), CriteriaResult(ruleScore.excluded), CriteriaResult(ruleScore.meetMeasure))
+  }
 }
 
 /**
@@ -50,6 +76,18 @@ case class RuleResult(eligibleResult: CriteriaResult, excludedResult: CriteriaRe
 
 object CriteriaResult {
   val emptyCriteriaResult = CriteriaResult(false, List())
+  
+  /**
+   * Mapping from RuleCriteriaScore (which came from Scorecard) to CriteriaResult
+   * 
+   * @TODO Need to get the provider first and last name from providerID
+   */
+  def apply(ruleCriteriaScore: RuleCriteriaScore): CriteriaResult = {
+    val criteriaResultReasons = ruleCriteriaScore.criteriaScore.toList flatMap { case (reason, claimList) => 
+      claimList map { c => CriteriaResultDetail(c.claimID, c.providerID, c.providerID, c.date, reason) }
+    }
+    CriteriaResult(ruleCriteriaScore.isCriteriaMet, criteriaResultReasons)
+  }
 }
 
 /**

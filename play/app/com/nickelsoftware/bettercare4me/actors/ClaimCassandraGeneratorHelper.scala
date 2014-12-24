@@ -99,7 +99,7 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     val scorecardsFuture = patientsHistoryFuture map (_ map {
       case (p, ph) =>
         val scorecard = rules.foldLeft(Scorecard())({ (scorecard, rule) => rule.scoreRule(scorecard, p, ph) })
-        //** save patient scorecard to cassandra herre
+        //** save patient scorecard to cassandra here
         scorecard
     })
 
