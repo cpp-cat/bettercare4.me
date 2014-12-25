@@ -52,7 +52,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
 
     "generate Patients, Providers and Claims based on configuration, single entity" in {
 
-      val config = ClaimGeneratorConfig.loadConfig("""
+      val configTxt = """
         basePath: """ + pathName + """
         baseFname: ClaimGenerator
         nbrGen: 1
@@ -67,9 +67,10 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
             eligibleRate: 100
             meetMeasureRate: 100
             exclusionRate: 0
-        """)
+        """
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
-      ClaimFileGeneratorHelper.generateClaims(0, config)
+      ClaimFileGeneratorHelper.generateClaims(0, configTxt)
 
       // validate the created files
       val fnameBase = pathName + "/" + config.baseFname
@@ -96,7 +97,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
 
     "generate Patients, Providers and Claims based on configuration, multiple entities" in {
 
-      val config = ClaimGeneratorConfig.loadConfig("""
+      val configTxt = """
         basePath: """ + pathName + """
         baseFname: ClaimGenerator
         nbrGen: 1
@@ -111,9 +112,10 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
             eligibleRate: 100
             meetMeasureRate: 100
             exclusionRate: 0
-        """)
+        """
 
-      ClaimFileGeneratorHelper.generateClaims(0, config)
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
+      ClaimFileGeneratorHelper.generateClaims(0, configTxt)
 
       // validate the created files
       val fnameBase = pathName + "/" + config.baseFname
@@ -128,7 +130,7 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
 
     "generate HEDIS measures simulation data, testing simulationParity in RuleConfig" in {
 
-      val config = ClaimGeneratorConfig.loadConfig("""
+      val configTxt = """
         basePath: """ + pathName + """
         baseFname: ClaimGenerator
         nbrGen: 1
@@ -161,11 +163,12 @@ class ClaimFileGeneratorTestSpec extends PlaySpec with TestFileGenerator {
             exclusionRate: 0
             meetMeasureRate: 50
             simulationParity: CDC-LDL-C-HEDIS-2014 
-        """)
+        """
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
 
       // generate the simulation data
       val igen = 0
-      ClaimFileGeneratorHelper.generateClaims(igen, config)
+      ClaimFileGeneratorHelper.generateClaims(igen, configTxt)
 
       // validate the created files
       // compute the HEDIS scores
