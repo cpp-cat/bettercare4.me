@@ -95,6 +95,7 @@ WITH CLUSTERING ORDER BY (hedis_date DESC);
 //------------------------------------------------
 //   rule_name rule identifier
 //   hedis_date is end date of evaluation period
+//   batch_id batch partition (used to complement the patient_id to read Patient Scorecard)
 //   patient_id patient identifier (only patients that are eligible are included)
 //   patient_data patient demographics
 //   is_excluded is patient excluded from measure
@@ -102,6 +103,7 @@ WITH CLUSTERING ORDER BY (hedis_date DESC);
 CREATE TABLE rule_scorecards (
   rule_name TEXT,
   hedis_date TIMESTAMP,
+  batch_id INT,
   patient_id TEXT,
   patient_data LIST<TEXT>,
   is_excluded BOOLEAN,
@@ -131,9 +133,9 @@ CREATE TABLE patient_scorecards (
   excluded_score LIST<TEXT>,
   is_meet_criteria BOOLEAN,
   meet_criteria_score LIST<TEXT>,
-  PRIMARY KEY (batch_id, hedis_date, patient_id, rule_name)
+  PRIMARY KEY (batch_id, patient_id, hedis_date, rule_name)
 )
-WITH CLUSTERING ORDER BY (hedis_date DESC);
+WITH CLUSTERING ORDER BY (patient_id ASC, hedis_date DESC);
 
 
 // Test Data

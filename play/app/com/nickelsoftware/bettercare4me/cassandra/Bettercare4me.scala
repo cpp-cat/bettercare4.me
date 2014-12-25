@@ -82,7 +82,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
 
   // Summary tables
   private val insertHEDISSummaryStmt = cassandra.session.prepare("INSERT INTO hedis_summary (name, hedis_date, patient_count, score_summaries, claim_generator_config) VALUES (?, ?, ?, ?, ?)")
-  private val insertRuleScorecardsStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?)")
+  private val insertRuleScorecardsStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, batch_id, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?)")
   private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
   /**
@@ -166,8 +166,8 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   /**
    * Insert a rule summary for patient
    */
-  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
-    cassandra.session.executeAsync(insertRuleScorecardsStmt.bind(ruleName, hedisDate.toDate(), patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean))
+  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, batchID: Int, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
+    cassandra.session.executeAsync(insertRuleScorecardsStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean))
   }
 
   /**
@@ -299,9 +299,9 @@ object Bettercare4me {
   /**
    * Insert a rule summary for a patient
    */
-  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
+  def insertRuleScorecards(ruleName: String, hedisDate: DateTime, batchID: Int, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
     bc4me match {
-      case Some(c) => c.insertRuleScorecards(ruleName, hedisDate, patient, isExcluded, isMeetCriteria)
+      case Some(c) => c.insertRuleScorecards(ruleName, hedisDate, batchID, patient, isExcluded, isMeetCriteria)
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }

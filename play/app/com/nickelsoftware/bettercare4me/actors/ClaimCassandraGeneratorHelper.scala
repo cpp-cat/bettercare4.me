@@ -106,7 +106,7 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
         // insert into rule_scorecards the rule summary for this patient
         scorecard.hedisRuleMap foreach {
           case (n, rs) =>
-            if (rs.meetDemographic.isCriteriaMet && rs.eligible.isCriteriaMet) Bettercare4me.insertRuleScorecards(n, hedisDate, p, rs.excluded.isCriteriaMet, rs.meetMeasure.isCriteriaMet)
+            if (rs.meetDemographic.isCriteriaMet && rs.eligible.isCriteriaMet) Bettercare4me.insertRuleScorecards(n, hedisDate, igen, p, rs.excluded.isCriteriaMet, rs.meetMeasure.isCriteriaMet)
         }
 
         // save patient scorecard to cassandra here, keep only the measure that the patient is eligible to
