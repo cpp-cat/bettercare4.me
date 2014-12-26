@@ -1,0 +1,50 @@
+@(ruleName: String, hedisDate: String, tuples: scala.collection.immutable.List[(Int, com.nickelsoftware.bettercare4me.models.Patient, Boolean, Boolean)])
+
+@import com.nickelsoftware.bettercare4me.models.Patient
+
+@displayRow(batchID: Int, patient: Patient, isExcluded: Boolean, isMeetMeasure: Boolean) = {
+     <tr>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.firstName</a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.lastName</a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
+          @if(isExcluded) {
+            <span class="glyphicon glyphicon-ok"></span>
+          } else {
+            <span class="glyphicon glyphicon-remove"></span>
+          }
+          </a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
+          @if(isMeetMeasure) {
+            <span class="glyphicon glyphicon-ok"></span>
+          } else {
+            <span class="glyphicon glyphicon-remove"></span>
+          }
+          </a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><span class="glyphicon glyphicon-chevron-right"></span></a></td>
+     </tr>
+}
+
+
+@main("BetterCare4.me") {
+  
+  <div class="container">
+    <h2>@ruleName HEDIS Measures Dashboard</h2>
+    <p>For reporting period ending on @hedisDate</p>
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Excluded?</th>
+          <th>Meet Measure?</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+      @for(t <- tuples) {
+        @displayRow(t._1, t._2, t._3, t._4)
+      }
+      </tbody>
+    </table>
+  </div>
+}

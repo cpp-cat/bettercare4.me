@@ -24,7 +24,6 @@ import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleSparkRequest
 import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig
-import com.nickelsoftware.bettercare4me.views.html.hedisDashboardView
 import com.nickelsoftware.bettercare4me.views.html.hedisReport
 import com.nickelsoftware.bettercare4me.views.html.patientList
 import akka.actor.Props
@@ -195,6 +194,16 @@ object Application extends Controller {
       case (hedisScoreSummary, configTxt) =>
         val config = ClaimGeneratorConfig.loadConfig(configTxt)
         Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, hedisScoreSummary))
+    }
+  }
+
+  // Return the list of patient for a given hedis measure
+  // ------------------------------------------------------------
+  def ruleScorecard(ruleName: String, date: String) = Action.async {
+
+    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    Bettercare4me.queryRuleScorecard(ruleName, hedisDate) map { tuples =>
+      Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, tuples.toList))
     }
   }
 

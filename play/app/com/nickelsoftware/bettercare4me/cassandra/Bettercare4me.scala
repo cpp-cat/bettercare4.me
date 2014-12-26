@@ -89,7 +89,9 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   private val queryHEDISReportStmt = cassandra.session.prepare("SELECT patient_count, score_summaries, claim_generator_config FROM hedis_summary WHERE name = ? AND hedis_date = ?")
   private val insertHEDISSummaryStmt = cassandra.session.prepare("INSERT INTO hedis_summary (name, hedis_date, patient_count, score_summaries, claim_generator_config) VALUES (?, ?, ?, ?, ?)")
 
-  private val insertRuleScorecardsStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, batch_id, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?)")
+  private val queryRuleScorecardStmt = cassandra.session.prepare("SELECT batch_id, patient_data, is_excluded, is_meet_criteria FROM rule_scorecards WHERE rule_name = ? AND hedis_date = ?")
+  private val insertRuleScorecardStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, batch_id, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?)")
+  
   private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
   /**
@@ -198,12 +200,25 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   def insertHEDISSummary(name: String, hedisDate: DateTime, patientCount: Long, scoreSummaries: List[String], claimGeneratorConfig: String) = {
     cassandra.session.executeAsync(insertHEDISSummaryStmt.bind(name, hedisDate.toDate(), patientCount: java.lang.Long, scoreSummaries: java.util.List[String], claimGeneratorConfig))
   }
+  
+  /**
+   * Return the list of patients for a hedis measure
+   */
+  def queryRuleScorecard(ruleName: String, hedisDate: DateTime): Future[Iterable[(Int, Patient, Boolean, Boolean)]] = {
+    val future = cassandra.session.executeAsync(new BoundStatement(queryRuleScorecardStmt).bind(ruleName, hedisDate.toDate))
+    future.map { rs =>
+      rs.all() map { row =>
+        val patient = PatientParser.fromList(row.getList("patient_data", classOf[String]).toList)
+        (row.getInt("batch_id"): Int, patient, row.getBool("is_excluded"): Boolean, row.getBool("is_meet_criteria"): Boolean)
+      }
+    }
+  }
 
   /**
    * Insert a rule summary for patient
    */
   def insertRuleScorecards(ruleName: String, hedisDate: DateTime, batchID: Int, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean) = {
-    cassandra.session.executeAsync(insertRuleScorecardsStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean))
+    cassandra.session.executeAsync(insertRuleScorecardStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean))
   }
 
   /**
@@ -348,6 +363,16 @@ object Bettercare4me {
   def insertHEDISSummary(name: String, hedisDate: DateTime, patientCount: Long, scoreSummaries: List[String], claimGeneratorConfig: String) = {
     bc4me match {
       case Some(c) => c.insertHEDISSummary(name, hedisDate, patientCount, scoreSummaries, claimGeneratorConfig)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+  
+  /**
+   * Return the list of patients for a hedis measure
+   */
+  def queryRuleScorecard(ruleName: String, hedisDate: DateTime): Future[Iterable[(Int, Patient, Boolean, Boolean)]] = {
+    bc4me match {
+      case Some(c) => c.queryRuleScorecard(ruleName, hedisDate)
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }

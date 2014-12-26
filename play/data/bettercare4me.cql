@@ -99,7 +99,7 @@ WITH CLUSTERING ORDER BY (hedis_date DESC);
 //   patient_id patient identifier (only patients that are eligible are included)
 //   patient_data patient demographics
 //   is_excluded is patient excluded from measure
-//   is_meet_measure indicates if patient meets the rule measure
+//   is_meet_criteria indicates if patient meets the rule measure
 CREATE TABLE rule_scorecards (
   rule_name TEXT,
   hedis_date TIMESTAMP,
