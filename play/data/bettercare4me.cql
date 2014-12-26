@@ -79,7 +79,7 @@ CREATE TABLE claims_providers (
 //   hedis_date is end date of evaluation period
 //   patient_count is number of patient in population
 //   score_summary is a list of RuleScoreSummary.toParseString
-//   rule_config is the yaml rule configuration
+//   claim_generator_config is the yaml claim generator configuration (ClaimGeneratorConfig)
 CREATE TABLE hedis_summary (
   name TEXT,
   hedis_date TIMESTAMP,

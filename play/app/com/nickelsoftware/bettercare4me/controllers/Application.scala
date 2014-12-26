@@ -2,7 +2,6 @@ package com.nickelsoftware.bettercare4me.controllers
 
 import java.io.FileNotFoundException
 import java.io.IOException
-
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -10,10 +9,8 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.future
 import scala.io.Source
 import scala.language.postfixOps
-
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsCompleted
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsRequest
@@ -27,9 +24,9 @@ import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleSparkRequest
 import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig
+import com.nickelsoftware.bettercare4me.views.html.hedisDashboardView
 import com.nickelsoftware.bettercare4me.views.html.hedisReport
 import com.nickelsoftware.bettercare4me.views.html.patientList
-
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
@@ -42,6 +39,7 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import org.joda.time.LocalDate
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -138,27 +136,21 @@ object Application extends Controller {
 
         case Some("application/x-yaml") =>
           val configTxt = Source.fromFile(file.ref.file).mkString
-          //          Ok(index(configTxt))
           (Some(configTxt), None)
-        //          Redirect(routes.Application.index(s"Ok, got file $filename"))
 
         case _ =>
           (None, Some("Error, File with invalid content type, must be YAML configuration file"))
-        //          Redirect(routes.Application.index("Error, File with invalid content type, must be YAML configuration file"))
       }
     }
 
     result match {
 
       case Some((Some(configTxt), _)) =>
-        //        future {
-        //          Ok(index(configTxt))
-        //        }
         val fresponse: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedClaims(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
         fresponse map { processGenereatedFilesCompleted =>
           val config = ClaimGeneratorConfig.loadConfig(configTxt)
           //*** use report view with config and ss
-          Ok(hedisReport(config, processGenereatedFilesCompleted.ss))
+          Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, processGenereatedFilesCompleted.ss))
         }
 
       case Some((None, Some(err))) =>
@@ -176,7 +168,34 @@ object Application extends Controller {
           Redirect(routes.Application.index("humm, unknown error!"))
         }
     }
+  }
 
+  // -------------------------------------------------------------------------------------------
+  // Action loading data from Cassandra
+  // ===========================================================================================
+  //
+  // List the available dashboards from hedis_summary table
+  // ------------------------------------------------------------
+  def hedisDashboard = Action.async {
+
+    val futureConfigList = Bettercare4me.queryHEDISSummary map { x =>
+      x map { case (_, c) => ClaimGeneratorConfig.loadConfig(c) } toList
+    }
+    futureConfigList map { cl =>
+      Ok(com.nickelsoftware.bettercare4me.views.html.hedisDashboardView(cl))
+    }
+  }
+
+  // Return an hedis report from hedis_summary table
+  // ------------------------------------------------------------
+  def hedisReport(name: String, date: String) = Action.async {
+
+    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    Bettercare4me.queryHEDISReport(name, hedisDate) map {
+      case (hedisScoreSummary, configTxt) =>
+        val config = ClaimGeneratorConfig.loadConfig(configTxt)
+        Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, hedisScoreSummary))
+    }
   }
 
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------

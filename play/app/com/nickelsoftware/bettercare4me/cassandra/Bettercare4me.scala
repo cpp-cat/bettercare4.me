@@ -31,6 +31,10 @@ import org.joda.time.DateTime
 import com.datastax.driver.core.PreparedStatement
 import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
 import com.nickelsoftware.bettercare4me.models.CriteriaResult
+import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
+import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
+import com.nickelsoftware.bettercare4me.hedis.HEDISRules
 
 /**
  * Class managing a connection to Cassandra cluster and
@@ -81,7 +85,10 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   private val insertClaims2Stmt = cassandra.session.prepare("INSERT INTO claims_providers (batch_id, id, provider_id, dos, data) VALUES (?, ?, ?, ?, ?)")
 
   // Summary tables
+  private val queryHEDISSummaryStmt = cassandra.session.prepare("SELECT name, hedis_date, patient_count, score_summaries, claim_generator_config FROM hedis_summary LIMIT 1000")
+  private val queryHEDISReportStmt = cassandra.session.prepare("SELECT patient_count, score_summaries, claim_generator_config FROM hedis_summary WHERE name = ? AND hedis_date = ?")
   private val insertHEDISSummaryStmt = cassandra.session.prepare("INSERT INTO hedis_summary (name, hedis_date, patient_count, score_summaries, claim_generator_config) VALUES (?, ?, ?, ?, ?)")
+
   private val insertRuleScorecardsStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, batch_id, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?)")
   private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
@@ -155,7 +162,36 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   def batchClaimsByProviders(batchId: Int, claims: List[Claim]) = {
     claims foreach { c => cassandra.session.executeAsync(insertClaims2Stmt.bind(batchId: java.lang.Integer, c.claimID, c.providerID, c.date.toDate(), c.toList: java.util.List[String])) }
   }
-  
+
+  /**
+   * Query all HEDIS report summary
+   */
+  def queryHEDISSummary: Future[Iterable[(HEDISScoreSummary, String)]] = {
+    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryHEDISSummaryStmt).bind())
+    future.map { rs =>
+      rs.all() map { row =>
+        val configTxt = row.getString("claim_generator_config")
+        val config = ClaimGeneratorConfig.loadConfig(configTxt)
+        val rules: List[HEDISRule] = config.rulesConfig.map { c => HEDISRules.createRuleByName(c.name, c, config.hedisDate) }.toList
+        (HEDISScoreSummary(rules, row.getLong("patient_count"): Long, row.getList("score_summaries", classOf[String]).toList), configTxt)
+      }
+    }
+  }
+
+  /**
+   * Query a specific HEDIS report
+   */
+  def queryHEDISReport(name: String, hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
+    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryHEDISReportStmt).bind(name, hedisDate.toDate))
+    future.map { rs =>
+      val row = rs.one()
+      val configTxt = row.getString("claim_generator_config")
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
+      val rules: List[HEDISRule] = config.rulesConfig.map { c => HEDISRules.createRuleByName(c.name, c, config.hedisDate) }.toList
+      (HEDISScoreSummary(rules, row.getLong("patient_count"): Long, row.getList("score_summaries", classOf[String]).toList), configTxt)
+    }
+  }
+
   /**
    * HEDIS report summary
    */
@@ -285,7 +321,27 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
+  /**
+   * Query all HEDIS report summary
+   */
+  def queryHEDISSummary: Future[Iterable[(HEDISScoreSummary, String)]] = {
+    bc4me match {
+      case Some(c) => c.queryHEDISSummary
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+
+  /**
+   * Query a specific HEDIS report
+   */
+  def queryHEDISReport(name: String, hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
+    bc4me match {
+      case Some(c) => c.queryHEDISReport(name, hedisDate)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+
   /**
    * HEDIS report summary
    */

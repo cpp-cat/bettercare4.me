@@ -14,8 +14,14 @@ POST    /claimGeneratorSubmit       com.nickelsoftware.bettercare4me.controllers
 # Report Generation form for HEDIS report simulation
 GET     /reportGenerator           com.nickelsoftware.bettercare4me.controllers.Application.reportGenerator
 
+# Return the list of HEDIS dashboads
+GET     /hedisDashboard             com.nickelsoftware.bettercare4me.controllers.Application.hedisDashboard
+
+# Return the HEDIS report from Cassandra
+GET     /hedisReport/:name/:date    com.nickelsoftware.bettercare4me.controllers.Application.hedisReport(name: String, date: String)
+
 # Report Generation config file posting for HEDIS report simulation
-POST    /reportGeneratorSubmit     com.nickelsoftware.bettercare4me.controllers.Application.reportGeneratorSubmit
+POST    /reportGeneratorSubmit      com.nickelsoftware.bettercare4me.controllers.Application.reportGeneratorSubmit
 
 # Akka simple test
 GET     /actor                      com.nickelsoftware.bettercare4me.controllers.Application.actor

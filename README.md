@@ -38,6 +38,10 @@
 - Make recommendations using Collaborative Filtering
 - Make recommendations based on content-based search criteria.
 
+## Bettercare4.me Product Backlog
+- Loading list of HEDIS Simulation Runs from Cassandra
+- Provide search capability to find patients based on gaps
+
 ######################################################################################################
 
 # Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
@@ -52,10 +56,12 @@
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Creating UI for displaying patient gaps-in-care / HEDIS scorecard
-- Provide search capability to find patients based on gaps
+- Loading list of patients for a HEDIS measure from the dashboard page (using Play ony, no Spark or Akka)
+- Loading patient gaps-in-care / patient profile (hedis measure summary) 
+  from a HEDIS measure summary page / patient list (using Play ony, no Spark or Akka)
 
 ## Completed User Stories
+- Loading HEDIS dashboard from Cassandra hedis_summary table (using Play ony, no Spark or Akka)
 - Persisting Patient HEDIS scorecard in Cassandra
 - Persisting Rule and Patient HEDIS scorecard summary in Cassandra
 - Persisting HEDIS summary in Cassandra
