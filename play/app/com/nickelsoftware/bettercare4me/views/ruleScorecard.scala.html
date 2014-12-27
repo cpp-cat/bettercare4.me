@@ -4,8 +4,7 @@
 
 @displayRow(batchID: Int, patient: Patient, isExcluded: Boolean, isMeetMeasure: Boolean) = {
      <tr>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.firstName</a></td>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.lastName</a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.firstName @patient.lastName</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.gender</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.dob.toLocalDate().toString</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
@@ -43,8 +42,7 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Firstname</th>
-          <th>Lastname</th>
+          <th>Name</th>
           <th>Gender</th>
           <th>DOB</th>
           <th>Excluded?</th>
