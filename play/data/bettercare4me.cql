@@ -91,7 +91,26 @@ CREATE TABLE hedis_summary (
 WITH CLUSTERING ORDER BY (hedis_date DESC);
 
 
-// Rule Scorecard Table - rule scorecard summaries
+// Rules Information Table - rule information and stats based on RuleScoreSummary
+//------------------------------------------------------------------------------------
+//   rule_name rule identifier
+//   full_name full name of hedis measure
+//   description hedis measure description
+//   hedis_date is end date of evaluation period
+//   patient_count is number of patient in population
+//   rule_score_summary is RuleScoreSummary.toParseString
+CREATE TABLE rules_information (
+  rule_name TEXT,
+  hedis_date TIMESTAMP,
+  full_name TEXT,
+  description TEXT,
+  patient_count BIGINT,
+  rule_score_summary TEXT,
+  PRIMARY KEY (rule_name, hedis_date)
+)
+WITH CLUSTERING ORDER BY (hedis_date DESC);
+
+// Rule Scorecard Table - rule scorecard summaries - list of patients for each rule
 //------------------------------------------------
 //   rule_name rule identifier
 //   hedis_date is end date of evaluation period

@@ -202,9 +202,12 @@ object Application extends Controller {
   def ruleScorecard(ruleName: String, date: String) = Action.async {
 
     val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
-    Bettercare4me.queryRuleScorecard(ruleName, hedisDate) map { tuples =>
-      Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, tuples.toList))
-    }
+    val futureRss = Bettercare4me.queryRuleScorecard(ruleName, hedisDate)
+    val futureRi = Bettercare4me.queryRuleInformation(ruleName, hedisDate)
+    for {
+      tuples <- futureRss
+      ri <- futureRi
+    } yield Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, ri._1, ri._2, tuples.toList))
   }
 
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------

@@ -7,6 +7,7 @@ import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 import com.nickelsoftware.bettercare4me.utils.NickelException
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 object HEDISScoreSummary {
 
@@ -19,16 +20,9 @@ object HEDISScoreSummary {
    * Constructor to load from Cassandra
    */
   def apply(rules: List[HEDISRule], patientCount: Long, ruleScoreSummaries: List[String]): HEDISScoreSummary = {
-    val rulesMap = rules map { r => (r.name, r) } toMap
-    val rss = ruleScoreSummaries map { s =>
-      val v = s.split(",")
-      if (v.size < 5) throw NickelException("HEDISScoreSummary: Invalid string representation of RuleScoreSummary: " + s)
-
-      // produce a tuple of (ruleName, RuleScoreSummary)
-      (v(0), RuleScoreSummary(HEDISRuleInfo(rulesMap.getOrElse(v(0), throw NickelException("HEDISScoreSummary: Invalid HEDIS measure name: " + v(0)))),
-        v(1).toLong, v(2).toLong, v(3).toLong, v(4).toLong))
-    }
-    HEDISScoreSummary(patientCount, rss toMap)
+    val ruleInfoMap = rules map { r => (r.name, HEDISRuleInfo(r)) } toMap
+    val rssList = ruleScoreSummaries map { s => RuleScoreSummary(ruleInfoMap, s) }
+    HEDISScoreSummary(patientCount, rssList map { rss => (rss.ruleInfo.name, rss) } toMap)
   }
 }
 /**
@@ -81,6 +75,37 @@ case class HEDISScoreSummary(patientCount: Long, ruleScoreSummaries: Map[String,
 
     val l = "Overall score summary over " + patientCount + " patients" :: (ruleNames map { ruleScoreSummaries.get(_) map { _.toString } getOrElse "" })
     l mkString "\n"
+  }
+}
+
+/**
+ * Utility object to define constructors for when we're loading from Cassandra
+ */
+object RuleScoreSummary {
+
+  private def parse(data: String): (String, Long, Long, Long, Long) = {
+    val v = data.split(",")
+    if (v.size < 5) throw NickelException("RuleScoreSummary: Invalid string representation of RuleScoreSummary: " + data)
+
+    (v(0), v(1).toLong, v(2).toLong, v(3).toLong, v(4).toLong)
+  }
+
+  /**
+   * Constructor used when loaded from Cassandra
+   */
+  def apply(ruleInfo: HEDISRuleInfo, data: String): RuleScoreSummary = {
+    val v = parse(data)
+    if(ruleInfo.name != v._1) throw NickelException("RuleScoreSummary: rule info object not matching serialized data! "+data)
+    RuleScoreSummary(ruleInfo, v._2, v._3, v._4, v._5)
+  }
+
+  /**
+   * Constructor used when loaded from Cassandra
+   */
+  def apply(ruleInfoMap: Map[String, HEDISRuleInfo], data: String): RuleScoreSummary = {
+    val v = parse(data)
+    val ruleInfo = ruleInfoMap.getOrElse(v._1, throw NickelException("HEDISScoreSummary: Invalid HEDIS measure name: " + v._1))
+    RuleScoreSummary(ruleInfo, v._2, v._3, v._4, v._5)
   }
 }
 

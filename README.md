@@ -56,11 +56,12 @@
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Loading list of patients for a HEDIS measure from the dashboard page (using Play ony, no Spark or Akka)
 - Loading patient gaps-in-care / patient profile (hedis measure summary) 
   from a HEDIS measure summary page / patient list (using Play ony, no Spark or Akka)
 
 ## Completed User Stories
+- Added HEDIS measure information to Rule Information page, added rules_infromation table
+- Loading list of patients for a HEDIS measure from the dashboard page (using Play ony, no Spark or Akka)
 - Loading HEDIS dashboard from Cassandra hedis_summary table (using Play ony, no Spark or Akka)
 - Persisting Patient HEDIS scorecard in Cassandra
 - Persisting Rule and Patient HEDIS scorecard summary in Cassandra
