@@ -18,6 +18,7 @@ import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
 import com.nickelsoftware.bettercare4me.models.PersonGenerator
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
 import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 /**
  * Class for generating patients, providers, and claims for a given \c igen generation
@@ -38,7 +39,7 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
   def generateClaims(igen: Int, configTxt: String): ClaimGeneratorCounts = {
 
     val config = ClaimGeneratorConfig.loadConfig(configTxt)
-    
+
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)
 
@@ -117,6 +118,29 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
 
     // fold all the patients scorecards into a HEDISScoreSummary and return it
     val f = scorecardsFuture map { _.foldLeft(HEDISScoreSummary(rules))({ (scoreSummary, scorecard) => scoreSummary.addScoreCard(scorecard) }) }
+
+    Await.result(f, Duration.Inf)
+  }
+
+  def paginateRuleScorecards(ruleName: String, configTxt: String): Unit = {
+
+    val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    val hedisDate = config.hedisDate
+
+    // read the patients for ruleName
+    val rowsFuture = Bettercare4me.queryRuleScorecard(ruleName, hedisDate)
+    val f = rowsFuture map { rows =>
+      var pageID = 1
+      var count = 0
+      for (row <- rows) {
+        count = count + 1
+        row match {
+          case (batchID, patient, isExcluded, isMeetCriteria) => Bettercare4me.insertRuleScorecardsPaginated(ruleName, hedisDate, batchID, pageID, patient, isExcluded, isMeetCriteria)
+          case _ => throw NickelException("ClaimCassandraGeneratorHelper: Unexpected case value in paginateRuleScorecards")
+        }
+        if (count % 20 == 0) pageID = pageID + 1
+      }
+    }
 
     Await.result(f, Duration.Inf)
   }

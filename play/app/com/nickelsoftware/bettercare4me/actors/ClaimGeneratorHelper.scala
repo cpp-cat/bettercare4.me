@@ -32,4 +32,9 @@ trait ClaimGeneratorHelper {
    * Compute the HEDIS score and patient gaps
    */
   def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary
+  
+  /**
+   * Paginate rule scorecards table (Cassandra only)
+   */
+  def paginateRuleScorecards(ruleName: String, configTxt: String): Unit
 }

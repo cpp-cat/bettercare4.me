@@ -122,4 +122,7 @@ case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
     // fold the scorecards into a HEDISScoreSummary and return it
     patientScorecards.foldLeft(HEDISScoreSummary(rules))({ (scoreSummary, scorecard) => scoreSummary.addScoreCard(scorecard) })
   }
+  
+  def paginateRuleScorecards(ruleName: String, configTxt: String): Unit = {}
+
 }

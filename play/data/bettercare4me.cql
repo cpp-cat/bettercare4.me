@@ -111,10 +111,13 @@ CREATE TABLE rules_information (
 WITH CLUSTERING ORDER BY (hedis_date DESC);
 
 // Rule Scorecard Table - rule scorecard summaries - list of patients for each rule
+// This table is used to sort the patient by name to create the paginated 
+// version of the table: rule_scorecards_pagiated
 //------------------------------------------------
 //   rule_name rule identifier
 //   hedis_date is end date of evaluation period
 //   batch_id batch partition (used to complement the patient_id to read Patient Scorecard)
+//   patient_name is patient full name ("lastname, firstname") for sorting order
 //   patient_id patient identifier (only patients that are eligible are included)
 //   patient_data patient demographics
 //   is_excluded is patient excluded from measure
@@ -123,11 +126,37 @@ CREATE TABLE rule_scorecards (
   rule_name TEXT,
   hedis_date TIMESTAMP,
   batch_id INT,
+  patient_name TEXT,
   patient_id TEXT,
   patient_data LIST<TEXT>,
   is_excluded BOOLEAN,
   is_meet_criteria BOOLEAN,
-  PRIMARY KEY (rule_name, hedis_date, patient_id)
+  PRIMARY KEY (rule_name, hedis_date, patient_name, patient_id)
+)
+WITH CLUSTERING ORDER BY (hedis_date DESC);
+
+// Paginated Rule Scorecard Table - rule scorecard summaries - list of patients for each rule with pagination
+//------------------------------------------------
+//   rule_name rule identifier
+//   hedis_date is end date of evaluation period
+//   batch_id batch partition (used to complement the patient_id to read Patient Scorecard)
+//   page_id is the page number starting at 1 (each page contains 20 patients)
+//   patient_name is patient full name ("lastname, firstname") for sorting order
+//   patient_id patient identifier (only patients that are eligible are included)
+//   patient_data patient demographics
+//   is_excluded is patient excluded from measure
+//   is_meet_criteria indicates if patient meets the rule measure
+CREATE TABLE rule_scorecards_paginated (
+  rule_name TEXT,
+  hedis_date TIMESTAMP,
+  batch_id INT,
+  page_id BIGINT,
+  patient_name TEXT,
+  patient_id TEXT,
+  patient_data LIST<TEXT>,
+  is_excluded BOOLEAN,
+  is_meet_criteria BOOLEAN,
+  PRIMARY KEY (rule_name, hedis_date, page_id, patient_name, patient_id)
 )
 WITH CLUSTERING ORDER BY (hedis_date DESC);
 

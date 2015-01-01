@@ -63,6 +63,9 @@ object ClaimGeneratorSparkHelper {
     // combine the result of each job to get the total count of patients, providers and claims
     val result = rdd reduce { (a, b) => a + b }
     
+    // create the paginated list of patients from rule_scorecards table to rule_scorecards_paginated table - Cassandra only
+    sc.parallelize(config.rulesConfig map (_.name), config.rulesConfig.size) foreach { ruleName => broadcastGenerator.value.paginateRuleScorecards(ruleName, broadcastConfigTxt.value) }
+    
     sc.stop
     result
   }

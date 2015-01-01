@@ -57,26 +57,23 @@
 
 ## User Stories Sprint Backlog.
 - Loading patient gaps-in-care / patient profile (hedis measure summary) 
-  from a HEDIS measure summary page / patient list (using Play ony, no Spark or Akka)
+  from a HEDIS measure summary page / patient list (using Play only, no Spark or Akka)
 
 ## Completed User Stories
-- Added simple pagination to ruleScorecard.scala.html view and associated rule_scorecard table. 
-  Pagination using patient_id range. 
-  - Outstanding issues:
-    - List of patients are in no particular order. Ordered by name across the pages would be desired.
-    - Cannot jump to a future page, e.g., cannot jump from page 1 to page 5 since we don't know the first
-      patient_id of page 5 ahead of time.
-  - Alternate and improved solution would be to create a rule_scorecard_paginated table:
+- Added pagination to ruleScorecard.scala.html view and associated rule_scorecard table. 
+  Pagination using pre-defined page range. 
+  - Solution: create a rule_scorecard_paginated table:
     - Add patient_name collumn for patient full name as a clustering collumn to rule_scorecard. 
-      The primary key would now be: PRIMARY KEY (rule_name, hedis_date, patient_name, patient_id)
+      The primary key is now: PRIMARY KEY (rule_name, hedis_date, patient_name, patient_id)
     - Once the rule_scorecard populated, load the rule_scorecard_paginated table with primary key:
       PRIMARY KEY (rule_name, hedis_date, page, patient_name, patient_id) with only 20 records for each page.
     - Client-side code (views) would setup pages of multiple of 20 records.
   - Potential outstanding issue:
     - Updating rule_scorecard table may require to rebuid rule_scorecard_paginated, since rule_scorecard_paginated
-      is essentially a view of rule_scorecard table
+      is essentially a view of rule_scorecard table (not an issue here since patient list in rule_scorecard is fixed for
+      a reporting period)
 - Added HEDIS measure information to Rule Information page, added rules_infromation table
-- Loading list of patients for a HEDIS measure from the dashboard page (using Play ony, no Spark or Akka)
+- Loading list of patients for a HEDIS measure from the dashboard page (using Play only, no Spark or Akka)
 - Loading HEDIS dashboard from Cassandra hedis_summary table (using Play ony, no Spark or Akka)
 - Persisting Patient HEDIS scorecard in Cassandra
 - Persisting Rule and Patient HEDIS scorecard summary in Cassandra
