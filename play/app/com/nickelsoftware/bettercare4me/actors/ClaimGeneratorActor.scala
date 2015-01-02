@@ -133,18 +133,7 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
 
           case "file-spark" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimFileGeneratorHelper, configTxt)
 
-          case "cassandra" => 
-            val result = ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimCassandraGeneratorHelper, configTxt)
-
-		    // insert the HEDISScoreSummary into Cassandra
-			val p = result.persist
-			Bettercare4me.insertHEDISSummary(config.runName, config.hedisDate, p._1, p._2, configTxt)
-    
-		    // Save in Cassandra HEDIS measures information and stats (rules_information table) based on RuleScoreSummary
-		    val hedisDate = config.hedisDate
-		    val r = result.ruleScoreSummaries foreach { case(n, rss) => Bettercare4me.insertRuleInformation(hedisDate, result.patientCount, rss) }
-			
-			result
+          case "cassandra" => ClaimGeneratorSparkHelper.processGeneratedClaims(ClaimCassandraGeneratorHelper, configTxt)
 
           case _ => throw NickelException(s"ClaimGeneratorActor: Message ProcessGenereatedClaims, unknown generator in config: ${config.generator}")
         }

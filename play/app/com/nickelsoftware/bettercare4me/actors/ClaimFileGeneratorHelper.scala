@@ -4,22 +4,22 @@
 package com.nickelsoftware.bettercare4me.actors
 
 import java.io.File
-import scala.collection.JavaConversions.asScalaBuffer
+
+import scala.collection.mutable.HashMap
 import scala.util.Random
-import org.joda.time.LocalDate
+
+import com.github.tototoshi.csv.CSVReader
 import com.github.tototoshi.csv.CSVWriter
 import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.HEDISRules
+import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.models.ClaimParser
+import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
+import com.nickelsoftware.bettercare4me.models.PatientParser
 import com.nickelsoftware.bettercare4me.models.PersonGenerator
 import com.nickelsoftware.bettercare4me.models.SimplePersistenceLayer
-import scala.collection.mutable.HashMap
-import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
-import com.github.tototoshi.csv.CSVReader
-import com.nickelsoftware.bettercare4me.models.PatientParser
-import com.nickelsoftware.bettercare4me.models.PatientHistoryFactory
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
 
 /**
  * Class for generating patients, providers, and claims for a given \c igen generation
@@ -123,6 +123,7 @@ case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
     patientScorecards.foldLeft(HEDISScoreSummary(rules))({ (scoreSummary, scorecard) => scoreSummary.addScoreCard(scorecard) })
   }
   
-  def paginateRuleScorecards(ruleName: String, configTxt: String): Unit = {}
+  def paginateRuleScorecards(ruleName: String, configTxt: String): Long = 0
+  def saveHEDISScoreSummary(result: HEDISScoreSummary, configTxt: String): Unit = {}
 
 }

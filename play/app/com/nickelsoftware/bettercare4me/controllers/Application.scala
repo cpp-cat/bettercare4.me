@@ -39,6 +39,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
 import org.joda.time.LocalDate
+import com.nickelsoftware.bettercare4me.models.Paginator
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -197,17 +198,22 @@ object Application extends Controller {
     }
   }
 
-  // Return the list of patient for a given hedis measure
+  // Return the list of patient for a given hedis measure - added pagination
   // ------------------------------------------------------------
-  def ruleScorecard(ruleName: String, date: String) = Action.async {
+  def ruleScorecard(ruleName: String, date: String, pageID: Long, pageCnt: Int) = Action.async {
 
     val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
-    val futureRss = Bettercare4me.queryRuleScorecard(ruleName, hedisDate)
+    val futureRss = Bettercare4me.queryRuleScorecardPaginated(ruleName, hedisDate, pageID, pageCnt)
     val futureRi = Bettercare4me.queryRuleInformation(ruleName, hedisDate)
     for {
       tuples <- futureRss
       ri <- futureRi
-    } yield Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, ri._1, ri._2, tuples.toList))
+    } yield {
+      val patientCount = ri._1
+      val totalPageCount = ri._2
+      val ruleScoreSummary = ri._3
+      Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, patientCount, ruleScoreSummary, tuples.toList, Paginator(pageID, pageCnt, totalPageCount) ))
+    }
   }
 
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------

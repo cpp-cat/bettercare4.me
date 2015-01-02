@@ -4,11 +4,16 @@
 package com.nickelsoftware.bettercare4me.actors
 
 import scala.util.Random
+
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
 
 case class ClaimGeneratorCounts(nbrPatients: Long, nbrProviders: Long, nbrClaims: Long) {
 
   def +(rhs: ClaimGeneratorCounts) = ClaimGeneratorCounts(nbrPatients + rhs.nbrPatients, nbrProviders + rhs.nbrProviders, nbrClaims + rhs.nbrClaims)
+
+  override def toString(): String = {
+    "ClaimGeneratorCounts: " + nbrPatients + " patients, " + nbrProviders + " providers, " + nbrClaims + " claims."
+  }
 }
 
 /**
@@ -34,7 +39,12 @@ trait ClaimGeneratorHelper {
   def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary
   
   /**
+   * Save HEDISScoreSummary to storage (Cassandra only)
+   */
+  def saveHEDISScoreSummary(result: HEDISScoreSummary, configTxt: String): Unit
+  
+  /**
    * Paginate rule scorecards table (Cassandra only)
    */
-  def paginateRuleScorecards(ruleName: String, configTxt: String): Unit
+  def paginateRuleScorecards(ruleName: String, configTxt: String): Long
 }

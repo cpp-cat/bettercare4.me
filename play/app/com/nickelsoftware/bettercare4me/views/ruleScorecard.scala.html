@@ -1,10 +1,12 @@
-@(ruleName: String, hedisDate: String, patientCount: Long, ruleScoreSummary: com.nickelsoftware.bettercare4me.hedis.RuleScoreSummary, tuples: scala.collection.immutable.List[(Int, com.nickelsoftware.bettercare4me.models.Patient, Boolean, Boolean)])
+@(ruleName: String, hedisDate: String, patientCount: Long, ruleScoreSummary: com.nickelsoftware.bettercare4me.hedis.RuleScoreSummary, 
+  tuples: scala.collection.immutable.List[(Int, com.nickelsoftware.bettercare4me.models.Patient, Boolean, Boolean)],
+  paginator: com.nickelsoftware.bettercare4me.models.Paginator)
 
 @import com.nickelsoftware.bettercare4me.models.Patient
 
 @displayRow(batchID: Int, patient: Patient, isExcluded: Boolean, isMeetMeasure: Boolean) = {
      <tr>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.firstName @patient.lastName</a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.lastName, @patient.firstName</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.gender</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.dob.toLocalDate().toString</a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
@@ -25,6 +27,30 @@
      </tr>
 }
 
+@displayPagination = {
+    <nav>
+      <ul class="pagination">
+        <li class="@paginator.prevClass">
+          <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.prevPageID/@paginator.pageCnt" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        
+        @for(i <- 1 to paginator.totalPageCnt.toInt) {
+          <li class="@paginator.pageClass(i)">
+            <a href="/ruleScorecard/@ruleName/@hedisDate/@i/@paginator.pageCnt">@i</a>
+          </li>
+        }
+        
+        <li class="@paginator.nextClass">
+          <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.nextPageID/@paginator.pageCnt" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+}
+
 
 @main("BetterCare4.me") {
   
@@ -39,6 +65,10 @@
       <li class="list-group-item"><span class="badge">@ruleScoreSummary.meetMeasure</span> Meet the HEDIS measure</li> 
     </ul>
     <p>Here's the list of @ruleScoreSummary.eligible Patients that meet the eligible criteria:</p>
+    
+    <!--  Add pagination here -->
+    @displayPagination
+    
     <table class="table table-hover">
       <thead>
         <tr>
@@ -56,5 +86,9 @@
       }
       </tbody>
     </table>
+    
+    <!--  Add pagination here -->
+    @displayPagination
+    
   </div>
 }

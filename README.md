@@ -60,6 +60,8 @@
   from a HEDIS measure summary page / patient list (using Play only, no Spark or Akka)
 
 ## Completed User Stories
+- Change all insert methods of Bettercare4me Cassandra access object to return Future[Unit]
+  rather than ResultSetFuture and make sure all futures completes before spark is closed.
 - Added pagination to ruleScorecard.scala.html view and associated rule_scorecard table. 
   Pagination using pre-defined page range. 
   - Solution: create a rule_scorecard_paginated table:

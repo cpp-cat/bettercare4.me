@@ -40,6 +40,9 @@ object ClaimGeneratorSparkHelper {
     // combine the result of each job to get the total count of patients, providers and claims
     val result = rdd reduce { (a, b) => a + b }
     
+    Logger.info("The claim generator produced:")
+    Logger.info(result.toString)
+
     sc.stop
     result
   }
@@ -63,8 +66,14 @@ object ClaimGeneratorSparkHelper {
     // combine the result of each job to get the total count of patients, providers and claims
     val result = rdd reduce { (a, b) => a + b }
     
+    // persist the HEDIS Score Summary in Cassandra (Cassandra only)
+    generator.saveHEDISScoreSummary(result, configTxt)
+    
     // create the paginated list of patients from rule_scorecards table to rule_scorecards_paginated table - Cassandra only
-    sc.parallelize(config.rulesConfig map (_.name), config.rulesConfig.size) foreach { ruleName => broadcastGenerator.value.paginateRuleScorecards(ruleName, broadcastConfigTxt.value) }
+    val rdd2 = sc.parallelize(config.rulesConfig map (_.name), config.rulesConfig.size) map { ruleName => (ruleName, broadcastGenerator.value.paginateRuleScorecards(ruleName, broadcastConfigTxt.value)) }
+    
+    Logger.info("The pagination of the rule scorecards produced:")
+    rdd2.collect foreach {case (ruleName, pageCnt) => Logger.info(ruleName + " has " + pageCnt + " pages of 20 patients each.")}
     
     sc.stop
     result

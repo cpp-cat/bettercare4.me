@@ -98,6 +98,7 @@ WITH CLUSTERING ORDER BY (hedis_date DESC);
 //   description hedis measure description
 //   hedis_date is end date of evaluation period
 //   patient_count is number of patient in population
+//   page_count is the number of pages in rule_scorecards_paginated
 //   rule_score_summary is RuleScoreSummary.toParseString
 CREATE TABLE rules_information (
   rule_name TEXT,
@@ -105,6 +106,7 @@ CREATE TABLE rules_information (
   full_name TEXT,
   description TEXT,
   patient_count BIGINT,
+  page_count BIGINT,
   rule_score_summary TEXT,
   PRIMARY KEY (rule_name, hedis_date)
 )

@@ -21,7 +21,7 @@ GET     /hedisDashboard             com.nickelsoftware.bettercare4me.controllers
 GET     /hedisReport/:name/:date    com.nickelsoftware.bettercare4me.controllers.Application.hedisReport(name: String, date: String)
 
 # Return the scorecard (patient list) of a HEDIS measure from Cassandra
-GET     /ruleScorecard/:ruleName/:date    com.nickelsoftware.bettercare4me.controllers.Application.ruleScorecard(ruleName: String, date: String)
+GET     /ruleScorecard/:ruleName/:date/:pageID/:pageCnt    com.nickelsoftware.bettercare4me.controllers.Application.ruleScorecard(ruleName: String, date: String, pageID: Long, pageCnt: Int)
 
 # Report Generation config file posting for HEDIS report simulation
 POST    /reportGeneratorSubmit      com.nickelsoftware.bettercare4me.controllers.Application.reportGeneratorSubmit
