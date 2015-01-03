@@ -36,9 +36,9 @@
           </a>
         </li>
         
-        @for(i <- 1 to paginator.totalPageCnt.toInt) {
+        @for(i <- 1 to paginator.nbrPageLinks) {
           <li class="@paginator.pageClass(i)">
-            <a href="/ruleScorecard/@ruleName/@hedisDate/@i/@paginator.pageCnt">@i</a>
+            <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.getPageID(i)/@paginator.pageCnt">@paginator.getPageID(i)</a>
           </li>
         }
         

@@ -1,0 +1,118 @@
+@(patientScorecard: com.nickelsoftware.bettercare4me.models.PatientScorecardResult)
+
+@import com.nickelsoftware.bettercare4me.models.Patient
+@import com.nickelsoftware.bettercare4me.models.RuleResult
+@import com.nickelsoftware.bettercare4me.models.CriteriaResultDetail
+
+
+@displayPatientInfo(patient: Patient) = {
+         <div class="panel panel-default">
+          <div class="panel-heading">
+            <p class="panel-title small text-uppercase">Patient Information</p>
+          </div>
+          <div class="panel-body">
+            <form class="form-horizontal">
+              <div class="form-group">
+                <label class="col-sm-2 control-label">First Name</label>
+                <div class="col-sm-4">
+                  <p class="form-control-static">@patient.firstName</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Last Name</label>
+                <div class="col-sm-4">
+                  <p class="form-control-static">@patient.lastName</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">Gender</label>
+                <div class="col-sm-4">
+                  <p class="form-control-static">@patient.gender</p>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label">DOB</label>
+                <div class="col-sm-4">
+                  <p class="form-control-static">@patient.dob.toLocalDate().toString</p>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+}
+
+@displayMeasureResult(ruleName: String, ruleResult: RuleResult) = {
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <p class="panel-title small text-uppercase">@ruleName</p>
+          </div>
+          <div class="panel-body">
+
+            <!--  Begin Panel content -->
+            @if(!ruleResult.eligibleResult.criteriaResultReasons.isEmpty) {
+              @displayCriteriaResult("Eligibility", ruleResult.eligibleResult.criteriaResultReasons)
+            }
+            @if(!ruleResult.excludedResult.criteriaResultReasons.isEmpty) {
+              @displayCriteriaResult("Exclution", ruleResult.excludedResult.criteriaResultReasons)
+            }
+            @if(ruleResult.meetMeasureResult.criteriaResultReasons.isEmpty) {
+              <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <p class="panel-heading small text-uppercase">Meet Measure</p>
+                <p>The patient does not meet the measure</p>
+              </div>
+            } else {
+              @displayCriteriaResult("Meet Measure", ruleResult.meetMeasureResult.criteriaResultReasons)
+            }
+            <!--  End Panel content -->
+
+          </div>
+        </div>
+
+}
+
+@displayCriteriaResult(criteriaName: String, list: List[CriteriaResultDetail]) = {
+        <div class="panel panel-default">
+          <!-- Default panel contents -->
+          <p class="panel-heading small text-uppercase">@criteriaName</p>
+          <!-- Table -->
+          <table class="table table-condensed table-hover">
+            <thead>
+              <tr>
+                <th>Claim #</th>
+                <th>Provider Name</th>
+                <th>Service Date</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for(row <- list) {
+                @displayCriteriaResultRow(row)
+              }
+            </tbody>
+          </table>
+        </div>
+}
+
+@displayCriteriaResultRow(row: CriteriaResultDetail) = {
+      <tr>
+        <td>@row.claimId</td>
+        <td>@row.providerFName</td>
+        <td>@row.dos.toLocalDate().toString</td>
+        <td>@row.reason</td>
+      </tr>
+}
+
+
+@main("BetterCare4.me") {
+  
+  <h2>Patient HEDIS Measures Dashboard</h2>
+
+  @displayPatientInfo(patientScorecard.patient)
+  
+
+  @for(measureResult <- patientScorecard.scorecardResult.toList) {
+    @displayMeasureResult(measureResult._1, measureResult._2)
+  }
+  
+}

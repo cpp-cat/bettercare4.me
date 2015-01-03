@@ -3,16 +3,18 @@
  */
 package com.nickelsoftware.bettercare4me.models
 
+import java.io.StringWriter
+
 import org.joda.time.DateTime
-import com.nickelsoftware.bettercare4me.hedis.HEDISRule
-import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.joda.time.LocalDate
+
 import com.github.tototoshi.csv.CSVParser
 import com.github.tototoshi.csv.CSVWriter
-import java.io.StringWriter
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
-import com.nickelsoftware.bettercare4me.hedis.RuleScore
+import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.RuleCriteriaScore
+import com.nickelsoftware.bettercare4me.hedis.RuleScore
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
+import com.nickelsoftware.bettercare4me.utils.NickelException
 
 
 /**
@@ -46,7 +48,7 @@ case class PatientScorecardResult(patient: Patient, scorecardResult: Map[String,
   def addRuleResult(ruleName: String, criteriaName: String, isCriteriaMet: Boolean, criteriaScore: List[String]): PatientScorecardResult = {
     val ruleResult = scorecardResult.getOrElse(ruleName, RuleResult.emptyRuleResult)
     PatientScorecardResult(patient, scorecardResult + (ruleName -> ruleResult.addCriteriaResult(criteriaName, isCriteriaMet, criteriaScore)))
-  }
+  }  
 }
 
 /**

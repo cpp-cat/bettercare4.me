@@ -25,5 +25,21 @@ case class Paginator(pageID: Long, pageCnt: Int, totalPageCnt: Long) {
   def prevClass = if(hasPrev) ""; else "disabled"
   def nextClass = if(hasNext) ""; else "disabled"
   def pageClass(i: Long) = if(i == pageID) "active"; else ""
+    
+  // methods to limit the number of page links 5
+  def nbrPageLinks: Int = {
+    if(totalPageCnt < 6) totalPageCnt.toInt
+    else if(totalPageCnt < 11) totalPageCnt.toInt/2
+    else if(totalPageCnt < 16) totalPageCnt.toInt/3
+    else if(totalPageCnt < 21) totalPageCnt.toInt/4
+    else 5
+  }
+  def getPageID(i: Int): Long = {
+    if(totalPageCnt < 6) i
+    else if(totalPageCnt < 11) i*2
+    else if(totalPageCnt < 16) i*3
+    else if(totalPageCnt < 21) i*4
+    else totalPageCnt.toInt*i/5
+  }
 }
 

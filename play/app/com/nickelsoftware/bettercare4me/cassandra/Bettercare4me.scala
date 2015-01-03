@@ -95,13 +95,14 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   private val insertRuleInformationStmt1 = cassandra.session.prepare("INSERT INTO rules_information (rule_name, hedis_date, full_name, description, patient_count, page_count, rule_score_summary) VALUES (?, ?, ?, ?, ?, 1, ?)")
   private val insertRuleInformationStmt2 = cassandra.session.prepare("INSERT INTO rules_information (rule_name, hedis_date, page_count) VALUES (?, ?, ?)")
   private val queryRuleInformationStmt = cassandra.session.prepare("SELECT rule_name, hedis_date, full_name, description, patient_count, page_count, rule_score_summary FROM rules_information WHERE rule_name = ? AND hedis_date = ?")
-    
+
   private val queryRuleScorecardStmt = cassandra.session.prepare("SELECT batch_id, patient_data, is_excluded, is_meet_criteria FROM rule_scorecards WHERE rule_name = ? AND hedis_date = ?")
   private val insertRuleScorecardStmt = cassandra.session.prepare("INSERT INTO rule_scorecards (rule_name, hedis_date, batch_id, patient_name, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?, ?)")
-    
+
   private val queryRuleScorecardPaginatedStmt = cassandra.session.prepare("SELECT batch_id, patient_data, is_excluded, is_meet_criteria FROM rule_scorecards_paginated WHERE rule_name = ? AND hedis_date = ? AND page_id = ?")
   private val insertRuleScorecardPaginatedStmt = cassandra.session.prepare("INSERT INTO rule_scorecards_paginated (rule_name, hedis_date, batch_id, page_id, patient_name, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
-  
+
+  private val queryPatientScorecardResultStmt = cassandra.session.prepare("SELECT patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score FROM patient_scorecards WHERE batch_id = ? AND patient_id = ? AND hedis_date = ?")
   private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
   /**
@@ -215,7 +216,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   def insertHEDISSummary(name: String, hedisDate: DateTime, patientCount: Long, scoreSummaries: List[String], claimGeneratorConfig: String): Future[Unit.type] = {
     cassandra.session.executeAsync(insertHEDISSummaryStmt.bind(name, hedisDate.toDate(), patientCount: java.lang.Long, scoreSummaries: java.util.List[String], claimGeneratorConfig)).map(rs => Unit)
   }
-  
+
   /**
    * Insert the rule information based on RuleScoreSummary into rules_information table
    */
@@ -223,14 +224,14 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
     val ri = ruleScoreSummary.ruleInfo
     cassandra.session.executeAsync(insertRuleInformationStmt1.bind(ri.name, hedisDate.toDate(), ri.fullName, ri.description, patientCount: java.lang.Long, ruleScoreSummary.toParseString)).map(rs => Unit)
   }
-  
+
   /**
    * Upsert the number of page count in rule information table
    */
   def insertRuleInformation(ruleName: String, hedisDate: DateTime, pageCount: Long): Future[Unit.type] = {
     cassandra.session.executeAsync(insertRuleInformationStmt2.bind(ruleName, hedisDate.toDate(), pageCount: java.lang.Long)).map(rs => Unit)
   }
-  
+
   /**
    * Return the rule information and stats for a hedis measure (RuleScoreSummary)
    */
@@ -244,7 +245,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
       (patientCount, pageCount, ruleScoreSummary)
     }
   }
-  
+
   /**
    * Return the list of patients for a hedis measure (rule_scorecard table)
    */
@@ -262,9 +263,9 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    * Insert a rule summary for patient (rule_scorecard table)
    */
   def insertRuleScorecards(ruleName: String, hedisDate: DateTime, batchID: Int, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean): Future[Unit.type] = {
-    cassandra.session.executeAsync(insertRuleScorecardStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, patient.lastName+", "+patient.firstName, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean)).map(rs => Unit)
+    cassandra.session.executeAsync(insertRuleScorecardStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, patient.lastName + ", " + patient.firstName, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean)).map(rs => Unit)
   }
-  
+
   /**
    * Return the paginated list of patients for a hedis measure (rule_scorecard_paginated table)
    */
@@ -277,10 +278,10 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
       }
     }
   }
-  
+
   /**
    * Return the paginated list of patients for a hedis measure (rule_scorecard_paginated table)
-   * 
+   *
    * Read pageCnt starting at pageID
    * @param ruleName name of rule to query
    * @param hedisDate end date of reporting period
@@ -288,11 +289,11 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    * @pageCnt the number of page to read
    */
   def queryRuleScorecardPaginated(ruleName: String, hedisDate: DateTime, pageID: Long, pageCnt: Int): Future[Iterable[(Int, Patient, Boolean, Boolean)]] = {
-    if(pageCnt < 1) throw NickelException("queryRuleScorecardPaginated: pageCnt must be >= 1, we got: "+pageCnt)
+    if (pageCnt < 1) throw NickelException("queryRuleScorecardPaginated: pageCnt must be >= 1, we got: " + pageCnt)
 
-    val listOfFuture = List(pageID to pageID + pageCnt - 1) map { p =>  queryRuleScorecardPaginated(ruleName, hedisDate, pageID)}
+    val listOfFuture = List(pageID to pageID + pageCnt - 1) map { p => queryRuleScorecardPaginated(ruleName, hedisDate, pageID) }
     val futureList = Future.sequence(listOfFuture)
-    
+
     // concatenate all results into a single list
     futureList map (_.flatten)
   }
@@ -301,7 +302,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    * Insert a rule summary for patient (rule_scorecard_paginated table)
    */
   def insertRuleScorecardsPaginated(ruleName: String, hedisDate: DateTime, batchID: Int, pageID: Long, patient: Patient, isExcluded: Boolean, isMeetCriteria: Boolean): Future[Unit.type] = {
-    cassandra.session.executeAsync(insertRuleScorecardPaginatedStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, pageID: java.lang.Long, patient.lastName+", "+patient.firstName, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean)).map(rs => Unit)
+    cassandra.session.executeAsync(insertRuleScorecardPaginatedStmt.bind(ruleName, hedisDate.toDate(), batchID: java.lang.Integer, pageID: java.lang.Long, patient.lastName + ", " + patient.firstName, patient.patientID, patient.toList: java.util.List[String], isExcluded: java.lang.Boolean, isMeetCriteria: java.lang.Boolean)).map(rs => Unit)
   }
 
   /**
@@ -323,6 +324,23 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
           mm.isCriteriaMet: java.lang.Boolean, toList(mm): java.util.List[String])).map(rs => Unit)
     }
     Future.sequence(f)
+  }
+
+  /**
+   * Read the patient scorecards, aka patient profile
+   */
+  def queryPatientScorecardResult(batchID: Int, patientID: String, hedisDate: DateTime): Future[PatientScorecardResult] = {
+    val future = cassandra.session.executeAsync(new BoundStatement(queryPatientScorecardResultStmt).bind(batchID: java.lang.Integer, patientID, hedisDate.toDate))
+    future.map { rs =>
+      val rows = rs.all().toList
+      val patient = PatientParser.fromList(rows.head.getList("patient_data", classOf[String]).toList)
+      rows.tail.foldLeft(PatientScorecardResult(patient)) { (ps, row) =>
+        val ruleName = row.getString("rule_name")
+        ps.addRuleResult(ruleName, HEDISRule.eligible, row.getBool("is_eligible"), row.getList("eligible_score", classOf[String]).toList).
+          addRuleResult(ruleName, HEDISRule.excluded, row.getBool("is_excluded"), row.getList("excluded_score", classOf[String]).toList).
+          addRuleResult(ruleName, HEDISRule.meetMeasure, row.getBool("is_meet_criteria"), row.getList("meet_criteria_score", classOf[String]).toList)
+      }
+    }
   }
 
   def close = {
@@ -450,7 +468,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Insert the rule information based on RuleScoreSummary into rules_information table
    */
@@ -460,7 +478,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Upsert the number of page count in rule information table
    */
@@ -470,7 +488,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Return the rule information and stats for a hedis measure (RuleScoreSummary)
    */
@@ -480,7 +498,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Return the list of patients for a hedis measure
    */
@@ -500,7 +518,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Return the paginated list of patients for a hedis measure (rule_scorecards_paginated table)
    */
@@ -510,10 +528,10 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Return the paginated list of patients for a hedis measure (rule_scorecard_paginated table)
-   * 
+   *
    * Read pageCnt starting at pageID
    * @param ruleName name of rule to query
    * @param hedisDate end date of reporting period
@@ -546,6 +564,17 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
+
+  /**
+   * Read the patient scorecards, aka patient profile
+   */
+  def queryPatientScorecardResult(batchID: Int, patientID: String, hedisDate: DateTime): Future[PatientScorecardResult] = {
+    bc4me match {
+      case Some(c) => c.queryPatientScorecardResult(batchID, patientID, hedisDate)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+
   /**
    * Closing the connection with Cassandra cluster
    *

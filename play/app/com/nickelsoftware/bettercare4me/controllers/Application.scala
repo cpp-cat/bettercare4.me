@@ -216,6 +216,18 @@ object Application extends Controller {
     }
   }
 
+  // Returns the patient profile / scorecard
+  // ------------------------------------------------------------
+  def patientScorecard(batchID: Int, patientID: String, date: String) = Action.async {
+    
+    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    val future = Bettercare4me.queryPatientScorecardResult(batchID, patientID, hedisDate)
+    future map { ps =>
+      Ok(com.nickelsoftware.bettercare4me.views.html.patientScorecard(ps))
+    }
+  }
+
+  
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------
   // Using Akka Actor to perform the action
   import SimpleActor._
