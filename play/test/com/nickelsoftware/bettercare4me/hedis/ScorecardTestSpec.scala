@@ -59,7 +59,7 @@ class ScorecardTestSpec extends PlaySpec {
       s1.isPatientMeetMeasure("TEST") mustBe false
       
       val dos = new LocalDate(2015, 1, 1).toDateTimeAtStartOfDay()
-      val s2 = s1.addScore("TEST", HEDISRule.eligible, "predicate 1", List(MedClaim("c", "p", "p", dos, dos)))
+      val s2 = s1.addScore("TEST", HEDISRule.eligible, "predicate 1", List(MedClaim("c", "p", "f", "l", "p", "f", "l", dos, dos)))
       s2.isPatientEligible("TEST") mustBe true
     }
   }

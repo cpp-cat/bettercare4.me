@@ -62,11 +62,11 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
 
       // One possible set: Most recent HbA1c test result (during the measurement year)
       () => List(
-        pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01),
-        pl.createLabClaim(patient.patientID, provider.providerID, dos2, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01)),
+        pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01),
+        pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, loinc = pickOne(loincA), result = baseVal + Random.nextDouble * 0.01)),
 
       // Another possible set: by cpt
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = cptV))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = cptV))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

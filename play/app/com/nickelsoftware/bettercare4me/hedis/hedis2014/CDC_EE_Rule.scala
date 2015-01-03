@@ -86,13 +86,13 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
     pickOne(List(
 
       // One possible set: CPT by Eye Professional
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, specialtyCde = splty, cpt = pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, specialtyCde = splty, cpt = pickOne(cptA))),
 
       // One possible set: CPT Type II
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptB))),
 
       // Another possible set: HCPCS by Eye Professional
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, specialtyCde = splty, hcpcs = pickOne(hcpcsA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, specialtyCde = splty, hcpcs = pickOne(hcpcsA)))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

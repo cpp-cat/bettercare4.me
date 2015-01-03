@@ -73,10 +73,10 @@ class CIS_VZV_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
     pickOne(List(
 
       // Possible set: CPT
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptA))),
 
       // Another possible set: ICD D
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdD = Set(pickOne(icdDA))))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdD = Set(pickOne(icdDA))))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

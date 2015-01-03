@@ -57,7 +57,7 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // At least one HbA1c test (during the measurement year)
-    List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA)))
+    List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptA)))
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

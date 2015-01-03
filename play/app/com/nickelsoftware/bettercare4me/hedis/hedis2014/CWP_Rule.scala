@@ -136,19 +136,19 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // Visit at ED
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
 
       // Visit at Outpatient facility
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40))))()
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40))))()
   }
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -186,43 +186,43 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // Visit at ED
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
 
       // make such that the antibiotics were dispensed more than 30 days prior the episode (diagnosis)
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
 
       // Visit at Outpatient facility
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
 
       // make such that the antibiotics were dispensed more than 30 days prior the episode (diagnosis)
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40)),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40))))()
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, ndc = pickOne(ndcA), daysSupply = Utils.daysBetween(dos3, dos1), qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, ndc = pickOne(ndcA), daysSupply = 20, qty = 40))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -260,31 +260,31 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       // Visit at ED
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptC)),
-          pl.createLabClaim(patient.patientID, provider.providerID, dos3, loinc = pickOne(loincC))))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptC)),
+          pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, loinc = pickOne(loincC))))),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA), roomBoardFlag = "N"),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptC)),
-          pl.createLabClaim(patient.patientID, provider.providerID, dos3, loinc = pickOne(loincC))))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptC)),
+          pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, loinc = pickOne(loincC))))),
 
       // Visit at Outpatient facility
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), cpt = pickOne(cptB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptC)),
-          pl.createLabClaim(patient.patientID, provider.providerID, dos3, loinc = pickOne(loincC))))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptC)),
+          pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, loinc = pickOne(loincC))))),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB)),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 20, qty = 40),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptC)),
-          pl.createLabClaim(patient.patientID, provider.providerID, dos3, loinc = pickOne(loincC)))))))()
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptC)),
+          pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, loinc = pickOne(loincC)))))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

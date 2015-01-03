@@ -127,39 +127,39 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
     pickOne(List(
 
       // Possible set: Urine Microalbumin Test CPT codes
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptA))),
 
       // Another possible set: Urine Microalbumin Test LOINC codes
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = pickOne(loincA))),
+      () => List(pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, loinc = pickOne(loincA))),
 
       // Visit to a Neuphrologist
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, specialtyCde = pickOne(nuccA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, specialtyCde = pickOne(nuccA))),
 
       // Diagnosis / Treatment for Nephropathy (ICD Diagnosis)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDA))),
 
       // Diagnosis / Treatment for Nephropathy (CPT)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptB))),
 
       // Diagnosis / Treatment for Nephropathy (HCPCS)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(hcpcsA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcpcs = pickOne(hcpcsA))),
 
       // Diagnosis / Treatment for Nephropathy (ICD P)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(icdPA)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdP = Set(pickOne(icdPA)))),
 
       // Diagnosis / Treatment for Nephropathy (UB)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, ubRevenue = pickOne(ubA))),
 
       // Diagnosis / Treatment for Nephropathy (TOB)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, tob = pickOne(tobA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, tob = pickOne(tobA))),
 
       // Diagnosis / Treatment for Nephropathy (NDC)
-      () => List(pl.createRxClaim(patient.patientID, provider.providerID, dos, ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(30 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos.minusDays(60 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60)),
+      () => List(pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos.minusDays(30 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos.minusDays(60 + Random.nextInt(7)), ndc = pickOne(CDC.ndcL), daysSupply = 30, qty = 60)),
 
       // Diagnosis / Treatment for Nephropathy (HCFA POS)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcfaPOS = pickOne(hcfaposA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcfaPOS = pickOne(hcfaposA)))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

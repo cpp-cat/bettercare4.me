@@ -120,22 +120,22 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
     pickOne(List(
 
       // Sexually-active women (CPT)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptAT))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptAT))),
 
       // Sexually-active women (ICD D)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDA))),
 
       // Sexually-active women (ICD P)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(icdPA)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdP = Set(pickOne(icdPA)))),
 
       // Sexually-active women (HCPCS)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(hcpcsA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcpcs = pickOne(hcpcsA))),
 
       // Sexually-active women (UB)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, ubRevenue = pickOne(ubA))),
 
       // Sexually-active women (NDC)
-      () => List(pl.createRxClaim(patient.patientID, provider.providerID, dos, ndc = pickOne(ndcA)))))()
+      () => List(pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, ndc = pickOne(ndcA)))))()
   }
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -196,12 +196,12 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
       // exclusion - X-ray or prescription for isotretinoin (CPT)
       () => List(
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptB)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubB)))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptB)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, ubRevenue = pickOne(ubB)))),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptC)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, ubRevenue = pickOne(ubC)),
-          pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcB)))))))()
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptC)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, ubRevenue = pickOne(ubC)),
+          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcB)))))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -234,7 +234,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
     val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
-    List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptD)))
+    List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptD)))
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

@@ -166,29 +166,29 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 	    pickOne(List(
 	
 	      // At least one emergency department (ED) visit with a principal diagnosis of asthma
-	      () => List(pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptA))),
-	      () => List(pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubA))),
+	      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptA))),
+	      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubA))),
 	
 	      // At least one acute inpatient discharge with a principal diagnosis of asthma
-	      () => List(pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptB))),
-	      () => List(pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubB))),
+	      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptB))),
+	      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubB))),
 	
 	      // At least 4 outpatient asthma visits and at least 2 asthma medication dispensing events
 	      () => List(
-	          pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptC)),
-	          pl.createMedClaim(patient.patientID, provider.providerID, d.minusDays(20), d.minusDays(20), icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubC)),
-	          pl.createMedClaim(patient.patientID, provider.providerID, d.minusDays(40), d.minusDays(40), icdDPri=pickOne(icdDA), cpt = pickOne(cptC)),
-	          pl.createMedClaim(patient.patientID, provider.providerID, d.minusDays(60), d.minusDays(60), icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubC)),
-	          pl.createRxClaim(patient.patientID, provider.providerID, d, ndc=pickOne(ndcAT), daysSupply=30, qty=1),
-	          pl.createRxClaim(patient.patientID, provider.providerID, d.minusDays(44), ndc=pickOne(ndcAT), daysSupply=30, qty=1)
+	          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri=pickOne(icdDA), cpt = pickOne(cptC)),
+	          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(20), d.minusDays(20), icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubC)),
+	          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(40), d.minusDays(40), icdDPri=pickOne(icdDA), cpt = pickOne(cptC)),
+	          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(60), d.minusDays(60), icdDPri=pickOne(icdDA), ubRevenue = pickOne(ubC)),
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, ndc=pickOne(ndcAT), daysSupply=30, qty=1),
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(44), ndc=pickOne(ndcAT), daysSupply=30, qty=1)
 	          ),
 	      
 	      // At least 4 asthma medication dispensing events
 	      () => List(
-	          pl.createRxClaim(patient.patientID, provider.providerID, d, ndc=pickOne(ndcAT), daysSupply=30, qty=1),
-	          pl.createRxClaim(patient.patientID, provider.providerID, d.minusDays(30), ndc=pickOne(ndcAT), daysSupply=30, qty=1),
-	          pl.createRxClaim(patient.patientID, provider.providerID, d.minusDays(60), ndc=pickOne(ndcAT), daysSupply=30, qty=1),
-	          pl.createRxClaim(patient.patientID, provider.providerID, d.minusDays(90), ndc=pickOne(ndcAT), daysSupply=30, qty=1)
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, ndc=pickOne(ndcAT), daysSupply=30, qty=1),
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(30), ndc=pickOne(ndcAT), daysSupply=30, qty=1),
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(60), ndc=pickOne(ndcAT), daysSupply=30, qty=1),
+	          pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d.minusDays(90), ndc=pickOne(ndcAT), daysSupply=30, qty=1)
 	          )	      
 	      ))()
 	    }
@@ -285,7 +285,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
     // exclusion - patients with a diagnosis of emphysema, COPD, cystic fibrosis, or acute respiratory failure
-    List( pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDB)))
+    List( pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDB)))
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -300,7 +300,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
     val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val fillD = hedisDate.minusDays(Random.nextInt(days))
 
-    List(pl.createRxClaim(patient.patientID, provider.providerID, fillD, ndc = pickOne(ndcC)))
+    List(pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, fillD, ndc = pickOne(ndcC)))
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

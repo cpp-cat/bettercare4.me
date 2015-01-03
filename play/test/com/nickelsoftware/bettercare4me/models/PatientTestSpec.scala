@@ -83,12 +83,12 @@ class PatientTestSpec extends PlaySpec {
       val date = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
       val patient = Patient("key1", "Michel", "Dufresne", "M", date)
 
-      val c1 = MedClaim("c1", "p1", "p2", date, date, MHead(specialtyCde="spe1", hcfaPOS="pos1"), MCodes(icdDPri="icd 1", icdD=Set("icd 2", "icd 3"), icdP=Set("icd p1"), cpt="cpt1"), MBill(tob="tob1", ubRevenue="ubRevenue", hcpcs="hcpcs1"))
-      val c2 = MedClaim("c2", "p1", "p2", date, date, MHead(specialtyCde="spe1"),                 MCodes(icdDPri="icd 1", icdD=Set("icd 2", "icd 3"), icdP=Set("icd p1"), cpt="cpt2"), MBill(            ubRevenue="ubRevenue", hcpcs="hcpcs"))
-      val c3 = MedClaim("c3", "p1", "p2", date, date, MHead(                     hcfaPOS="pos1"), MCodes(icdDPri="icd 4", icdD=Set(         "icd 3"), icdP=Set("icd p1"), cpt="cpt3"), MBill(tob="tob1", ubRevenue="ubRevenue", hcpcs="hcpcs"))
-      val c4 = RxClaim("c4", "p1", "p2", date, ndc = "ndc 1")
-      val c5 = LabClaim("c5", "p1", "p2", date, cpt = "cpt L1", loinc = "loinc 1")
-      val c6 = LabClaim("c6", "p1", "p2", date, cpt = "cpt L1", loinc = "loinc 2")
+      val c1 = MedClaim("c1", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, date, MHead(specialtyCde="spe1", hcfaPOS="pos1"), MCodes(icdDPri="icd 1", icdD=Set("icd 2", "icd 3"), icdP=Set("icd p1"), cpt="cpt1"), MBill(tob="tob1", ubRevenue="ubRevenue", hcpcs="hcpcs1"))
+      val c2 = MedClaim("c2", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, date, MHead(specialtyCde="spe1"),                 MCodes(icdDPri="icd 1", icdD=Set("icd 2", "icd 3"), icdP=Set("icd p1"), cpt="cpt2"), MBill(            ubRevenue="ubRevenue", hcpcs="hcpcs"))
+      val c3 = MedClaim("c3", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, date, MHead(                     hcfaPOS="pos1"), MCodes(icdDPri="icd 4", icdD=Set(         "icd 3"), icdP=Set("icd p1"), cpt="cpt3"), MBill(tob="tob1", ubRevenue="ubRevenue", hcpcs="hcpcs"))
+      val c4 = RxClaim("c4", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, ndc = "ndc 1")
+      val c5 = LabClaim("c5", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, cpt = "cpt L1", loinc = "loinc 1")
+      val c6 = LabClaim("c6", "p1", "p1.first", "p1.last", "p2", "p2.first", "p2.last", date, cpt = "cpt L1", loinc = "loinc 2")
 
       val cl1 = List(c1)
       val cl2 = List(c2)

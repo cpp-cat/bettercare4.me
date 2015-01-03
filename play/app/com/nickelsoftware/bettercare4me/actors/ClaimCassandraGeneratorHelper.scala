@@ -70,13 +70,13 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     var nbrClaims = 0L
     val f3 = for {
       patient <- patients
-      provider = getOne(providers)
+//      provider = getOne(providers)
     } yield {
       simScores.clear
       val claims = for {
         rule <- rules
         simScoreTpl = simScores.getOrElseUpdate(rule.config.simParityRuleName, (Random.nextInt(100), Random.nextInt(100), Random.nextInt(100)))
-        claim <- rule.generateClaims(persistenceLayer, patient, provider, simScoreTpl._1, simScoreTpl._2, simScoreTpl._3)
+        claim <- rule.generateClaims(persistenceLayer, patient, getOne(providers), simScoreTpl._1, simScoreTpl._2, simScoreTpl._3)
       } yield {
         nbrClaims = nbrClaims + 1
         claim
@@ -96,6 +96,7 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
   def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary = {
 
     val patientsFuture = Bettercare4me.queryPatients(igen)
+    val providerFuture = Bettercare4me.queryProviders(igen)
     val claimsMapFuture = Bettercare4me.queryClaims(igen) map { c => c groupBy { _.patientID } }
     val config = ClaimGeneratorConfig.loadConfig(configTxt)
 

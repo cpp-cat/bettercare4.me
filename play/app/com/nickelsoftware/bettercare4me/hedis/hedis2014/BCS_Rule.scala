@@ -112,21 +112,21 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     pickOne(List(
 
       // One possible set of claims based on ICD Procedure code
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(icdPA)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdP = Set(pickOne(icdPA)))),
 
       // Another possible set of claims based on CPT codes and modifier being 50
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "50")),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod2 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "50")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA), cptMod2 = "50")),
 
       // Another possible set of claims based on 2 claims have CPT codes and each have one of the modifier RT and LT
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "RT"),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptA), cptMod2 = "LT")),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA), cptMod1 = "RT"),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptA), cptMod2 = "LT")),
 
       // Another possible set of claims based on 2 claims on different day with unilateral mastectomy using icdP
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(icdPC))),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdP = Set(pickOne(icdPC))))))()
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdP = Set(pickOne(icdPC))),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdP = Set(pickOne(icdPC))))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -174,16 +174,16 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
     pickOne(List(
 
       // One possible set of claims based on cpt
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptB))),
 
       // Another possible set of claims based on hcpcs
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(hcpcsA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcpcs = pickOne(hcpcsA))),
 
       // Another possible set of claims based on ICD Procedure codes
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdP = Set(pickOne(icdPB)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdP = Set(pickOne(icdPB)))),
 
       // Another possible set of claims based on UB Revenue Procedure codes
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, ubRevenue = pickOne(ubA)))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

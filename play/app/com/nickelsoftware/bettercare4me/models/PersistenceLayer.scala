@@ -3,6 +3,8 @@
  */
 package com.nickelsoftware.bettercare4me.models
 
+import scala.math.BigDecimal.double2bigDecimal
+
 import org.joda.time.DateTime
 
 /**
@@ -18,85 +20,34 @@ trait PersistenceLayer {
 
   /**
    * create Medical Claim
-   *
-   * The params are:
-   *  - patientID Patient ID
-   *  - providerID Provider ID
-   *  - dos Date of Service
-   *  - dosThru DOS Thru - same as DOS for single day service, same as discharge date for in-patient claim
-   *  - claimStatus Claim status
-   *  - pcpFlag PCP Flag - relationship of provider with health plan ("Y" / "N")
-   *  - specialtyCde - NUCC Provider Specialty
-   *  - icdDPri ICD Primary Diagnostic
-   *  - icdD Secondary Diagnostic codes (up to 10)
-   *  - icdP ICD Procedure codes (up to 10)
-   *  - drg Diagnosis Related Group
-   *  - cpt CPT (procedure procedure)
-   *  - cptMod1 CPT Modifier 1 (2 chars)
-   *  - cptMod2 CPT Modifier 2 (2 chars)
-   *  - tob Type of Bill (3 chars)
-   *  - ubRevenue UB Revenue (billing code)
-   *  - hcpcs HCPCS (medical goods and services)
-   *  - hcpcsMod HCPCS Modifier code (2 chars)
    */
-  def createMedClaim(patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
+  def createMedClaim(
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
+    dos: DateTime, dosThru: DateTime,
     claimStatus: String = "", pcpFlag: String = "", specialtyCde: String = "", hcfaPOS: String = "",
     dischargeStatus: String = "", daysDenied: Int = 0, roomBoardFlag: String = "N",
     icdDPri: String = "", icdD: Set[String] = Set(), icdP: Set[String] = Set(), drg: String = "",
     cpt: String = "", cptMod1: String = "", cptMod2: String = "",
     tob: String = "", ubRevenue: String = "", hcpcs: String = "", hcpcsMod: String = ""): MedClaim
 
+  /**
+   * create Rx Claim
+   */
   def createRxClaim(
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
+    fillD: DateTime, claimStatus: String = "",
+    ndc: String = "", daysSupply: Int = 1, qty: Int = 0, supplyF: String = "N"): RxClaim
 
-    //2 patientID Patient ID
-    patientID: String,
-
-    //3 providerID Provider ID
-    providerID: String,
-
-    //4 fillD: fill date
-    fillD: DateTime,
-
-    //5 claimStatus Claim status: 
-    claimStatus: String = "",
-
-    //6 NDC drug NDC
-    ndc: String = "",
-
-    //7 daysSupply Nbr of days supply
-    daysSupply: Int = 1,
-
-    //8 Qty quantity dispensed
-    qty: Int = 0,
-
-    //9 Supply Flag, "Y" if DME rather than drugs
-    supplyF: String = "N"): RxClaim
-
+  /**
+   * create Lab Claim
+   */
   def createLabClaim(
-
-    //2 patientID Patient ID
-    patientID: String,
-
-    //3 providerID Provider ID
-    providerID: String,
-
-    //4 dos Date of Service
-    dos: DateTime,
-
-    //5 claimStatus Claim status: 
-    claimStatus: String = "",
-
-    //6 cpt CPT (procedure procedure)
-    cpt: String = "",
-
-    //7 LOINC
-    loinc: String = "",
-
-    //8 result: numeric (Double)
-    result: Double = 0.0,
-
-    //9 PosNegResult for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
-    posNegResult: String = ""): LabClaim
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
+    dos: DateTime, claimStatus: String = "",
+    cpt: String = "", loinc: String = "", result: Double = 0.0, posNegResult: String = ""): LabClaim
 }
 
 class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
@@ -122,7 +73,10 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     Provider(providerKeyPrefix + k, firstName, lastName)
   }
 
-  def createMedClaim(patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
+  def createMedClaim(
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
+    dos: DateTime, dosThru: DateTime,
     claimStatus: String, pcpFlag: String, specialtyCde: String, hcfaPOS: String,
     dischargeStatus: String, daysDenied: Int, roomBoardFlag: String,
     icdDPri: String, icdD: Set[String], icdP: Set[String], drg: String,
@@ -131,15 +85,17 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
 
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
-    MedClaim(mdClaimKeyPrefix + k, patientID, providerID, dos, dosThru,
-        MHead(claimStatus, pcpFlag, specialtyCde, hcfaPOS, dischargeStatus, daysDenied, roomBoardFlag),
-        MCodes(icdDPri, icdD, icdP, drg, cpt, cptMod1, cptMod2),
-        MBill(tob, ubRevenue, hcpcs, hcpcsMod))
+    MedClaim(mdClaimKeyPrefix + k,
+      patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
+      dos, dosThru,
+      MHead(claimStatus, pcpFlag, specialtyCde, hcfaPOS, dischargeStatus, daysDenied, roomBoardFlag),
+      MCodes(icdDPri, icdD, icdP, drg, cpt, cptMod1, cptMod2),
+      MBill(tob, ubRevenue, hcpcs, hcpcsMod))
   }
 
   def createRxClaim(
-    patientID: String,
-    providerID: String,
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
     fillD: DateTime,
     claimStatus: String,
     ndc: String,
@@ -150,8 +106,7 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
     RxClaim(rxClaimKeyPrefix + k,
-      patientID,
-      providerID,
+      patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
       fillD,
       claimStatus,
       ndc,
@@ -161,8 +116,8 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
   }
 
   def createLabClaim(
-    patientID: String,
-    providerID: String,
+    patientID: String, patientFirstName: String, patientLastName: String,
+    providerID: String, providerFirstName: String, providerLastName: String,
     dos: DateTime,
     claimStatus: String,
     cpt: String,
@@ -173,8 +128,7 @@ class SimplePersistenceLayer(keyGen: Int) extends PersistenceLayer {
     val k = nextClaimKey
     nextClaimKey = nextClaimKey + 1
     LabClaim(lcClaimKeyPrefix + k,
-      patientID,
-      providerID,
+      patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
       dos,
       claimStatus,
       cpt,

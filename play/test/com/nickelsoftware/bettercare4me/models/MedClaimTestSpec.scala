@@ -10,13 +10,13 @@ import org.scalatestplus.play.PlaySpec
 object MedClaimTestSpecHelper {
   val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
 
-  def mkClaim = MedClaim("claimID", "patientID", "providerID", dos, dos,
+  def mkClaim = MedClaim("claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", dos, dos,
     MHead("claimStatus", "Y", "specialtyCde", "hcfaPOS", "dischargeStatus", 5, "Y"),
     MCodes("icdDPri", Set("icd 1", "icd 2"), Set("icd p1"), "drg", "cpt", "cptMod1", "cptMod2"),
     MBill("tob", "ubRevenue", "hcpcs", "hcpcsMod"))
 
   // default values
-  def mkClaim0 = MedClaim("claimID", "patientID", "providerID", dos, dos)
+  def mkClaim0 = MedClaim("claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", dos, dos)
 
 }
 
@@ -31,8 +31,15 @@ class MedClaimTestSpec extends PlaySpec {
       val claim = mkClaim
 
       claim.claimID mustBe "claimID"
+      
       claim.patientID mustBe "patientID"
+      claim.patientFirstName mustBe "patient.first"
+      claim.patientLastName mustBe "patient.last"
+
       claim.providerID mustBe "providerID"
+      claim.providerFirstName mustBe "provider.first"
+      claim.providerLastName mustBe "provider.last"
+      
       claim.dos mustBe dos
       claim.dosThru mustBe dos
       claim.claimStatus mustBe "claimStatus"
@@ -59,7 +66,7 @@ class MedClaimTestSpec extends PlaySpec {
       val claim = mkClaim
 
       val l = claim.toList
-      val ans = List("MD", "claimID", "patientID", "providerID", "2014-09-05", "2014-09-05",
+      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05", "2014-09-05",
         "claimStatus", "Y", "specialtyCde", "hcfaPOS", "dischargeStatus", "5", "Y",
         "icdDPri",
         "icd 1", "icd 2", "", "", "", "", "", "", "", "",
@@ -75,7 +82,7 @@ class MedClaimTestSpec extends PlaySpec {
       val claim = mkClaim0
 
       val l = claim.toList
-      val ans = List("MD", "claimID", "patientID", "providerID", "2014-09-05", "2014-09-05",
+      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05", "2014-09-05",
         "", "", "", "", "", "0", "N",
         "",
         "", "", "", "", "", "", "", "", "", "",
@@ -99,11 +106,11 @@ class MedClaimTestSpec extends PlaySpec {
       val persistenceLayer = new SimplePersistenceLayer(99)
 
       val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
-      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-0", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-1", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-2", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-3", "patient.uuid", "provider.uuid", dos, dos)
-      persistenceLayer.createMedClaim("patient.uuid", "provider.uuid", dos, dos) mustBe MedClaim("c-md-99-4", "patient.uuid", "provider.uuid", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos) mustBe MedClaim("c-md-99-0", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos) mustBe MedClaim("c-md-99-1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos) mustBe MedClaim("c-md-99-2", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos) mustBe MedClaim("c-md-99-3", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos)
+      persistenceLayer.createMedClaim("patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos) mustBe MedClaim("c-md-99-4", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last", dos, dos)
     }
   }
 }

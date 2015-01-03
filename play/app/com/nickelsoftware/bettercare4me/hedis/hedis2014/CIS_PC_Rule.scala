@@ -77,17 +77,17 @@ class CIS_PC_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(
 
       // Possible set: CPT
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos4, dos4, cpt = pickOne(cptA))),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, dos4, cpt = pickOne(cptA))),
 
       // Another possible set: HCPCS
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, hcpcs = pickOne(hcpcsA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, hcpcs = pickOne(hcpcsA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, hcpcs = pickOne(hcpcsA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos4, dos4, hcpcs = pickOne(hcpcsA)))
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, hcpcs = pickOne(hcpcsA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, hcpcs = pickOne(hcpcsA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, hcpcs = pickOne(hcpcsA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, dos4, hcpcs = pickOne(hcpcsA)))
         ))()
   }
 

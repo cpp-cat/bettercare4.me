@@ -102,9 +102,9 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
     // Ensure patient has 180 days supply within the current measurement year
     List(
-      pl.createRxClaim(patient.patientID, provider.providerID, dos1, ndc = pickOne(ndcA), daysSupply = 60, qty = 60),
-      pl.createRxClaim(patient.patientID, provider.providerID, dos2, ndc = pickOne(ndcA), daysSupply = 60, qty = 60),
-      pl.createRxClaim(patient.patientID, provider.providerID, dos3, ndc = pickOne(ndcA), daysSupply = 60, qty = 60))
+      pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, ndc = pickOne(ndcA), daysSupply = 60, qty = 60),
+      pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, ndc = pickOne(ndcA), daysSupply = 60, qty = 60),
+      pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, ndc = pickOne(ndcA), daysSupply = 60, qty = 60))
   }
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -135,10 +135,10 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
     pickOne(List(
 
       // Inpatient admission (acute, non-acute, or long term care)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcfaPOS = pickOne(posA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, tob = pickOne(tobA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, ubRevenue = pickOne(ubA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, hcpcs = pickOne(hcpcsA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcfaPOS = pickOne(posA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, tob = pickOne(tobA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, ubRevenue = pickOne(ubA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, hcpcs = pickOne(hcpcsA)))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -164,12 +164,12 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
     pickOne(List(
 
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptB))),
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptC)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptC)),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptD)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptE)))))))()
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptD)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptE)))))))()
   }
 
   def scorePatientMeetMeasureADD(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -198,7 +198,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
     val days = Utils.daysBetween(hedisDate.minusYears(1), hedisDate)
     val dos = hedisDate.minusDays(Random.nextInt(days))
 
-    List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = pickOne(cptA)))
+    List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = pickOne(cptA)))
   }
 
   def scorePatientMeetMeasureA(cptAS: Set[String], scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

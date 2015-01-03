@@ -17,65 +17,77 @@ object ClaimParser {
   def fromList(l: List[String]): Claim = {
 
     def mkMedClaim(l: List[String]): Claim = {
-      if (l.size < 42) throw NickelException("ClaimParser.fromList - MedClaim must have a least 42 elements, have " + l.size)
+      if (l.size < 46) throw NickelException("ClaimParser.fromList - MedClaim must have a least 46 elements, have " + l.size)
 
       MedClaim(
         l(1), // claimID claim ID
         l(2), // patientID Patient ID 
-        l(3), // providerID Provider ID
-        LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // dos Date of Service
-        LocalDate.parse(l(5)).toDateTimeAtStartOfDay(), // dosThru DOS Thru
+        l(3), // patientFirstName Patient first name 
+        l(4), // patientLastName Patient last name 
+        l(5), // providerID Provider ID
+        l(6), // providerFirstName provider first name 
+        l(7), // providerLastName provider last name 
+        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // dos Date of Service
+        LocalDate.parse(l(9)).toDateTimeAtStartOfDay(), // dosThru DOS Thru
         MHead(
-          l(6), // claimStatus Claim status
-          l(7), // pcpFlag PCP Flag
-          l(8), // specialtyCde
-          l(9), // hcfaPOS HCFA Form 1500 POS (Point of Service),
-          l(10), // dischargeStatus Discharge Status (2 chars)
-          l(11).toInt, // daysDenied Nbr of days denied for in-patient claims
-          l(12)), // roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
+          l(10), // claimStatus Claim status
+          l(11), // pcpFlag PCP Flag
+          l(12), // specialtyCde
+          l(13), // hcfaPOS HCFA Form 1500 POS (Point of Service),
+          l(14), // dischargeStatus Discharge Status (2 chars)
+          l(15).toInt, // daysDenied Nbr of days denied for in-patient claims
+          l(16)), // roomBoardFlag Room & Board Flag ("Y" indicates in-patient discharged claim) - optional
         MCodes(
-          l(13), // icdDPri ICD Primary Diagnostic
-          toSet(l.slice(14, 24)), // icdD Secondary Diagnostic codes (up to 10)
-          toSet(l.slice(24, 34)), // icdP ICD Procedure codes (up to 10)
-          l(34), // drg Diagnosis Related Group
-          l(35), // cpt CPT (procedure procedure)
-          l(36), // cptMod1 CPT Modifier 1 (2 chars)
-          l(37)), // cptMod2 CPT Modifier 1 (2 chars)
+          l(17), // icdDPri ICD Primary Diagnostic
+          toSet(l.slice(18, 28)), // icdD Secondary Diagnostic codes (up to 10)
+          toSet(l.slice(28, 38)), // icdP ICD Procedure codes (up to 10)
+          l(38), // drg Diagnosis Related Group
+          l(39), // cpt CPT (procedure procedure)
+          l(40), // cptMod1 CPT Modifier 1 (2 chars)
+          l(41)), // cptMod2 CPT Modifier 1 (2 chars)
         MBill(
-          l(38), // tob Type of Bill (3 chars)
-          l(39), // ubRevenue UB Revenue (billing code) 
-          l(40), // hcpcs HCPCS (medical goods and services)
-          l(41))) // hcpcsMod HCPCS Modifier code (2 chars)
+          l(42), // tob Type of Bill (3 chars)
+          l(43), // ubRevenue UB Revenue (billing code) 
+          l(44), // hcpcs HCPCS (medical goods and services)
+          l(45))) // hcpcsMod HCPCS Modifier code (2 chars)
     }
 
     def mkRxClaim(l: List[String]): Claim = {
-      if (l.size < 10) throw NickelException("ClaimParser.fromList - RxClaim must have a least 10 elements, have " + l.size)
+      if (l.size < 14) throw NickelException("ClaimParser.fromList - RxClaim must have a least 14 elements, have " + l.size)
 
       RxClaim(
         l(1), // claimID claim ID
         l(2), // patientID Patient ID 
-        l(3), // providerID Provider ID
-        LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // fill date
-        l(5), // claimStatus Claim status
-        l(6), // ndc
-        l(7).toInt, // days of supply
-        l(8).toInt, // quantity
-        l(9)) // supply flag
+        l(3), // patientFirstName Patient first name 
+        l(4), // patientLastName Patient last name 
+        l(5), // providerID Provider ID
+        l(6), // providerFirstName provider first name 
+        l(7), // providerLastName provider last name 
+        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // fill date
+        l(9), // claimStatus Claim status
+        l(10), // ndc
+        l(11).toInt, // days of supply
+        l(12).toInt, // quantity
+        l(13)) // supply flag
     }
 
     def mkLabClaim(l: List[String]): Claim = {
-      if (l.size < 10) throw NickelException("ClaimParser.fromList - RxClaim must have a least 10 elements, have " + l.size)
+      if (l.size < 14) throw NickelException("ClaimParser.fromList - RxClaim must have a least 14 elements, have " + l.size)
 
       LabClaim(
         l(1), // claimID claim ID
         l(2), // patientID Patient ID 
-        l(3), // providerID Provider ID
-        LocalDate.parse(l(4)).toDateTimeAtStartOfDay(), // date of service
-        l(5), // claimStatus Claim status
-        l(6), // cpt
-        l(7), // LOINC
-        BigDecimal(l(8)), // result
-        l(9)) // positive/negative result
+        l(3), // patientFirstName Patient first name 
+        l(4), // patientLastName Patient last name 
+        l(5), // providerID Provider ID
+        l(6), // providerFirstName provider first name 
+        l(7), // providerLastName provider last name 
+        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // date of service
+        l(9), // claimStatus Claim status
+        l(10), // cpt
+        l(11), // LOINC
+        BigDecimal(l(12)), // result
+        l(13)) // positive/negative result
     }
 
     if (l(0) == "MD") mkMedClaim(l)
@@ -96,7 +108,7 @@ object Claim {
    * @returns true if there is at least 2 claims with different DOS
    */
   def twoDifferentDOS(claims: List[MedClaim]): Boolean = {
-    
+
     if (claims.size < 2) false
     else {
       val dos = claims.head.dos
@@ -113,8 +125,14 @@ trait Claim {
   val claimType: String
   val claimID: String
   def date: DateTime
+
   val patientID: String
+  val patientFirstName: String
+  val patientLastName: String
+
   val providerID: String
+  val providerFirstName: String
+  val providerLastName: String
 
   def toList: List[String]
 }
@@ -180,8 +198,12 @@ case class MBill(tob: String = "", ubRevenue: String = "", hcpcs: String = "", h
  * The parameters to the class are:
  * 	- claimID Claim ID
  *  - patientID Patient ID
+ *  - patientFirstName patient first name
+ *  - patientLastName patient last name
  *  - providerID Provider ID
- *  - dos Date of Service
+ *  - providerFirstName provider first name
+ *  - providerLastName provider last name
+ *  - dos Date of Service (Claim.date)
  *  - dosThru DOS Thru - same as DOS for single day service, same as discharge date for in-patient claim
  *  - mHead: MHead - Medical Claim additional header parameters
  *  	- claimStatus Claim status
@@ -205,7 +227,10 @@ case class MBill(tob: String = "", ubRevenue: String = "", hcpcs: String = "", h
  *  	- hcpcs HCPCS (medical goods and services)
  *  	- hcpcsMod HCPCS Modifier code (2 chars)
  */
-case class MedClaim(claimID: String, patientID: String, providerID: String, dos: DateTime, dosThru: DateTime,
+case class MedClaim(claimID: String,
+  patientID: String, patientFirstName: String, patientLastName: String,
+  providerID: String, providerFirstName: String, providerLastName: String,
+  dos: DateTime, dosThru: DateTime,
   mHead: MHead = MHead(), mCodes: MCodes = MCodes(), mBill: MBill = MBill()) extends Claim {
 
   val claimType = "MD"
@@ -232,17 +257,19 @@ case class MedClaim(claimID: String, patientID: String, providerID: String, dos:
   def hcpcs = mBill.hcpcs
   def hcpcsMod = mBill.hcpcsMod
 
-  def toList: List[String] = List.concat(List("MD", claimID, patientID, providerID, dos.toLocalDate().toString, dosThru.toLocalDate().toString), mHead.toList, mCodes.toList, mBill.toList)
+  def toList: List[String] = List.concat(List("MD", claimID,
+    patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
+    dos.toLocalDate().toString, dosThru.toLocalDate().toString), mHead.toList, mCodes.toList, mBill.toList)
 
   /**
    * @param dia set of diasgnotics to check against
    * @returns true if this claim has any of the diagnostics passed as argument
    */
   def hasDiagnostic(dia: Set[String]): Boolean = {
-    if(dia.isEmpty) false
+    if (dia.isEmpty) false
     else {
       val d = dia.head
-      if(mCodes.icdDPri==d || mCodes.icdD.contains(d)) true
+      if (mCodes.icdDPri == d || mCodes.icdD.contains(d)) true
       else hasDiagnostic(dia.tail)
     }
   }
@@ -252,93 +279,72 @@ case class MedClaim(claimID: String, patientID: String, providerID: String, dos:
  * RxClaim class
  *
  * The attributes are:
- * - claimID
- * - patientID
- * - fillD
- * - claimStatus
- * - ndc
- * - daysSupply: Int >= 1
- * - qty: Int >= 0
- * - supplyF: set to "Y" for DME
+ * 	- claimID Claim ID
+ *  - patientID Patient ID
+ *  - patientFirstName patient first name
+ *  - patientLastName patient last name
+ *  - providerID Provider ID
+ *  - providerFirstName provider first name
+ *  - providerLastName provider last name
+ *  - fillD Rx fill date (Claim.date)
+ *  - claimStatus Claim status:
+ *    - "A" Adjustment to original claim
+ *    - "D" Denied claims
+ *    - "I" Initial Paid Claim
+ *    - "P" Pended for adjudication
+ *    - "R" Reversal to original claim
+ *  - ndc drug NDC
+ *  - daysSupply Nbr of days supply: Int >= 1
+ *  - qty Qty quantity dispensed: Int >= 0
+ *  - supplyF: Supply Flag, "Y" if DME rather than drugs
  */
-case class RxClaim(
-
-  //1 claimID Claim ID
-  claimID: String,
-
-  //2 patientID Patient ID
-  patientID: String,
-
-  //3 providerID Provider ID
-  providerID: String,
-
-  //4 fillD: fill date
-  fillD: DateTime,
-
-  //5 claimStatus Claim status: 
-  //	"A" Adjustment to original claim
-  //	"D" Denied claims
-  // 	"I" Initial Paid Claim
-  // 	"P" Pended for adjudication
-  //	"R" Reversal to original claim
-  claimStatus: String = "",
-
-  //6 NDC drug NDC
-  ndc: String = "",
-
-  //7 daysSupply Nbr of days supply
-  daysSupply: Int = 1,
-
-  //8 Qty quantity dispensed
-  qty: Int = 0,
-
-  //9 Supply Flag, "Y" if DME rather than drugs
-  supplyF: String = "N") extends Claim {
+case class RxClaim(claimID: String,
+  patientID: String, patientFirstName: String, patientLastName: String,
+  providerID: String, providerFirstName: String, providerLastName: String,
+  fillD: DateTime, claimStatus: String = "",
+  ndc: String = "", daysSupply: Int = 1, qty: Int = 0, supplyF: String = "N") extends Claim {
 
   val claimType = "RX"
   def date = fillD
 
-  def toList: List[String] = List("RX", claimID, patientID, providerID,
+  def toList: List[String] = List("RX", claimID,
+    patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
     fillD.toLocalDate().toString, claimStatus, ndc, daysSupply.toString(), qty.toString(), supplyF)
 }
 
-case class LabClaim(
-
-  //1 claimID Claim ID
-  claimID: String,
-
-  //2 patientID Patient ID
-  patientID: String,
-
-  //3 providerID Provider ID
-  providerID: String,
-
-  //4 dos Date of Service
-  dos: DateTime,
-
-  //5 claimStatus Claim status: 
-  //	"A" Adjustment to original claim
-  //	"D" Denied claims
-  // 	"I" Initial Paid Claim
-  // 	"P" Pended for adjudication
-  //	"R" Reversal to original claim
-  claimStatus: String = "",
-
-  //6 cpt CPT (procedure procedure)
-  cpt: String = "",
-
-  //7 LOINC
-  loinc: String = "",
-
-  //8 result: numeric (BigDecimal)
-  result: BigDecimal = 0.0,
-
-  //9 PosNegResult for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
-  posNegResult: String = "") extends Claim {
+/**
+ * LabClaim class
+ *
+ * The attributes are:
+ * 	- claimID Claim ID
+ *  - patientID Patient ID
+ *  - patientFirstName patient first name
+ *  - patientLastName patient last name
+ *  - providerID Provider ID
+ *  - providerFirstName provider first name
+ *  - providerLastName provider last name
+ *  - dos date of service (Claim.date)
+ *  - claimStatus Claim status:
+ *    - "A" Adjustment to original claim
+ *    - "D" Denied claims
+ *    - "I" Initial Paid Claim
+ *    - "P" Pended for adjudication
+ *    - "R" Reversal to original claim
+ *  - cpt CPT (procedure procedure)
+ *  - loinc LOINC code
+ *  - result test result: BigDecimal
+ *  - posNegResult: for binary result (as opposed to numeric) "1" is positive, "0" is negative, "" for N/A (numeric)
+ */
+case class LabClaim(claimID: String,
+  patientID: String, patientFirstName: String, patientLastName: String,
+  providerID: String, providerFirstName: String, providerLastName: String,
+  dos: DateTime, claimStatus: String = "",
+  cpt: String = "", loinc: String = "", result: BigDecimal = 0.0, posNegResult: String = "") extends Claim {
 
   val claimType = "LC"
   def date = dos
 
-  def toList: List[String] = List("LC", claimID, patientID, providerID,
+  def toList: List[String] = List("LC", claimID,
+    patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
     dos.toLocalDate().toString, claimStatus, cpt, loinc, result.toString(), posNegResult)
 }

@@ -117,19 +117,19 @@ class CIS_MMR_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
     // received at least one measles/mumps/rubella (MMR) vaccination (or separate measles, mumps, and rubella vaccinations)
     List(
         pickOne(List(
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA)),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP = Set(pickOne(icdPA))),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA))
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA)),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdP = Set(pickOne(icdPA))),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA))
             ) ) (),
         pickOne(List(
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptB)),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdP = Set(pickOne(icdPB))),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icdDB))
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptB)),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdP = Set(pickOne(icdPB))),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icdDB))
             ))(),
         pickOne(List(
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptC)),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, icdP = Set(pickOne(icdPC))),
-            () => pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, icdDPri = pickOne(icdDC))
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptC)),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, icdP = Set(pickOne(icdPC))),
+            () => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, icdDPri = pickOne(icdDC))
             ))() )
   }
 

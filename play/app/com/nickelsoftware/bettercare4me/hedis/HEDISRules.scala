@@ -133,7 +133,6 @@ object HEDISRules {
     URI.name -> { (c, d) => new URI_Rule(c, d) },
     AAB.name -> { (c, d) => new AAB_Rule(c, d) },
     LBP.name -> { (c, d) => new LBP_Rule(c, d) })
-    
 
   def createRuleByName(name: String, config: RuleConfig, hedisDate: DateTime): HEDISRule = {
     if (!rules.contains(name)) throw NickelException("HEDISRules: Cannot create HEDISRule; No such rule with name: " + name)
@@ -154,7 +153,8 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider, eligibleSimScore: Int, excludedSimScore: Int, meetCriteriaSimScore: Int): List[Claim] = {
     val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
     List(
-      persistenceLayer.createMedClaim(patient.patientID, provider.providerID, dos, dos,
+      persistenceLayer.createMedClaim(
+        patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos,
         icdDPri = "icd 1", icdD = Set("icd 1", "icd 2"), icdP = Set("icd p1"),
         hcfaPOS = "hcfaPOS", ubRevenue = "ubRevenue"))
   }

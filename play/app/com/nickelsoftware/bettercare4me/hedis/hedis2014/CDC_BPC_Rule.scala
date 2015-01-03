@@ -91,10 +91,10 @@ class CDC_BPC_Rule(val name: String, tag: String, cptS: List[String], cptD: List
 
     // Latest BP test is compliant, earlier test non-compliant
     List(
-      pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = "3077F"),
-      pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = "3080F"),
-      pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptS)),
-      pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptD)))
+      pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = "3077F"),
+      pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = "3080F"),
+      pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptS)),
+      pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptD)))
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

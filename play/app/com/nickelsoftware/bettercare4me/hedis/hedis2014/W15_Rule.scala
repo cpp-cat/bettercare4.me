@@ -82,10 +82,10 @@ class W15_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
     val rules = List(
 
       // One possible set of claims based on cpt
-      (d: DateTime) => pl.createMedClaim(patient.patientID, provider.providerID, d, d, cpt = pickOne(cptA)),
+      (d: DateTime) => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, cpt = pickOne(cptA)),
 
       // Another possible set of claims based on ICD D
-      (d: DateTime) => pl.createMedClaim(patient.patientID, provider.providerID, d, d, icdDPri = pickOne(icdDA)) )
+      (d: DateTime) => pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, d, d, icdDPri = pickOne(icdDA)) )
       
     def generateClaims(d: DateTime, n: Int, l: List[Claim]): List[Claim] = {
       if(n == 0) l

@@ -61,10 +61,10 @@ class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) 
     Utils.pickOne(List(
 
       // Possible set: CPT
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = Utils.pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = Utils.pickOne(cptA))),
 
       // Another possible set: LOINC on lab claim 
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = Utils.pickOne(loincA) )) ))()
+      () => List(pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, loinc = Utils.pickOne(loincA) )) ))()
   }
 
   def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -114,10 +114,10 @@ class LDL_C_TestValueRuleBase(name: String, config: RuleConfig, hedisDate: DateT
     Utils.pickOne(List(
 
       // Possible set: CPT
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, cpt = Utils.pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, cpt = Utils.pickOne(cptA))),
 
       // Another possible set: Most recent LDL-C test result > 0 and < 100 mg/dL
-      () => List(pl.createLabClaim(patient.patientID, provider.providerID, dos, loinc = Utils.pickOne(loincA), result=Random.nextDouble*99.0)) ))()
+      () => List(pl.createLabClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, loinc = Utils.pickOne(loincA), result=Random.nextDouble*99.0)) ))()
   }
 
   def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

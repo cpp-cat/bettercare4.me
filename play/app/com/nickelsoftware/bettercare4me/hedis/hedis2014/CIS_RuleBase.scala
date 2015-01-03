@@ -76,13 +76,13 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
     pickOne(List(
 
       // exclusions - Anaphylactic reaction to the vaccine or its components (ICD D)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDA))),
 
       // exclusions - Encephalopathy (ICD D)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDB), icdD = Set(pickOne(icdDC)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDB), icdD = Set(pickOne(icdDC)))),
 
       // exclusion - Immunodeficiency syndromes, HIV disease. . . (ICD D)
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos, dos, icdDPri = pickOne(icdDD)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos, icdDPri = pickOne(icdDD)))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

@@ -56,11 +56,12 @@
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Carry over the provider name to patient scorecard page
 - Add link from patient scorecard page back to rule scorecard page
 - Load claim generator configuration to sort the hedis measures on patient scorecard page
 
 ## Completed User Stories
+- Carry over the provider name to patient scorecard page
+  - Added patient name and provider name to Claim model class
 - Loading patient gaps-in-care / patient profile (hedis measure summary) 
   from a HEDIS measure summary page / patient list (using Play only, no Spark or Akka)
 - Change all insert methods of Bettercare4me Cassandra access object to return Future[Unit]

@@ -61,9 +61,9 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
     def generateDiabetesRx: List[Claim] = {
       val ndc1 = pickOne(ndcA)
       List(
-        pl.createRxClaim(patient.patientID, provider.providerID, dos1, ndc = ndc1, daysSupply = 90, qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(80 + Random.nextInt(20)), ndc = ndc1, daysSupply = 90, qty = 90),
-        pl.createRxClaim(patient.patientID, provider.providerID, dos1.minusDays(170 + Random.nextInt(30)), ndc = ndc1, daysSupply = 90, qty = 90))
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, ndc = ndc1, daysSupply = 90, qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1.minusDays(80 + Random.nextInt(20)), ndc = ndc1, daysSupply = 90, qty = 90),
+        pl.createRxClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1.minusDays(170 + Random.nextInt(30)), ndc = ndc1, daysSupply = 90, qty = 90))
     }
 
     if (isExcluded) {
@@ -81,16 +81,16 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
         () => {
           List(
             pickOne(List(
-              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)),
-              pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)))),
+              pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)),
+              pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)))),
             pickOne(List(
-              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)),
-              pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)))))
+              pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubAT), hcfaPOS = pickOne(posAT)),
+              pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptA), hcfaPOS = pickOne(posAT)))))
         },
 
         // Another possible set of claims based on 1 face-to-face in ER
-        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptB), hcfaPOS = pickOne(posB))),
-        () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubBT), hcfaPOS = pickOne(posB)))))()
+        () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icd9DAT), cpt = pickOne(cptB), hcfaPOS = pickOne(posB))),
+        () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icd9DAT), ubRevenue = pickOne(ubBT), hcfaPOS = pickOne(posB)))))()
     }
   }
 
@@ -146,7 +146,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
     val dos1 = hedisDate.minusDays(Random.nextInt(days))
 
     // Exclusion based on ICD Diagnostic (anytime prior to or during the measurement year)
-    List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icd9DB)))
+    List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icd9DB)))
   }
 
   //

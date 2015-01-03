@@ -137,20 +137,20 @@ abstract class CMC_RuleBase(val name: String, val fullName: String, config: Rule
 
       // acute inpatient facility with a diagnosis of acute myocardial infarction (AMI) or a
       // coronary artery bypass graft (CABG) procedure
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri=pickOne(icdDA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt=pickOne(cptA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, hcpcs=pickOne(hcpcsA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP=Set(pickOne(icdPA)), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri=pickOne(icdDA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt=pickOne(cptA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, hcpcs=pickOne(hcpcsA), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdP=Set(pickOne(icdPA)), hcfaPOS=pickOne(posA), dischargeStatus="01", roomBoardFlag="Y")),
 
       // A percutaneous coronary intervention (PCI) procedure performed in any setting
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt=pickOne(cptB))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdP=Set(pickOne(icdPB)))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, hcpcs=pickOne(hcpcsB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt=pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdP=Set(pickOne(icdPB)))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, hcpcs=pickOne(hcpcsB))),
       
       // At least one outpatient or acute inpatient visit with a diagnosis of ischemic vascular disease (IVD)
       () => List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri=pickOne(icdDB), cpt=pickOne(cptC)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, icdDPri=pickOne(icdDB), ubRevenue=pickOne(ubA), hcfaPOS=pickOne(posB))
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri=pickOne(icdDB), cpt=pickOne(cptC)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, icdDPri=pickOne(icdDB), ubRevenue=pickOne(ubA), hcfaPOS=pickOne(posB))
           )
         ))()
   }

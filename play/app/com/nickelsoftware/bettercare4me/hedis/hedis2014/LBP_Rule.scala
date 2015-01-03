@@ -119,8 +119,8 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
     pickOne(List(
 
       // Visit outpatient or emergency department visit
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))))()
   }
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -150,23 +150,23 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // Two episodes
       () => List(
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA))))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA))))),
 
       // Competing diagnosis
       () => List(
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, icdDPri = pickOne(icdDB), hcfaPOS = "01", cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, icdDPri = pickOne(icdDB), hcfaPOS = "01", ubRevenue = pickOne(ubA))))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, icdDPri = pickOne(icdDB), hcfaPOS = "01", cpt = pickOne(cptA)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, icdDPri = pickOne(icdDB), hcfaPOS = "01", ubRevenue = pickOne(ubA))))),
 
       // cancer
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos4, dos4, icdDPri = pickOne(icdDC)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos4, dos4, icdDPri = pickOne(icdDC)))))()
   }
 
   override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
@@ -212,17 +212,17 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
     pickOne(List(
 
       // Spinal imaging for low back pain
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icdDA), cpt = pickOne(cptB))),
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icdDA), cpt = pickOne(cptB))),
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, icdDPri = pickOne(icdDA), ubRevenue = pickOne(ubB))),
 
       // No imaging performed
       () => List(
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", cpt = pickOne(cptA)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA), hcfaPOS = "01", ubRevenue = pickOne(ubA)))),
         pickOne(List(
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptB)),
-          pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, ubRevenue = pickOne(ubB)))))))()
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptB)),
+          pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, ubRevenue = pickOne(ubB)))))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {

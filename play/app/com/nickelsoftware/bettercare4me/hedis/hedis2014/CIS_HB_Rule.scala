@@ -84,18 +84,18 @@ class CIS_HB_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(
 
       // Possible set: CPT
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, cpt = pickOne(cptA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, cpt = pickOne(cptA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, cpt = pickOne(cptA))),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, cpt = pickOne(cptA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, cpt = pickOne(cptA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, cpt = pickOne(cptA))),
 
       // Another possible set: HCPCS
       () => List(
-        pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, hcpcs = pickOne(hcpcsA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos2, dos2, hcpcs = pickOne(hcpcsA)),
-        pl.createMedClaim(patient.patientID, provider.providerID, dos3, dos3, hcpcs = pickOne(hcpcsA))),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, hcpcs = pickOne(hcpcsA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos2, dos2, hcpcs = pickOne(hcpcsA)),
+        pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos3, dos3, hcpcs = pickOne(hcpcsA))),
 
       // Another possible set: ICD D
-      () => List(pl.createMedClaim(patient.patientID, provider.providerID, dos1, dos1, icdDPri = pickOne(icdDA)))))()
+      () => List(pl.createMedClaim(patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos1, dos1, icdDPri = pickOne(icdDA)))))()
   }
 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
