@@ -68,10 +68,10 @@
 
             <!--  Begin Panel content -->
             @if(!ruleResult.eligibleResult.criteriaResultReasons.isEmpty) {
-              @displayCriteriaResult("Eligibility", ruleResult.eligibleResult.criteriaResultReasons)
+              @displayCriteriaResult("Eligibility", ruleResult.eligibleResult.sortedCriteriaResultReasons)
             }
             @if(!ruleResult.excludedResult.criteriaResultReasons.isEmpty) {
-              @displayCriteriaResult("Exclution", ruleResult.excludedResult.criteriaResultReasons)
+              @displayCriteriaResult("Exclution", ruleResult.excludedResult.sortedCriteriaResultReasons)
             } else {
               @if(ruleResult.meetMeasureResult.criteriaResultReasons.isEmpty) {
                 <div class="panel panel-default">
@@ -80,7 +80,7 @@
                   <p>The patient does not meet the measure</p>
                 </div>
               } else {
-                @displayCriteriaResult("Meet Measure", ruleResult.meetMeasureResult.criteriaResultReasons)
+                @displayCriteriaResult("Meet Measure", ruleResult.meetMeasureResult.sortedCriteriaResultReasons)
               }
             }
             <!--  End Panel content -->

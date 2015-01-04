@@ -1,6 +1,6 @@
-/*
- * Copyright (c) 2014 Dufresne Management Consulting LLC.
- */
+//
+// Copyright (c) 2014 Dufresne Management Consulting LLC.
+//
 //
 // bettercare4me.cql
 //

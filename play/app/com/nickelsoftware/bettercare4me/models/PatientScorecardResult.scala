@@ -107,7 +107,10 @@ object CriteriaResult {
 /**
  * Rule criteria result with details
  */
-case class CriteriaResult(isCriteriaMet: Boolean, criteriaResultReasons: List[CriteriaResultDetail])
+case class CriteriaResult(isCriteriaMet: Boolean, criteriaResultReasons: List[CriteriaResultDetail]) {
+  
+  def sortedCriteriaResultReasons = criteriaResultReasons sortWith { (l, r) => l.dos.isAfter(r.dos) }
+}
 
 object CriteriaResultDetail {
   

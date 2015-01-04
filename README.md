@@ -4,43 +4,13 @@
 
 # Product backlog
 
-## Mobile Features
-- Create single page mobile app using PhoneGap, Backbone, Handlebar and jQuery Mobile
-- Develop media files for backgrounds and logo
-- Put in place a left menu and right pane for dialog with left/right page navigation
-- Simple login using email address
-- Loging using OAuth with Google and Facebook
-- Search result page without recommendations
-- Search result page with recommendations on top
-- Search result page with recommendations and features events
-- User profile page
-- Add past activity to user profile page
-- Provider profile page with user discussion with star rating
-- Facility profile page with user discussion and star rating
-- Personal calendar for personalized health roadmap (Gaps in Care Opportunities)
-- Personal list of Gaps in Care (dashboard)
-- A 2-questions survey for closing opportunity
-- Care event submission page (gap closing)
-
-## Font End Features (DRAFT)
-- Create an index.html with a login
-- Create a dashboard page to to show a payor quality rating (HEDIS measures)
-- Create a dashboard page to to show a primary care organization (by provider breakdown) quality rating (HEDIS measures)
-- Create a dashboard page to to show a primary care physician quality rating (HEDIS measures)
-- Make a user profile page
-
-## Data Management Features (DRAFT)
-- Add Cassandra database for storage
-- Investigate if need Akka Circuit Breaker pattern or supervision for claim generation agents
-- Create a security model with a user login using email and OAuth 
-
-## Recommender Engine
-- Make recommendations using Collaborative Filtering
-- Make recommendations based on content-based search criteria.
-
 ## Bettercare4.me Product Backlog
-- Loading list of HEDIS Simulation Runs from Cassandra
 - Provide search capability to find patients based on gaps
+- Add Gaps Summary section on Patient Scorecard page
+- Add visual dashboards
+  - Patient distribution by age
+  - HEDIS reports with pie charts
+- Add a Claim Detail page (what information to show?)
 
 ######################################################################################################
 
@@ -59,6 +29,9 @@
 
 ## Completed User Stories
 - Made presentation improvements and fix bug
+  - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service
+  - Added cheveron on the right of measure link on Patient Scorecard page
+  - Fix the provider name in claim list on Patient Scorecard page - first and last were inverted
 
 
 # Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
