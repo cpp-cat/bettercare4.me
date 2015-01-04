@@ -26,8 +26,20 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
+- Create s3 bucket for s3.bettercare4.me
+  - Put application /data directory as subdirectory
+  - Copy bettercare4me.cql using wget from Cassandra instance:  
+    - wget http://s3.amazonaws.com/s3.bettercare4.me/data/bettercare4me.cql
+    - Execute this command from ssh on the Cassandra instance.
+  - Execute nodetool and cqlsh shell command to load the database schema
 
 ## Completed User Stories
+- Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
+  - Instance Advance Details: --clustername bettercare4meCluster --totalnodes 6 --version community
+  - Connect to the instance using: ssh -i cassandra1-kp.pem ubuntu@ec2-54-161-199-197.compute-1.amazonaws.com
+  - Connect to Opscenter: http://ec2-54-161-199-197.compute-1.amazonaws.com:8888/ using the AMI Launch Index 0 instance Public DNS
+  - Datastax AMI: ami-ada2b6c4
+
 - Made presentation improvements and fix bug
   - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service
   - Added cheveron on the right of measure link on Patient Scorecard page
