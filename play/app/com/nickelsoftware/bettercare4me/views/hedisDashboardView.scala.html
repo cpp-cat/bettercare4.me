@@ -3,23 +3,23 @@
 @import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 
 @displayRow(config: ClaimGeneratorConfig) = {
-<li><a href="/hedisReport/@config.runName/@config.hedisDate.toLocalDate().toString">
-<h3>@config.runName</h3>
-<p><strong>@config.hedisDate.toLocalDate().toString</strong></p>
-</a></li>
+  <li><a href="/hedisReport/@config.hedisDate.toLocalDate().toString">
+    <h3>@config.runName</h3>
+    <p><strong>@config.hedisDate.toLocalDate().toString</strong></p>
+  </a></li>
 }
 
 
 @main("BetterCare4.me") {
   
-<h2>Primary Care HEDIS Measures Dashboard</h2>
-<p> Available HEDIS Reports</p>
-  
-<ul data-role="listview" data-inset="true">
+  <h2>Primary Care HEDIS Measures Dashboard</h2>
+  <p> Available HEDIS Reports</p>
     
-@for(config <- configList) {
-  @displayRow(config)
-}
-
-</ul>
+  <ul data-role="listview" data-inset="true">
+      
+    @for(config <- configList) {
+      @displayRow(config)
+    }
+  
+  </ul>
 }

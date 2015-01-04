@@ -101,7 +101,7 @@ class CIS_DTaP_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBas
         val claims2 = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
         val claims = List.concat(claims1, claims2)
         // need to have 3 with different dates
-        if(hasDifferentDates(3, claims)) s.addScore(name, HEDISRule.meetMeasure, DTaPVacc, claims)
+        if(hasDifferentDates(3, claims)) s.addScore(name, fullName, HEDISRule.meetMeasure, DTaPVacc, claims)
         else s
       })
 

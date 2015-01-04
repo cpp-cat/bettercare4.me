@@ -7,7 +7,6 @@ import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 
-
 /**
  * Track the HEDIS metric scores, each HEDIS rule have a `RuleScore
  *
@@ -27,8 +26,8 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
    * @param oride is the override to set for the criteria
    * @throws NickelException for unknown `criteriaName
    */
-  def addScore(measureName: String, criteriaName: String, oride: Boolean): Scorecard = {
-    val ruleScore = getRuleScore(measureName)
+  def addScore(measureName: String, ruleFullName: String, criteriaName: String, oride: Boolean): Scorecard = {
+    val ruleScore = getRuleScore(measureName, ruleFullName)
     Scorecard(hedisRuleMap + (measureName -> ruleScore.addScore(criteriaName, oride)))
   }
 
@@ -41,11 +40,11 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
    * @param claims is the list of claim that matched the predicate, if the list is empty then the predicate did not match (no update to scorecard)
    * @throws NickelException for unknown `criteriaName
    */
-  def addScore(measureName: String, criteriaName: String, predicateName: String, claims: List[Claim]): Scorecard = {
+  def addScore(measureName: String, ruleFullName: String, criteriaName: String, predicateName: String, claims: List[Claim]): Scorecard = {
 
     if (claims.isEmpty) this
     else {
-      val ruleScore = getRuleScore(measureName)
+      val ruleScore = getRuleScore(measureName, ruleFullName)
       Scorecard(hedisRuleMap + (measureName -> ruleScore.addScore(criteriaName, predicateName, claims)))
     }
   }
@@ -60,48 +59,50 @@ case class Scorecard(hedisRuleMap: Map[String, RuleScore] = Map()) {
    * @param predicateName is the name of the predicate that was evaluated (Predicate::predicateName)
    * @throws NickelException for unknown `criteriaName
    */
-  def addScore(measureName: String, criteriaName: String, predicateName: String): Scorecard = {
+  def addScore(measureName: String, ruleFullName: String, criteriaName: String, predicateName: String): Scorecard = {
 
-    val ruleScore = getRuleScore(measureName)
+    val ruleScore = getRuleScore(measureName, ruleFullName)
     Scorecard(hedisRuleMap + (measureName -> ruleScore.addScore(criteriaName, predicateName, List.empty)))
   }
 
   /**
    * @return true if patient meets demographic of the measure, provided the scorecard was updated to that effect
    */
-  def isPatientMeetDemographic(measureName: String): Boolean = getRuleScore(measureName).meetDemographic.isCriteriaMet
+  def isPatientMeetDemographic(measureName: String): Boolean = getRuleScore(measureName, "").meetDemographic.isCriteriaMet
 
   /**
    * @return true if patient eligible to the measure, provided the scorecard was updated to that effect
    */
-  def isPatientEligible(measureName: String): Boolean = getRuleScore(measureName).eligible.isCriteriaMet
+  def isPatientEligible(measureName: String): Boolean = getRuleScore(measureName, "").eligible.isCriteriaMet
 
   /**
    * @return true if patient excluded from the measure, provided the scorecard was updated to that effect
    */
-  def isPatientExcluded(measureName: String): Boolean = getRuleScore(measureName).excluded.isCriteriaMet
+  def isPatientExcluded(measureName: String): Boolean = getRuleScore(measureName, "").excluded.isCriteriaMet
 
   /**
    * @return true if patient meet the measure, provided the scorecard was updated to that effect
    */
-  def isPatientMeetMeasure(measureName: String): Boolean = getRuleScore(measureName).meetMeasure.isCriteriaMet
-  
+  def isPatientMeetMeasure(measureName: String): Boolean = getRuleScore(measureName, "").meetMeasure.isCriteriaMet
+
   /**
    * @param measureName is the HEDIS rule name (HEDISRule::name)
    * @returns rule score that was recorded for the user
    */
-  def getRuleScore(measureName: String): RuleScore = hedisRuleMap.getOrElse(measureName, HEDISRule.emptyRuleScore)
+  def getRuleScore(measureName: String, ruleFullName: String): RuleScore = hedisRuleMap.getOrElse(measureName, RuleScore(measureName, ruleFullName))
 }
-
 
 /**
  * Keeping track of how an HEDIS rule is matched by claims
  *
+ * @param ruleName is the HEDIS measure name
  * @param eligible is a map(Predicate.predicateName, List of matching claims) for `HEDISRule.isPatientEligible
  * @param excluded is a map(Predicate.predicateName, List of matching claims) for `HEDISRule.isPatientExcluded
  * @param meetMeasure is a map(Predicate.predicateName, List of matching claims) for `HEDISRule.isPatientMeetMeasure
  */
 case class RuleScore(
+  ruleName: String,
+  ruleFullName: String, 
   meetDemographic: RuleCriteriaScore = HEDISRule.emptyMeetDemographicCriteriaScore,
   eligible: RuleCriteriaScore = HEDISRule.emptyEligibleCriteriaScore,
   excluded: RuleCriteriaScore = HEDISRule.emptyExcludedCriteriaScore,
@@ -112,10 +113,10 @@ case class RuleScore(
    */
   def addScore(criteriaName: String, oride: Boolean): RuleScore = {
     criteriaName match {
-      case HEDISRule.meetDemographic => RuleScore(meetDemographic.addScore(oride), eligible, excluded, meetMeasure)
-      case HEDISRule.eligible => RuleScore(meetDemographic, eligible.addScore(oride), excluded, meetMeasure)
-      case HEDISRule.excluded => RuleScore(meetDemographic, eligible, excluded.addScore(oride), meetMeasure)
-      case HEDISRule.meetMeasure => RuleScore(meetDemographic, eligible, excluded, meetMeasure.addScore(oride))
+      case HEDISRule.meetDemographic => RuleScore(ruleName, ruleFullName, meetDemographic.addScore(oride), eligible, excluded, meetMeasure)
+      case HEDISRule.eligible => RuleScore(ruleName, ruleFullName, meetDemographic, eligible.addScore(oride), excluded, meetMeasure)
+      case HEDISRule.excluded => RuleScore(ruleName, ruleFullName, meetDemographic, eligible, excluded.addScore(oride), meetMeasure)
+      case HEDISRule.meetMeasure => RuleScore(ruleName, ruleFullName, meetDemographic, eligible, excluded, meetMeasure.addScore(oride))
       case _ => throw NickelException("RuleScore: Unknown criteriaName: " + criteriaName)
     }
   }
@@ -129,15 +130,14 @@ case class RuleScore(
    */
   def addScore(criteriaName: String, predicateName: String, l: List[Claim]): RuleScore = {
     criteriaName match {
-      case HEDISRule.meetDemographic => RuleScore(meetDemographic.addScore(predicateName, l), eligible, excluded, meetMeasure) // don't expect this one to be called!
-      case HEDISRule.eligible => RuleScore(meetDemographic, eligible.addScore(predicateName, l), excluded, meetMeasure)
-      case HEDISRule.excluded => RuleScore(meetDemographic, eligible, excluded.addScore(predicateName, l), meetMeasure)
-      case HEDISRule.meetMeasure => RuleScore(meetDemographic, eligible, excluded, meetMeasure.addScore(predicateName, l))
+      case HEDISRule.meetDemographic => RuleScore(ruleName, ruleFullName, meetDemographic.addScore(predicateName, l), eligible, excluded, meetMeasure) // don't expect this one to be called!
+      case HEDISRule.eligible => RuleScore(ruleName, ruleFullName, meetDemographic, eligible.addScore(predicateName, l), excluded, meetMeasure)
+      case HEDISRule.excluded => RuleScore(ruleName, ruleFullName, meetDemographic, eligible, excluded.addScore(predicateName, l), meetMeasure)
+      case HEDISRule.meetMeasure => RuleScore(ruleName, ruleFullName, meetDemographic, eligible, excluded, meetMeasure.addScore(predicateName, l))
       case _ => throw NickelException("RuleScore: Unknown criteriaName: " + criteriaName)
     }
   }
 }
-
 
 /**
  * Keep track of a particular criteria of an HEDIS rule, a rule criteria is one of:
@@ -160,9 +160,9 @@ case class RuleCriteriaScore(name: String = "", oride: Option[Boolean] = None, c
   }
 
   def addScore(predicateName: String, l: List[Claim]): RuleCriteriaScore = {
-    if(criteriaScore.contains(predicateName)) RuleCriteriaScore(name, None, add2Map(predicateName, l, criteriaScore))
+    if (criteriaScore.contains(predicateName)) RuleCriteriaScore(name, None, add2Map(predicateName, l, criteriaScore))
     else RuleCriteriaScore(name, None, Map((predicateName -> l)))
   }
-  
+
   def addScore(b: Boolean): RuleCriteriaScore = RuleCriteriaScore(name, Some(b), Map())
 }

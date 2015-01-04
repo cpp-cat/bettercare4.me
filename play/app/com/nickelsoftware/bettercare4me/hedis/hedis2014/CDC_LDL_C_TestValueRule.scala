@@ -42,7 +42,7 @@ class CDC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends C
   val fullName = "Diabetes Lipid Test (< 100 mg/dL)"
   val description = "Identifies patients with type 1 or type 2 diabetes, aged 18 to 75 years, who had at least one LDL cholesterol lab result record with a value greater than zero and less than 100 mg/dL."
 
-  private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, config, hedisDate)
+  private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, fullName, config, hedisDate)
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = ldlTestValueRule.generateMeetMeasureClaims(pl, patient, provider)
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldlTestValueRule.scorePatientMeetMeasure(scorecard, patient, ph)

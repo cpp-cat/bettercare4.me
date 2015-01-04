@@ -78,7 +78,7 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
       // Check if patient has claim with cpt
       (s: Scorecard) => {
         val claims = ph.claims4CPT(cptV) filter { claim: MedClaim => measurementInterval.contains(claim.dos) }
-        s.addScore(name, HEDISRule.meetMeasure, "HbA1C " + tag + " (CPT)", claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, "HbA1C " + tag + " (CPT)", claims)
       },
 
       // Check if most recent lab test
@@ -87,7 +87,7 @@ class CDCHbA1cTestValueRule(ruleName: String, tag: String, cptV: String, baseVal
         if (claims.isEmpty) s
         else {
           val claim = (claims sortWith { (c1: LabClaim, c2: LabClaim) => c1.dos.isAfter(c2.dos) }).head
-          if (meetCriteria(claim)) s.addScore(name, HEDISRule.meetMeasure, "HbA1C Test Value " + tag, List(claim))
+          if (meetCriteria(claim)) s.addScore(name, fullName, HEDISRule.meetMeasure, "HbA1C Test Value " + tag, List(claim))
           else s
         }
       })

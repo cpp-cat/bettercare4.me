@@ -121,14 +121,14 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else {
 
       // AAB primary diagnosis
       val claims = diagnosisClaims(icdDAS, ph, hedisDate)
 
       if (claims.isEmpty) scorecard
-      else scorecard.addScore(name, HEDISRule.eligible, aabPatient, claims)
+      else scorecard.addScore(name, fullName, HEDISRule.eligible, aabPatient, claims)
     }
   }
 
@@ -198,7 +198,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       (s: Scorecard) => {
         val rxExclusion = activeRxPriorDiagnosis(claims.head, ph)
         if (rxExclusion.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, antibioticMedication, List.concat(claims, rxExclusion))
+        else s.addScore(name, fullName, HEDISRule.excluded, antibioticMedication, List.concat(claims, rxExclusion))
       },
 
       // check for conficting diagnosis
@@ -207,7 +207,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val interval = new Interval(claim.dos.minusDays(30), claim.dos.plusDays(8))
         val claims2 = filterClaims(ph.icdD, icdDFS, { c: MedClaim => interval.contains(c.dos) })
         if (claims2.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
+        else s.addScore(name, fullName, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
       },
 
       // check for comorbidity diagnosis
@@ -216,7 +216,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val interval = new Interval(claim.dos.minusYears(1), claim.dos.plusDays(1))
         val claims2 = filterClaims(ph.icdD, icdDES, { c: MedClaim => interval.contains(c.dos) })
         if (claims2.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
+        else s.addScore(name, fullName, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
       })
 
     if (claims.isEmpty) scorecard
@@ -248,7 +248,7 @@ class AAB_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // check to ensure antibiotic was not prescribed within 3 days of the diagnosis
       val interval = new Interval(claim.dos, claim.dos.plusDays(4))
       val rxs = filterClaims(ph.ndc, CWP.ndcAS, { rx: RxClaim => interval.contains(rx.fillD) })
-      if (rxs.isEmpty) scorecard.addScore(name, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
+      if (rxs.isEmpty) scorecard.addScore(name, fullName, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
       else scorecard
     }
   }

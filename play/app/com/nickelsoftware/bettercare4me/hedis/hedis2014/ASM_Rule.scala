@@ -268,14 +268,14 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
       rules.foldLeft[List[Claim]](List.empty) {(claims, f) => List.concat(claims, f())} distinct  
     }
     
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else {
     
     // check the eligibility in both years (measurement year and prior year), patient meet eligibility if claims are returned
     val y1 = eligiblePatients(measurementInterval1)
     val y2 = eligiblePatients(measurementInterval2)
       if(y1.isEmpty || y2.isEmpty) scorecard
-    else scorecard.addScore(name, HEDISRule.eligible, "Patient Eligible", List.concat(y1, y2))
+    else scorecard.addScore(name, fullName, HEDISRule.eligible, "Patient Eligible", List.concat(y1, y2))
     }
   }
 
@@ -292,7 +292,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
     // exclusion - patients with a diagnosis of emphysema, COPD, cystic fibrosis, or acute respiratory failure
     val claims = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-    scorecard.addScore(name, HEDISRule.excluded, "Excluded Patient", claims)
+    scorecard.addScore(name, fullName, HEDISRule.excluded, "Excluded Patient", claims)
   }
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
@@ -309,7 +309,7 @@ class ASM_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
     // Check if patient has a controller drug
     val claims = filterClaims(ph.ndc, ndcCS, { claim: RxClaim => measurementInterval.contains(claim.fillD) })
-    scorecard.addScore(name, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
+    scorecard.addScore(name, fullName, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
   }
 }
 

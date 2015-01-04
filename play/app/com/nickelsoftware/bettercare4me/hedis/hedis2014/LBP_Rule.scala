@@ -130,10 +130,10 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => interval.contains(claim.dos) && (cptA.contains(claim.cpt) || ubA.contains(claim.ubRevenue) && !posAS.contains(claim.hcfaPOS)) })
-        s.addScore(name, HEDISRule.eligible, lbpPatient, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, lbpPatient, claims)
       })
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else applyRules(scorecard, rules)
   }
 
@@ -181,7 +181,7 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
           c1 <- filterClaims(ph.icdD, icdDAS, { c: MedClaim => interval.contains(c.dos) })
           c2 <- filterClaims(ph.icdD, icdDAS, { c: MedClaim => new Interval(c1.dos.minusMonths(6), c1.dos).contains(c.dos) && c1.claimID != c.claimID })
         } yield List(c1, c2)
-        s.addScore(name, HEDISRule.excluded, twoLBPEpisodes, mclaims.flatten)
+        s.addScore(name, fullName, HEDISRule.excluded, twoLBPEpisodes, mclaims.flatten)
       },
 
       // check for conficting diagnosis
@@ -191,13 +191,13 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
           c2 <- filterClaims(ph.icdD, icdDBS, { c: MedClaim => new Interval(c1.dos.minusYears(1), c1.dos.plusDays(29)).contains(c.dos) })
         } yield List(c1, c2)
 
-        s.addScore(name, HEDISRule.excluded, confictingDiagnosis, mclaims.flatten)
+        s.addScore(name, fullName, HEDISRule.excluded, confictingDiagnosis, mclaims.flatten)
       },
 
       // check for cancer diagnosis
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDCS, { c: MedClaim => intervalF.contains(c.dos) })
-        s.addScore(name, HEDISRule.excluded, cancerDiagnosis, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, cancerDiagnosis, claims)
       })
 
     applyRules(scorecard, rules)
@@ -241,7 +241,7 @@ class LBP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
     } yield List(c1, c2)
 
     // this measure checks for failure
-    if (claims1.isEmpty && claims2.isEmpty) scorecard.addScore(name, HEDISRule.meetMeasure, true)
-    else scorecard.addScore(name, HEDISRule.meetMeasure, false)
+    if (claims1.isEmpty && claims2.isEmpty) scorecard.addScore(name, fullName, HEDISRule.meetMeasure, true)
+    else scorecard.addScore(name, fullName, HEDISRule.meetMeasure, false)
   }
 }

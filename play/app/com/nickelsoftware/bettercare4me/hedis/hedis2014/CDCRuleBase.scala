@@ -106,7 +106,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
       // Check if patient is taking diabetes drugs
       (s: Scorecard) => {
         val claims = filterClaims(ph.ndc, ndcAS, { claim: RxClaim => measurementInterval.contains(claim.fillD) })
-        s.addScore(name, HEDISRule.eligible, diabetesDrugs, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, diabetesDrugs, claims)
       },
 
       // check if patient has 2 face-2-face Diagnosis on different dates
@@ -119,7 +119,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
         
         // need to check we have 2 claims with different DOS
         if (Claim.twoDifferentDOS(claims)) {
-          s.addScore(name, HEDISRule.eligible, twoF2FDiabetesICD, claims)
+          s.addScore(name, fullName, HEDISRule.eligible, twoF2FDiabetesICD, claims)
         } else s
       },
 
@@ -130,10 +130,10 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
             posBS.contains(claim.hcfaPOS) &&
             (cptBS.contains(claim.cpt) || (ubBS.contains(claim.ubRevenue)))
         })
-        s.addScore(name, HEDISRule.eligible, oneF2FDiabetesICD, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, oneF2FDiabetesICD, claims)
       })
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else applyRules(scorecard, rules)
   }
 
@@ -166,7 +166,7 @@ abstract class CDCRuleBase(config: RuleConfig, hedisDate: DateTime) extends HEDI
 
       // see if have any claims w/ face-2-face diagnosis
       val claims = filterClaims(ph.icdD, icd9DAS, { _: Claim => true })
-      if (claims.isEmpty) scorecard.addScore(name, HEDISRule.excluded, exclutionDiabetesICD, exClaims)
+      if (claims.isEmpty) scorecard.addScore(name, fullName, HEDISRule.excluded, exclutionDiabetesICD, exClaims)
       else scorecard
     }
   }

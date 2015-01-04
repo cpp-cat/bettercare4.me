@@ -86,14 +86,14 @@ CREATE TABLE hedis_summary (
   patient_count BIGINT,
   score_summaries LIST<TEXT>,
   claim_generator_config TEXT,
-  PRIMARY KEY (name, hedis_date)
-)
-WITH CLUSTERING ORDER BY (hedis_date DESC);
+  PRIMARY KEY (hedis_date)
+);
 
 
 // Rules Information Table - rule information and stats based on RuleScoreSummary
 //------------------------------------------------------------------------------------
 //   rule_name rule identifier
+//   hedis_date is end date of evaluation period
 //   full_name full name of hedis measure
 //   description hedis measure description
 //   hedis_date is end date of evaluation period
@@ -168,6 +168,7 @@ WITH CLUSTERING ORDER BY (hedis_date DESC);
 //   patient_id id of patient
 //   patient_data patient demographics
 //   rule_name rule identifier
+//   rule_full_name rule full name for display
 //   XXX: one of (eligible, excluded, meetMeasure)
 //   is_XXX indicates whether the XXX criteria is met or not (RuleCriteriaScore.isCriteriaMet)
 //   XXX_score represent RuleCriteriaScore.criteriaScore; list of [(claim_id, provider_last_name, provider_first_name, dos, reason).mkString]
@@ -177,6 +178,7 @@ CREATE TABLE patient_scorecards (
   patient_id TEXT,
   patient_data LIST<TEXT>,
   rule_name TEXT,
+  rule_full_name TEXT,
   is_eligible BOOLEAN,
   eligible_score LIST<TEXT>,
   is_excluded BOOLEAN,

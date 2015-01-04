@@ -149,12 +149,12 @@ abstract class HEDISRuleBase(val config: RuleConfig, hedisDate: DateTime) extend
    */
   def isPatientInDenominator(scorecard: Scorecard): Boolean = isPatientEligible(scorecard) && !isPatientExcluded(scorecard)
 
-  def scorePatientMeetDemographic(scorecard: Scorecard, patient: Patient): Scorecard = scorecard.addScore(name, HEDISRule.meetDemographic, isPatientMeetDemographic(patient))
+  def scorePatientMeetDemographic(scorecard: Scorecard, patient: Patient): Scorecard = scorecard.addScore(name, fullName, HEDISRule.meetDemographic, isPatientMeetDemographic(patient))
 
   /**
    * By default, assume there is no claim-based predicates, defaults to isPatientMeetDemographic
    */
-  def scorePatientEligible(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.eligible, isPatientMeetDemographic(patient))
+  def scorePatientEligible(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, fullName, HEDISRule.eligible, isPatientMeetDemographic(patient))
 
   /**
    * Utility method to pick randomly one item from the list

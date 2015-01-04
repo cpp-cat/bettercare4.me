@@ -153,7 +153,7 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else {
 
       // intake period - find all claim with only pharyngitis (icdDA) is primary diagnosis, no other diagnosis
@@ -169,7 +169,7 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val next3 = new Interval(claim.dos, claim.dos.plusDays(4))
         val rxs = filterClaims(ph.ndc, ndcAS, { rx: RxClaim => next3.contains(rx.fillD) })
         if (rxs.isEmpty) scorecard
-        else scorecard.addScore(name, HEDISRule.eligible, pharyngitisPatient, List(claim, rxs.head))
+        else scorecard.addScore(name, fullName, HEDISRule.eligible, pharyngitisPatient, List(claim, rxs.head))
       }
     }
   }
@@ -245,7 +245,7 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // get all claims with Antibiotic Medication prior to pharyngitis diagnosis to see if should be excluded
       val rxExclusion = activeRxPriorDianosis(claim, ph)
       if (rxExclusion.isEmpty) scorecard
-      else scorecard.addScore(name, HEDISRule.excluded, "Excluded Patient", List.concat(List(claim), rxExclusion))
+      else scorecard.addScore(name, fullName, HEDISRule.excluded, "Excluded Patient", List.concat(List(claim), rxExclusion))
     }
   }
 
@@ -316,7 +316,7 @@ class CWP_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         // check for group A streptococcus test
         val testClaims = streptococcusTest(claim, ph)
         if (testClaims.isEmpty) scorecard
-        else scorecard.addScore(name, HEDISRule.meetMeasure, "Patient Meet Measure", testClaims)
+        else scorecard.addScore(name, fullName, HEDISRule.meetMeasure, "Patient Meet Measure", testClaims)
       }
     }
   }

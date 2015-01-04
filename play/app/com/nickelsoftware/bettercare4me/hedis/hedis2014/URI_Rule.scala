@@ -120,14 +120,14 @@ class URI_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else {
 
       // intake period - find all claim with only pharyngitis (icdDA) is primary diagnosis, no other diagnosis
       val claims = diagnosisClaims(URI.icdDAS, ph, hedisDate)
 
       if (claims.isEmpty) scorecard
-      else scorecard.addScore(name, HEDISRule.eligible, uriPatient, claims)
+      else scorecard.addScore(name, fullName, HEDISRule.eligible, uriPatient, claims)
     }
   }
 
@@ -202,7 +202,7 @@ class URI_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         // get all claims with Antibiotic Medication prior to diagnosis to see if should be excluded
         val rxExclusion = activeRxPriorDianosis(claims.head, ph)
         if (rxExclusion.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, antibioticMedication, List.concat(claims, rxExclusion))
+        else s.addScore(name, fullName, HEDISRule.excluded, antibioticMedication, List.concat(claims, rxExclusion))
       },
 
       (s: Scorecard) => {
@@ -212,7 +212,7 @@ class URI_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val next3 = new Interval(claim.dos, claim.dos.plusDays(4))
         val claims2 = filterClaims(ph.icdD, icdDFS, { c: MedClaim => next3.contains(c.dos) })
         if (claims2.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
+        else s.addScore(name, fullName, HEDISRule.excluded, confictingDiagnosis, List.concat(claims, claims2))
       })
 
     if (claims.isEmpty) scorecard
@@ -248,7 +248,7 @@ class URI_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // check to ensure antibiotic was not prescribed within 3 days of the diagnosis
       val next3 = new Interval(claim.dos, claim.dos.plusDays(4))
       val rxs = filterClaims(ph.ndc, ndcAS, { rx: RxClaim => next3.contains(rx.fillD) })
-      if (rxs.isEmpty) scorecard.addScore(name, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
+      if (rxs.isEmpty) scorecard.addScore(name, fullName, HEDISRule.meetMeasure, "Patient Meet Measure", claims)
       else scorecard
     }
   }

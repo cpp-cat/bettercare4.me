@@ -112,14 +112,14 @@ class CIS_HB_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(
         val claims = List.concat(claims1, claims2)
 
         // need to have 3 claims with different dates
-        if (hasDifferentDates(3, claims)) s.addScore(name, HEDISRule.meetMeasure, hepBVaccine, claims)
+        if (hasDifferentDates(3, claims)) s.addScore(name, fullName, HEDISRule.meetMeasure, hepBVaccine, claims)
         else s
       },
 
       // Check for patient has ICD D (History of disease)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.meetMeasure, hepBHistory, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, hepBHistory, claims)
       })
 
     applyRules(scorecard, rules)

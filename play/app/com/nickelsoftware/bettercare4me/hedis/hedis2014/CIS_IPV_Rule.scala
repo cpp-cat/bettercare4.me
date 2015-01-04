@@ -99,7 +99,7 @@ class CIS_IPV_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
         val claims = List.concat(claims1, claims2)
 
         // need to have 3 claims with different dates
-        if (hasDifferentDates(3, claims)) s.addScore(name, HEDISRule.meetMeasure, ipvVaccine, claims)
+        if (hasDifferentDates(3, claims)) s.addScore(name, fullName, HEDISRule.meetMeasure, ipvVaccine, claims)
         else s
       })
 

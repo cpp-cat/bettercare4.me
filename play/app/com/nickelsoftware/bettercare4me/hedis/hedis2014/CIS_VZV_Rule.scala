@@ -89,13 +89,13 @@ class CIS_VZV_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
       // Check for patient has CPT
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, chickenPoxVacc, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, chickenPoxVacc, claims)
       },
 
       // Check for ICD D
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, chickenPoxHist, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, chickenPoxHist, claims)
       })
 
     applyRules(scorecard, rules)

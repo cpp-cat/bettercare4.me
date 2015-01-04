@@ -72,7 +72,7 @@ class W15_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   // This rule has 100% meet measure (the predicate will indicate the number of visit performed)
   override val meetMeasureRate: Int = 100
 
-  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.excluded, false)
+  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = scorecard.addScore(name, fullName, HEDISRule.excluded, false)
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
@@ -110,13 +110,13 @@ class W15_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val claims = List.concat(claims1, claims2)
         //* may want to make sure the claims are all on different dos
         claims.size match {
-          case 0 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit0)  
-          case 1 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit1, claims)  
-          case 2 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit2, claims)  
-          case 3 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit3, claims)  
-          case 4 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit4, claims)  
-          case 5 => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit5, claims)
-          case _ => s.addScore(name, HEDISRule.meetMeasure, wellChildVisit6, claims)  
+          case 0 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit0)  
+          case 1 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit1, claims)  
+          case 2 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit2, claims)  
+          case 3 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit3, claims)  
+          case 4 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit4, claims)  
+          case 5 => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit5, claims)
+          case _ => s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit6, claims)  
         }
       })
 

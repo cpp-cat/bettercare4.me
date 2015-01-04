@@ -49,17 +49,20 @@
 - Version: 0.9.0.00 (v0.9.0.00_12-XX-2014)
 - Start Date: 11/29/2014
 - Target Date: 12/27/2014
-- Actual Date: 12/XX/2014
+- Actual Date: 01/04/2015
 
 ## Product Features:
 - Paralleling claim generation and HEDIS report using Spark and Cassandra
 - Pesisting patients, providers, claims and patient HEDIS scorecard using Cassandra
 
 ## User Stories Sprint Backlog.
-- Add link from patient scorecard page back to rule scorecard page
-- Load claim generator configuration to sort the hedis measures on patient scorecard page
 
 ## Completed User Stories
+- Build tag is bettercare4.me-v0.8.0.00_01-02-2015
+- Add link from patient scorecard page back to rule scorecard page
+- Load claim generator configuration to sort the hedis measures on patient scorecard page
+  - Removed name (run name) as primary key for hedis_summary table. Has no consquence since all
+    descendant tables key only with hedis_date and not the rune name.
 - Carry over the provider name to patient scorecard page
   - Added patient name and provider name to Claim model class
 - Loading patient gaps-in-care / patient profile (hedis measure summary) 

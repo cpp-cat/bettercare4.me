@@ -126,7 +126,7 @@ case class RuleScoreSummary(ruleInfo: HEDISRuleInfo, meetDemographics: Long = 0,
 
   def addScore(scorecard: Scorecard) = {
 
-    val rs = scorecard.getRuleScore(ruleInfo.name)
+    val rs = scorecard.getRuleScore(ruleInfo.name, ruleInfo.fullName)
     RuleScoreSummary(
       ruleInfo,
       if (rs.meetDemographic.isCriteriaMet) meetDemographics + 1 else meetDemographics,

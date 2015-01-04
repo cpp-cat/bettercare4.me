@@ -109,7 +109,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
   override def scorePatientEligible(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = {
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else {
       val measurementInterval = getIntervalFromYears(1)
 
@@ -122,7 +122,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
         }
       })
 
-      if (daysSupply >= 180) scorecard.addScore(name, HEDISRule.eligible, "Patient Eligible", claims)
+      if (daysSupply >= 180) scorecard.addScore(name, fullName, HEDISRule.eligible, "Patient Eligible", claims)
       else scorecard
     }
   }
@@ -153,7 +153,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
       filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) }))
 
     if (claims.isEmpty) scorecard
-    else scorecard.addScore(name, HEDISRule.excluded, "Patient Excluded", claims)
+    else scorecard.addScore(name, fullName, HEDISRule.excluded, "Patient Excluded", claims)
   }
 
   def generateMeetMeasureClaimsADD(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
@@ -180,14 +180,14 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, "All 3 tests", claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, "All 3 tests", claims)
       },
 
       (s: Scorecard) => {
         val claims1 = filterClaims(ph.cpt, cptCS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
         val claims2 = filterClaims(ph.cpt, cptDES, { claim: MedClaim => measurementInterval.contains(claim.dos) })
         if (claims1.isEmpty || claims2.isEmpty) s
-        else s.addScore(name, HEDISRule.meetMeasure, "Potassium and Creatinine/BUN", List.concat(claims1, claims2))
+        else s.addScore(name, fullName, HEDISRule.meetMeasure, "Potassium and Creatinine/BUN", List.concat(claims1, claims2))
       })
 
     applyRules(scorecard, rules)
@@ -207,7 +207,7 @@ abstract class MPM_RuleBase(val name: String, tag: String, ndcA: List[String], n
     val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
 
     if (claims.isEmpty) scorecard
-    else scorecard.addScore(name, HEDISRule.meetMeasure, "All 3 tests", claims)
+    else scorecard.addScore(name, fullName, HEDISRule.meetMeasure, "All 3 tests", claims)
   }
 }
 

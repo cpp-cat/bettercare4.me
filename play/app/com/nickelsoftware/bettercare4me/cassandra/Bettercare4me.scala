@@ -89,7 +89,8 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
 
   // Summary tables
   private val queryHEDISSummaryStmt = cassandra.session.prepare("SELECT name, hedis_date, patient_count, score_summaries, claim_generator_config FROM hedis_summary LIMIT 1000")
-  private val queryHEDISReportStmt = cassandra.session.prepare("SELECT patient_count, score_summaries, claim_generator_config FROM hedis_summary WHERE name = ? AND hedis_date = ?")
+  private val queryHEDISReportStmt = cassandra.session.prepare("SELECT patient_count, score_summaries, claim_generator_config FROM hedis_summary WHERE hedis_date = ?")
+  private val queryClaimGeneratorConfigStmt = cassandra.session.prepare("SELECT claim_generator_config FROM hedis_summary WHERE hedis_date = ?")
   private val insertHEDISSummaryStmt = cassandra.session.prepare("INSERT INTO hedis_summary (name, hedis_date, patient_count, score_summaries, claim_generator_config) VALUES (?, ?, ?, ?, ?)")
 
   private val insertRuleInformationStmt1 = cassandra.session.prepare("INSERT INTO rules_information (rule_name, hedis_date, full_name, description, patient_count, page_count, rule_score_summary) VALUES (?, ?, ?, ?, ?, 1, ?)")
@@ -102,8 +103,8 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   private val queryRuleScorecardPaginatedStmt = cassandra.session.prepare("SELECT batch_id, patient_data, is_excluded, is_meet_criteria FROM rule_scorecards_paginated WHERE rule_name = ? AND hedis_date = ? AND page_id = ?")
   private val insertRuleScorecardPaginatedStmt = cassandra.session.prepare("INSERT INTO rule_scorecards_paginated (rule_name, hedis_date, batch_id, page_id, patient_name, patient_id, patient_data, is_excluded, is_meet_criteria) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
-  private val queryPatientScorecardResultStmt = cassandra.session.prepare("SELECT patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score FROM patient_scorecards WHERE batch_id = ? AND patient_id = ? AND hedis_date = ?")
-  private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+  private val queryPatientScorecardResultStmt = cassandra.session.prepare("SELECT patient_data, rule_name, rule_full_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score FROM patient_scorecards WHERE batch_id = ? AND patient_id = ? AND hedis_date = ?")
+  private val insertPatientScorecardResultStmt = cassandra.session.prepare("INSERT INTO patient_scorecards (batch_id, hedis_date, patient_id, patient_data, rule_name, rule_full_name, is_eligible, eligible_score, is_excluded, excluded_score, is_meet_criteria, meet_criteria_score) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
 
   /**
    * execute provided query, can be used for testing to initialize database
@@ -199,14 +200,27 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
   /**
    * Query a specific HEDIS report
    */
-  def queryHEDISReport(name: String, hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
-    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryHEDISReportStmt).bind(name, hedisDate.toDate))
+  def queryHEDISReport(hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
+    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryHEDISReportStmt).bind(hedisDate.toDate))
     future.map { rs =>
       val row = rs.one()
       val configTxt = row.getString("claim_generator_config")
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
       val rules: List[HEDISRule] = config.rulesConfig.map { c => HEDISRules.createRuleByName(c.name, c, config.hedisDate) }.toList
       (HEDISScoreSummary(rules, row.getLong("patient_count"): Long, row.getList("score_summaries", classOf[String]).toList), configTxt)
+    }
+  }
+  
+  /**
+   * Query the Claim Generator Configuration for a specific HEDIS date (run)
+   */
+  def queryClaimGeneratorConfig(hedisDate: DateTime): Future[(ClaimGeneratorConfig, String)] = {
+    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryClaimGeneratorConfigStmt).bind(hedisDate.toDate))
+    future.map { rs =>
+      val row = rs.one()
+      val configTxt = row.getString("claim_generator_config")
+      val config = ClaimGeneratorConfig.loadConfig(configTxt)
+      (config, configTxt)
     }
   }
 
@@ -318,7 +332,7 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
         val ex = rr.excludedResult
         val mm = rr.meetMeasureResult
         cassandra.session.executeAsync(insertPatientScorecardResultStmt.bind(
-          batchID: java.lang.Integer, hedisDate.toDate(), p.patientID, p.toList: java.util.List[String], ruleName,
+          batchID: java.lang.Integer, hedisDate.toDate(), p.patientID, p.toList: java.util.List[String], ruleName, rr.ruleFullName,
           el.isCriteriaMet: java.lang.Boolean, toList(el): java.util.List[String],
           ex.isCriteriaMet: java.lang.Boolean, toList(ex): java.util.List[String],
           mm.isCriteriaMet: java.lang.Boolean, toList(mm): java.util.List[String])).map(rs => Unit)
@@ -334,11 +348,12 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
     future.map { rs =>
       val rows = rs.all().toList
       val patient = PatientParser.fromList(rows.head.getList("patient_data", classOf[String]).toList)
-      rows.tail.foldLeft(PatientScorecardResult(patient)) { (ps, row) =>
+      rows.foldLeft(PatientScorecardResult(patient)) { (ps, row) =>
         val ruleName = row.getString("rule_name")
-        ps.addRuleResult(ruleName, HEDISRule.eligible, row.getBool("is_eligible"), row.getList("eligible_score", classOf[String]).toList).
-          addRuleResult(ruleName, HEDISRule.excluded, row.getBool("is_excluded"), row.getList("excluded_score", classOf[String]).toList).
-          addRuleResult(ruleName, HEDISRule.meetMeasure, row.getBool("is_meet_criteria"), row.getList("meet_criteria_score", classOf[String]).toList)
+        val ruleFullName = row.getString("rule_full_name")
+        ps.addRuleResult(ruleName, ruleFullName, HEDISRule.eligible, row.getBool("is_eligible"), row.getList("eligible_score", classOf[String]).toList).
+          addRuleResult(ruleName, ruleFullName, HEDISRule.excluded, row.getBool("is_excluded"), row.getList("excluded_score", classOf[String]).toList).
+          addRuleResult(ruleName, ruleFullName, HEDISRule.meetMeasure, row.getBool("is_meet_criteria"), row.getList("meet_criteria_score", classOf[String]).toList)
       }
     }
   }
@@ -452,9 +467,19 @@ object Bettercare4me {
   /**
    * Query a specific HEDIS report
    */
-  def queryHEDISReport(name: String, hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
+  def queryHEDISReport(hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
     bc4me match {
-      case Some(c) => c.queryHEDISReport(name, hedisDate)
+      case Some(c) => c.queryHEDISReport(hedisDate)
+      case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
+    }
+  }
+  
+  /**
+   * Query the Claim Generator Configuration for a specific HEDIS date (run)
+   */
+  def queryClaimGeneratorConfig(hedisDate: DateTime): Future[(ClaimGeneratorConfig, String)] = {
+    bc4me match {
+      case Some(c) => c.queryClaimGeneratorConfig(hedisDate)
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }

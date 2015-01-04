@@ -159,7 +159,7 @@ class CIS_MMR_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
 
         // need to have all 3 vaccines
         if (claimsA.isEmpty || claimsB.isEmpty || claimsC.isEmpty) s
-        else s.addScore(name, HEDISRule.meetMeasure, MMRVaccine, List.concat(claimsA, claimsB, claimsC))
+        else s.addScore(name, fullName, HEDISRule.meetMeasure, MMRVaccine, List.concat(claimsA, claimsB, claimsC))
       })
 
     applyRules(scorecard, rules)

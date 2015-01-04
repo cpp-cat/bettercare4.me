@@ -48,7 +48,7 @@ object LDL_C {
  * Identifies patients who had a lipid test done.
  *
  */
-class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) {
+class LDL_C_TestRuleBase(name: String, fullName: String, config: RuleConfig, hedisDate: DateTime) {
 
   import LDL_C._
   
@@ -76,13 +76,13 @@ class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) 
       // Check for patient has CPT
       (s: Scorecard) => {
         val claims = Utils.filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, cptLipidTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, cptLipidTest, claims)
       },
 
       // Check for LOINC on Lab Claim
       (s: Scorecard) => {
         val claims = Utils.filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, loincLipidTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, loincLipidTest, claims)
       })
       
     Utils.applyRules(scorecard, rules)
@@ -101,7 +101,7 @@ class LDL_C_TestRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) 
  * Identifies patients who had a lipid test with test result done.
  *
  */
-class LDL_C_TestValueRuleBase(name: String, config: RuleConfig, hedisDate: DateTime) {
+class LDL_C_TestValueRuleBase(name: String, fullName: String, config: RuleConfig, hedisDate: DateTime) {
 
   import LDL_C._
   
@@ -129,13 +129,13 @@ class LDL_C_TestValueRuleBase(name: String, config: RuleConfig, hedisDate: DateT
       // Check for patient has CPT
       (s: Scorecard) => {
         val claims = Utils.filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, cptLipidTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, cptLipidTest, claims)
       },
 
       // Check for LOINC on Lab Claim
       (s: Scorecard) => {
         val claims = Utils.filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) && claim.result>0.0 && claim.result<100.0 })
-        s.addScore(name, HEDISRule.meetMeasure, loincLipidTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, loincLipidTest, claims)
       })
 
     Utils.applyRules(scorecard, rules)

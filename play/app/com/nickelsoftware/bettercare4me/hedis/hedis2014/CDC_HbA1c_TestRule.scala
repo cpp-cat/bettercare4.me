@@ -66,7 +66,7 @@ class CDCHbA1cTestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleB
 
     // Check if patient had at least one HbA1c test (during the measurement year)
     val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-    scorecard.addScore(name, HEDISRule.meetMeasure, hasHbA1cTest, claims)
+    scorecard.addScore(name, fullName, HEDISRule.meetMeasure, hasHbA1cTest, claims)
   }
 
 }

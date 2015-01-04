@@ -65,7 +65,7 @@ class W34_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   // This rule has 0% exclusion when the demographics are meet
   override val exclusionRate: Int = 0
 
-  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.excluded, false)
+  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = scorecard.addScore(name, fullName, HEDISRule.excluded, false)
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
@@ -91,7 +91,7 @@ class W34_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
         val claims1 = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
         val claims2 = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
         val claims = List.concat(claims1, claims2)
-        s.addScore(name, HEDISRule.meetMeasure, wellChildVisit, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, wellChildVisit, claims)
       })
 
     applyRules(scorecard, rules)

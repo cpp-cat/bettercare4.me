@@ -70,7 +70,6 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     var nbrClaims = 0L
     val f3 = for {
       patient <- patients
-//      provider = getOne(providers)
     } yield {
       simScores.clear
       val claims = for {

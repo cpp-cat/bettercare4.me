@@ -105,7 +105,7 @@ class CIS_PC_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase(
         val claims = List.concat(claims1, claims2)
 
         // need to have 4 claims with different dates
-        if (hasDifferentDates(4, claims)) s.addScore(name, HEDISRule.meetMeasure, pcVaccine, claims)
+        if (hasDifferentDates(4, claims)) s.addScore(name, fullName, HEDISRule.meetMeasure, pcVaccine, claims)
         else s
       })
 

@@ -104,19 +104,19 @@ class CDCEERule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(con
       // Check for patient has CPT by Eye Professional
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) })
-        s.addScore(name, HEDISRule.meetMeasure, cptEyeProfessional, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, cptEyeProfessional, claims)
       },
 
       // Check for CPT Type II
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, cptDrOffice, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, cptDrOffice, claims)
       },
 
       // Check for HCPCS by Eye Professional
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) && specialtyCdeAS.contains(claim.specialtyCde) })
-        s.addScore(name, HEDISRule.meetMeasure, hcpcsEyeProfessional, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, hcpcsEyeProfessional, claims)
       })
 
     applyRules(scorecard, rules)

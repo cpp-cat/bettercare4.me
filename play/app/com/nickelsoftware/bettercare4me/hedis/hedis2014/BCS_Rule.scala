@@ -138,13 +138,13 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, bilateralMastectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, bilateralMastectomy, claims)
       },
 
       // Check if patient had a Unilateral Mastectomy with bilateral modifier (anytime prior to or during the measurement year)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "50") })
-        s.addScore(name, HEDISRule.excluded, unilateralMastectomy50, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, unilateralMastectomy50, claims)
       },
 
       // Check if patient had a previous right unilateral mastectomy and a previous
@@ -153,14 +153,14 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
         val claimsRT = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "RT") })
         val claimsLT = filterClaims(ph.cpt, cptAS, { claim: MedClaim => claimWithMod(claim, "LT") })
         if (claimsRT.isEmpty || claimsLT.isEmpty) s
-        else s.addScore(name, HEDISRule.excluded, unilateralMastectomyLR, List.concat(claimsRT, claimsLT))
+        else s.addScore(name, fullName, HEDISRule.excluded, unilateralMastectomyLR, List.concat(claimsRT, claimsLT))
       },
 
       // Check if patient had 2 previous unilateral mastectomy on different days based on icdP (anytime prior to or during the measurement year)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPCS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
         if (Claim.twoDifferentDOS(claims)) {
-          s.addScore(name, HEDISRule.excluded, unilateralMastectomy2, claims)
+          s.addScore(name, fullName, HEDISRule.excluded, unilateralMastectomy2, claims)
         } else s
       })
 
@@ -195,22 +195,22 @@ class BCSRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(con
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, mammogramCPT, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, mammogramCPT, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, mammogramHCPCS, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, mammogramHCPCS, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, mammogramICDP, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, mammogramICDP, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, mammogramUB, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, mammogramUB, claims)
       })
 
     applyRules(scorecard, rules)

@@ -6,24 +6,24 @@
 
 @displayRow(batchID: Int, patient: Patient, isExcluded: Boolean, isMeetMeasure: Boolean) = {
      <tr>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.lastName, @patient.firstName</a></td>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.gender</a></td>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">@patient.dob.toLocalDate().toString</a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><small>@patient.lastName, @patient.firstName</small></a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><small>@patient.gender</small></a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><small>@patient.dob.toLocalDate().toString</small></a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
           @if(isExcluded) {
-            <span class="glyphicon glyphicon-remove"></span>
+            <small><span class="glyphicon glyphicon-remove"></span></small>
           }
           </a></td>
         <td><a href="/patient/@batchID/@patient.patientID/@hedisDate">
           @if(!isExcluded) {
             @if(isMeetMeasure) {
-              <span class="glyphicon glyphicon-ok"></span>
+             <small> <span class="glyphicon glyphicon-ok"></span></small>
             } else {
-              <span class="glyphicon glyphicon-remove"></span>
+              <small><span class="glyphicon glyphicon-remove"></span></small>
             }
           }
           </a></td>
-        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><span class="glyphicon glyphicon-chevron-right"></span></a></td>
+        <td><a href="/patient/@batchID/@patient.patientID/@hedisDate"><small><span class="glyphicon glyphicon-chevron-right"></span></small></a></td>
      </tr>
 }
 
@@ -65,30 +65,43 @@
       <li class="list-group-item"><span class="badge">@ruleScoreSummary.meetMeasure</span> Meet the HEDIS measure</li> 
     </ul>
     <p>Here's the list of @ruleScoreSummary.eligible Patients that meet the eligible criteria:</p>
-    
-    <!--  Add pagination here -->
-    @displayPagination
-    
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Gender</th>
-          <th>DOB</th>
-          <th>Excluded?</th>
-          <th>Meet Measure?</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      @for(t <- tuples) {
-        @displayRow(t._1, t._2, t._3, t._4)
-      }
-      </tbody>
-    </table>
-    
-    <!--  Add pagination here -->
-    @displayPagination
+
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <!--  Add pagination here -->
+        @displayPagination
+      </div>
+      
+      <div class="panel-body">
+  
+        <!--  Begin Panel content -->
+        <table class="table table-hover table table-condensed">
+          <thead>
+            <tr>
+              <th><small>Name</small></th>
+              <th><small>Gender</small></th>
+              <th><small>DOB</small></th>
+              <th><small>Excluded?</small></th>
+              <th><small>Meet Measure?</small></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          @for(t <- tuples) {
+            @displayRow(t._1, t._2, t._3, t._4)
+          }
+          </tbody>
+        </table>
+        <!--  End Panel content -->
+
+      <div class="panel-footer">
+        <!--  Add pagination here -->
+        @displayPagination
+      </div>
+  
+      </div>
+    </div>
     
   </div>
 }

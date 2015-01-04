@@ -171,67 +171,67 @@ class CDC_MAN_Rule(config: RuleConfig, hedisDate: DateTime) extends CDCRuleBase(
       // Check for patient has Urine Microalbumin Test CPT codes
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, urineMicroalbuminTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, urineMicroalbuminTest, claims)
       },
 
       // Check for patient has Urine Microalbumin Test LOINC codes
       (s: Scorecard) => {
         val claims = filterClaims(ph.loinc, loincAS, { claim: LabClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, urineMicroalbuminTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, urineMicroalbuminTest, claims)
       },
 
       // Check for patient visit to a Neuphrologist
       (s: Scorecard) => {
         val claims = filterClaims(ph.specialtyCde, nuccAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, neuphrologist, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, neuphrologist, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (ICD Diagnosis)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment1, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment1, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment2, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment2, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment3, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment3, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment4, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment4, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (UB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment5, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment5, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (TOB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.tob, tobAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment6, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment6, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (NDC)
       (s: Scorecard) => {
         val claims = filterClaims(ph.ndc, CDC.ndcLS, { claim: RxClaim => measurementInterval.contains(claim.fillD) })
-        s.addScore(name, HEDISRule.meetMeasure, aceArbTheraphy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, aceArbTheraphy, claims)
       },
 
       // Diagnosis / Treatment for Nephropathy (TOB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcfaPOS, hcfaposAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, nephropathyTreatment7, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, nephropathyTreatment7, claims)
       })
 
     applyRules(scorecard, rules)

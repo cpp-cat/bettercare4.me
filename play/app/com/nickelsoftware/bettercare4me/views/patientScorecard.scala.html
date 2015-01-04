@@ -1,4 +1,4 @@
-@(patientScorecard: com.nickelsoftware.bettercare4me.models.PatientScorecardResult)
+@(config: com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig, patientScorecard: com.nickelsoftware.bettercare4me.models.PatientScorecardResult)
 
 @import com.nickelsoftware.bettercare4me.models.Patient
 @import com.nickelsoftware.bettercare4me.models.RuleResult
@@ -41,10 +41,21 @@
         </div>
 }
 
-@displayMeasureResult(ruleName: String, ruleResult: RuleResult) = {
+@displayMeasureCategory(categoryName: String, ruleResults: List[RuleResult]) = {
+  @if(!ruleResults.isEmpty) {
+    <h3>@categoryName</h3>
+    @for(ruleResult <- ruleResults) {
+      @displayMeasureResult(ruleResult)
+    }
+  }
+}
+
+@displayMeasureResult(ruleResult: RuleResult) = {
         <div class="panel panel-default">
           <div class="panel-heading">
-            <p class="panel-title small text-uppercase">@ruleName</p>
+            <p class="panel-title small text-uppercase">
+              <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1">@ruleResult.ruleFullName</a>
+            </p>
           </div>
           <div class="panel-body">
 
@@ -54,15 +65,16 @@
             }
             @if(!ruleResult.excludedResult.criteriaResultReasons.isEmpty) {
               @displayCriteriaResult("Exclution", ruleResult.excludedResult.criteriaResultReasons)
-            }
-            @if(ruleResult.meetMeasureResult.criteriaResultReasons.isEmpty) {
-              <div class="panel panel-default">
-                <!-- Default panel contents -->
-                <p class="panel-heading small text-uppercase">Meet Measure</p>
-                <p>The patient does not meet the measure</p>
-              </div>
             } else {
-              @displayCriteriaResult("Meet Measure", ruleResult.meetMeasureResult.criteriaResultReasons)
+              @if(ruleResult.meetMeasureResult.criteriaResultReasons.isEmpty) {
+                <div class="panel panel-default">
+                  <!-- Default panel contents -->
+                  <p class="panel-heading small text-uppercase">Meet Measure</p>
+                  <p>The patient does not meet the measure</p>
+                </div>
+              } else {
+                @displayCriteriaResult("Meet Measure", ruleResult.meetMeasureResult.criteriaResultReasons)
+              }
             }
             <!--  End Panel content -->
 
@@ -97,7 +109,7 @@
 @displayCriteriaResultRow(row: CriteriaResultDetail) = {
       <tr>
         <td>@row.claimId</td>
-        <td>@row.providerFName</td>
+        <td>@row.providerFName @row.providerLName</td>
         <td>@row.dos.toLocalDate().toString</td>
         <td>@row.reason</td>
       </tr>
@@ -110,9 +122,14 @@
 
   @displayPatientInfo(patientScorecard.patient)
   
+  @displayMeasureCategory("Population Health Measures", patientScorecard.filterScorecardResults(config.populationHealthMeasures))
+    
+  @displayMeasureCategory("Well Child Visits", patientScorecard.filterScorecardResults(config.wellChildVisits))
 
-  @for(measureResult <- patientScorecard.scorecardResult.toList) {
-    @displayMeasureResult(measureResult._1, measureResult._2)
-  }
-  
+  @displayMeasureCategory("Comprehensive Diabetes Care", patientScorecard.filterScorecardResults(config.comprehensiveDiabetesCare))
+    
+  @displayMeasureCategory("Additional Chronic Care Measures", patientScorecard.filterScorecardResults(config.additionalChronicCareMeasures))
+    
+  @displayMeasureCategory("Other Measures", patientScorecard.filterScorecardResults(config.otherMeasures))
+
 }

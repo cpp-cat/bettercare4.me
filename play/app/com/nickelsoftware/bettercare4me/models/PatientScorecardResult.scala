@@ -45,36 +45,45 @@ object PatientScorecardResult {
  */
 case class PatientScorecardResult(patient: Patient, scorecardResult: Map[String, RuleResult]=Map()) {
   
-  def addRuleResult(ruleName: String, criteriaName: String, isCriteriaMet: Boolean, criteriaScore: List[String]): PatientScorecardResult = {
-    val ruleResult = scorecardResult.getOrElse(ruleName, RuleResult.emptyRuleResult)
+  def addRuleResult(ruleName: String, ruleFullName: String, criteriaName: String, isCriteriaMet: Boolean, criteriaScore: List[String]): PatientScorecardResult = {
+    val ruleResult = scorecardResult.getOrElse(ruleName, RuleResult(ruleName, ruleFullName))
     PatientScorecardResult(patient, scorecardResult + (ruleName -> ruleResult.addCriteriaResult(criteriaName, isCriteriaMet, criteriaScore)))
   }  
+  
+  /**
+   * Method used in Views to list rule results by categories (patientScorecard page)
+   */
+  def filterScorecardResults(ruleCategories: List[String]): List[RuleResult] = ruleCategories flatMap { n => scorecardResult.get(n) }
 }
 
 /**
  * Utility object
  */
 object RuleResult {
-  val emptyRuleResult = RuleResult(CriteriaResult.emptyCriteriaResult, CriteriaResult.emptyCriteriaResult, CriteriaResult.emptyCriteriaResult)
   
   /**
    * Mapping from RuleScore (which came from Scorecard) to RuleResult
    */
   def apply(ruleScore: RuleScore): RuleResult = {
-    RuleResult(CriteriaResult(ruleScore.eligible), CriteriaResult(ruleScore.excluded), CriteriaResult(ruleScore.meetMeasure))
+    RuleResult(ruleScore.ruleName, ruleScore.ruleFullName, CriteriaResult(ruleScore.eligible), CriteriaResult(ruleScore.excluded), CriteriaResult(ruleScore.meetMeasure))
   }
 }
 
 /**
  * Holds the criteria results for a rule
  */
-case class RuleResult(eligibleResult: CriteriaResult, excludedResult: CriteriaResult, meetMeasureResult: CriteriaResult) {
+case class RuleResult(
+    ruleName: String, 
+    ruleFullName: String,
+    eligibleResult: CriteriaResult=CriteriaResult.emptyCriteriaResult, 
+    excludedResult: CriteriaResult=CriteriaResult.emptyCriteriaResult, 
+    meetMeasureResult: CriteriaResult=CriteriaResult.emptyCriteriaResult) {
   
   def addCriteriaResult(criteriaName: String, isCriteriaMet: Boolean, criteriaScore: List[String]): RuleResult = {
     criteriaName match {
-      case HEDISRule.eligible => RuleResult(CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}), excludedResult, meetMeasureResult)
-      case HEDISRule.excluded => RuleResult(eligibleResult, CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}), meetMeasureResult)
-      case HEDISRule.meetMeasure => RuleResult(eligibleResult, excludedResult, CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}))
+      case HEDISRule.eligible => RuleResult(ruleName, ruleFullName, CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}), excludedResult, meetMeasureResult)
+      case HEDISRule.excluded => RuleResult(ruleName, ruleFullName, eligibleResult, CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}), meetMeasureResult)
+      case HEDISRule.meetMeasure => RuleResult(ruleName, ruleFullName, eligibleResult, excludedResult, CriteriaResult(isCriteriaMet, criteriaScore map { s =>  CriteriaResultDetail(s)}))
       case _ => throw NickelException("RuleResult.addCriteriaResult: Unknown criteriaName: " + criteriaName)
     }
   }
@@ -86,12 +95,10 @@ object CriteriaResult {
   
   /**
    * Mapping from RuleCriteriaScore (which came from Scorecard) to CriteriaResult
-   * 
-   * @TODO Need to get the provider first and last name from providerID
    */
   def apply(ruleCriteriaScore: RuleCriteriaScore): CriteriaResult = {
     val criteriaResultReasons = ruleCriteriaScore.criteriaScore.toList flatMap { case (reason, claimList) => 
-      claimList map { c => CriteriaResultDetail(c.claimID, c.providerID, c.providerID, c.date, reason) }
+      claimList map { c => CriteriaResultDetail(c.claimID, c.providerFirstName, c.providerLastName, c.date, reason) }
     }
     CriteriaResult(ruleCriteriaScore.isCriteriaMet, criteriaResultReasons)
   }

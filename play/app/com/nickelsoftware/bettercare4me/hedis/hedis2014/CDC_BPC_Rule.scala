@@ -118,7 +118,7 @@ class CDC_BPC_Rule(val name: String, tag: String, cptS: List[String], cptD: List
 
           val claimS = (claimsS sortWith { (c1: MedClaim, c2: MedClaim) => c1.dos.isAfter(c2.dos) }).head
           val claimD = (claimsD sortWith { (c1: MedClaim, c2: MedClaim) => c1.dos.isAfter(c2.dos) }).head
-          if (cptS.contains(claimS.cpt) && cptD.contains(claimD.cpt)) s.addScore(name, HEDISRule.meetMeasure, meetPredicate, List(claimS, claimD))
+          if (cptS.contains(claimS.cpt) && cptD.contains(claimD.cpt)) s.addScore(name, fullName, HEDISRule.meetMeasure, meetPredicate, List(claimS, claimD))
           else s
         }
       })

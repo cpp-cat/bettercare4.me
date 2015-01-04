@@ -24,7 +24,6 @@ object HEDISRule {
   val emptyEligibleCriteriaScore = RuleCriteriaScore(name = eligible)
   val emptyExcludedCriteriaScore = RuleCriteriaScore(name = excluded)
   val emptyMeetMeasureCriteriaScore = RuleCriteriaScore(name = meetMeasure)
-  val emptyRuleScore = RuleScore()
   val emptyScorecard = Scorecard()
 }
 

@@ -92,19 +92,19 @@ abstract class CIS_RuleBase(config: RuleConfig, hedisDate: DateTime) extends HED
       // exclusions - Anaphylactic reaction to the vaccine or its components (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, anaphylactic, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, anaphylactic, claims)
       },
 
       // exclusions - Encephalopathy (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => claim.hasDiagnostic(icdDCS) && !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, encephalopathy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, encephalopathy, claims)
       },
 
       // exclusion - Immunodeficiency syndromes, HIV disease. . . (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDDS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, immunodeficiency, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, immunodeficiency, claims)
       })
 
     applyRules(scorecard, rules)

@@ -113,19 +113,19 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // Previous hysterectomy with no residual cervix (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, hysterectomy, claims)
       },
 
       // Previous hysterectomy with no residual cervix (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, hysterectomy, claims)
       },
 
       // Previous hysterectomy with no residual cervix (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, hysterectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, hysterectomy, claims)
       })
 
     applyRules(scorecard, rules)
@@ -159,22 +159,22 @@ class CCS_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // Check if patient had Bilateral Mastectomy (anytime prior to or during the measurement year)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, papTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, papTest, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, papTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, papTest, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, papTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, papTest, claims)
       },
 
       (s: Scorecard) => {
         val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, papTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, papTest, claims)
       })
 
     applyRules(scorecard, rules)

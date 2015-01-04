@@ -188,10 +188,10 @@ object Application extends Controller {
 
   // Return an hedis report from hedis_summary table
   // ------------------------------------------------------------
-  def hedisReport(name: String, date: String) = Action.async {
+  def hedisReport(date: String) = Action.async {
 
     val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
-    Bettercare4me.queryHEDISReport(name, hedisDate) map {
+    Bettercare4me.queryHEDISReport(hedisDate) map {
       case (hedisScoreSummary, configTxt) =>
         val config = ClaimGeneratorConfig.loadConfig(configTxt)
         Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, hedisScoreSummary))
@@ -221,9 +221,16 @@ object Application extends Controller {
   def patientScorecard(batchID: Int, patientID: String, date: String) = Action.async {
     
     val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
-    val future = Bettercare4me.queryPatientScorecardResult(batchID, patientID, hedisDate)
-    future map { ps =>
-      Ok(com.nickelsoftware.bettercare4me.views.html.patientScorecard(ps))
+    val patientScorecardFuture = Bettercare4me.queryPatientScorecardResult(batchID, patientID, hedisDate)
+    val configFuture = Bettercare4me.queryClaimGeneratorConfig(hedisDate)
+    for {
+      configTuple <- configFuture
+      patientScorecard <- patientScorecardFuture
+    } yield {
+//      println(patientScorecard.patient.lastName+", "+patientScorecard.patient.lastName+" - "+patientScorecard.patient.patientID)
+//      patientScorecard.scorecardResult foreach { case (n, _) => println(n) }
+      
+      Ok(com.nickelsoftware.bettercare4me.views.html.patientScorecard(configTuple._1, patientScorecard))
     }
   }
 

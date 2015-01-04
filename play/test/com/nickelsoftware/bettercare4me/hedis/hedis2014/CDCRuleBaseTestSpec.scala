@@ -26,7 +26,7 @@ class CDCRuleBaseTestSpec extends PlaySpec {
     val description = "This rule is for testing."
     def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
     def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
-      scorecard.addScore("TEST", HEDISRule.meetMeasure, true)
+      scorecard.addScore("TEST", "TEST", HEDISRule.meetMeasure, true)
   }
 
   // override to use CDCRuleBaseTest

@@ -41,7 +41,7 @@ class CDC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CDCRul
   val description = "Diabetes Lipid Test indicates whether a patient with type 1 or type 2 diabetes, aged 18 to 75 years, had a lipid test performed. " +
     "This excludes patients with a previous diagnosis of polycystic ovaries, gestational diabetes, or steroid-induced diabetes."
 
-  private val ldl_TestRule = new LDL_C_TestRuleBase(name, config, hedisDate)
+  private val ldl_TestRule = new LDL_C_TestRuleBase(name, fullName, config, hedisDate)
   
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = ldl_TestRule.generateMeetMeasureClaims(pl, patient, provider)
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldl_TestRule.scorePatientMeetMeasure(scorecard, patient, ph)

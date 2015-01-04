@@ -148,25 +148,25 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // exclusions - Total Colectomy (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, totalColectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, totalColectomy, claims)
       },
 
       // exclusions - Total Colectomy (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, totalColectomy, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, totalColectomy, claims)
       },
 
       // exclusions - Total Colorectal cancer (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, colorectalCancer, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, colorectalCancer, claims)
       },
 
       // exclusion - Colorectal cancer (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => !claim.dos.isAfter(hedisDate) })
-        s.addScore(name, HEDISRule.excluded, colorectalCancer, claims)
+        s.addScore(name, fullName, HEDISRule.excluded, colorectalCancer, claims)
       })
 
     applyRules(scorecard, rules)
@@ -213,49 +213,49 @@ class COL_Rule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
       // meet criteria - Fecal occult blood test (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, fecalOccultBloodTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, fecalOccultBloodTest, claims)
       },
 
       // meet criteria - Fecal occult blood test (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsBS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, fecalOccultBloodTest, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, fecalOccultBloodTest, claims)
       },
 
       // meet criteria - Flexible sigmoidoscopy (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptCS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
       },
 
       // meet criteria - Flexible sigmoidoscopy (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsCS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
       },
 
       // meet criteria - Flexible sigmoidoscopy (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPCS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, flexibleSigmoidoscopy, claims)
       },
 
       // meet criteria - Colonoscopy (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptDS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, colonoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, colonoscopy, claims)
       },
 
       // meet criteria - Colonoscopy (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsDS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, colonoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, colonoscopy, claims)
       },
 
       // meet criteria - Colonoscopy (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPDS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.meetMeasure, colonoscopy, claims)
+        s.addScore(name, fullName, HEDISRule.meetMeasure, colonoscopy, claims)
       })
 
     applyRules(scorecard, rules)

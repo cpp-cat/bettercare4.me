@@ -147,40 +147,40 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
       // Sexually-active women (CPT)
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       },
 
       // Sexually-active women (ICD D)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       },
 
       // Sexually-active women (ICD P)
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       },
 
       // Sexually-active women (HCPCS)
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       },
 
       // Sexually-active women (UB)
       (s: Scorecard) => {
         val claims = filterClaims(ph.ubRevenue, ubAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       },
 
       // Sexually-active women (NDC)
       (s: Scorecard) => {
         val claims = filterClaims(ph.ndc, ndcAS, { claim: RxClaim => measurementInterval.contains(claim.fillD) })
-        s.addScore(name, HEDISRule.eligible, sexuallyActiveWomen, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, sexuallyActiveWomen, claims)
       })
 
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else applyRules(scorecard, rules)
   }
 
@@ -226,7 +226,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
       if ((new Interval(c1.date, c1.date.plusDays(8))).contains(c2.date))
     } yield List(c1, c2)
 
-    scorecard.addScore(name, HEDISRule.excluded, chlExclusion, claimsEx.flatten)
+    scorecard.addScore(name, fullName, HEDISRule.excluded, chlExclusion, claimsEx.flatten)
   }
 
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
@@ -243,7 +243,7 @@ class CHL_Rule(override val name: String, tag: String, ageLo: Int, ageHi: Int, c
 
     // Check if patient had tested
     val claims = filterClaims(ph.cpt, cptDS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
-    scorecard.addScore(name, HEDISRule.meetMeasure, chlTest, claims)
+    scorecard.addScore(name, fullName, HEDISRule.meetMeasure, chlTest, claims)
 
   }
 }

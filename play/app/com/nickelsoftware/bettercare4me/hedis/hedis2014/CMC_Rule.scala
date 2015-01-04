@@ -121,7 +121,7 @@ abstract class CMC_RuleBase(val name: String, val fullName: String, config: Rule
 
   // This rule has 0% exclusion when the demographics are meet
   override val exclusionRate: Int = 0
-  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, HEDISRule.excluded, false)
+  override def scorePatientExcluded(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard = scorecard.addScore(name, fullName, HEDISRule.excluded, false)
 
   override def generateEligibleClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = {
 
@@ -169,33 +169,33 @@ abstract class CMC_RuleBase(val name: String, val fullName: String, config: Rule
       // coronary artery bypass graft (CABG) procedure
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdD, icdDAS, { claim: MedClaim => measurementInterval1.contains(claim.dos) && posAS.contains(claim.hcfaPOS) && claim.dischargeStatus!="20" && claim.roomBoardFlag=="Y" })
-        s.addScore(name, HEDISRule.eligible, AMIorCABG, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, AMIorCABG, claims)
       },
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPAS, { claim: MedClaim => measurementInterval1.contains(claim.dos) && posAS.contains(claim.hcfaPOS) && claim.dischargeStatus!="20" && claim.roomBoardFlag=="Y" })
-        s.addScore(name, HEDISRule.eligible, AMIorCABG, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, AMIorCABG, claims)
       },
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval1.contains(claim.dos) && posAS.contains(claim.hcfaPOS) && claim.dischargeStatus!="20" && claim.roomBoardFlag=="Y" })
-        s.addScore(name, HEDISRule.eligible, AMIorCABG, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, AMIorCABG, claims)
       },
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsAS, { claim: MedClaim => measurementInterval1.contains(claim.dos) && posAS.contains(claim.hcfaPOS) && claim.dischargeStatus!="20" && claim.roomBoardFlag=="Y" })
-        s.addScore(name, HEDISRule.eligible, AMIorCABG, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, AMIorCABG, claims)
       },
 
       // A percutaneous coronary intervention (PCI) procedure performed in any setting
       (s: Scorecard) => {
         val claims = filterClaims(ph.icdP, icdPBS, { claim: MedClaim => measurementInterval1.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, CPIprocedure, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, CPIprocedure, claims)
       },
       (s: Scorecard) => {
         val claims = filterClaims(ph.cpt, cptBS, { claim: MedClaim => measurementInterval1.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, CPIprocedure, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, CPIprocedure, claims)
       },
       (s: Scorecard) => {
         val claims = filterClaims(ph.hcpcs, hcpcsBS, { claim: MedClaim => measurementInterval1.contains(claim.dos) })
-        s.addScore(name, HEDISRule.eligible, CPIprocedure, claims)
+        s.addScore(name, fullName, HEDISRule.eligible, CPIprocedure, claims)
       },
 
       // At least one outpatient or acute inpatient visit with a diagnosis of ischemic vascular disease (IVD)
@@ -203,17 +203,17 @@ abstract class CMC_RuleBase(val name: String, val fullName: String, config: Rule
         val claims2 = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => measurementInterval2.contains(claim.dos) && (cptCS.contains(claim.cpt) || (ubAS.contains(claim.ubRevenue) && posBS.contains(claim.hcfaPOS)) ) })
         val claims3 = filterClaims(ph.icdD, icdDBS, { claim: MedClaim => measurementInterval3.contains(claim.dos) && (cptCS.contains(claim.cpt) || (ubAS.contains(claim.ubRevenue) && posBS.contains(claim.hcfaPOS)) ) })
         if(claims2.isEmpty || claims3.isEmpty) s
-        else s.addScore(name, HEDISRule.eligible, IVDdiagnosis, List.concat(claims2, claims3))
+        else s.addScore(name, fullName, HEDISRule.eligible, IVDdiagnosis, List.concat(claims2, claims3))
       })
       
-    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, HEDISRule.eligible, false)
+    if (!isPatientMeetDemographic(patient)) scorecard.addScore(name, fullName, HEDISRule.eligible, false)
     else applyRules(scorecard, rules)
   }
 }
 
 class CMC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTest, CMC.fullNameTest, config, hedisDate) {
 
-  private val ldlTestRule = new LDL_C_TestRuleBase(name, config, hedisDate)
+  private val ldlTestRule = new LDL_C_TestRuleBase(name, fullName, config, hedisDate)
   
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = ldlTestRule.generateMeetMeasureClaims(pl, patient, provider) 
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldlTestRule.scorePatientMeetMeasure(scorecard, patient, ph)
@@ -221,7 +221,7 @@ class CMC_LDL_C_TestRule(config: RuleConfig, hedisDate: DateTime) extends CMC_Ru
 
 class CMC_LDL_C_TestValueRule(config: RuleConfig, hedisDate: DateTime) extends CMC_RuleBase(CMC.nameTestValue, CMC.fullNameTestValue, config, hedisDate) {
 
-  private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, config, hedisDate)
+  private val ldlTestValueRule = new LDL_C_TestValueRuleBase(name, fullName, config, hedisDate)
   
   override def generateMeetMeasureClaims(pl: PersistenceLayer, patient: Patient, provider: Provider): List[Claim] = ldlTestValueRule.generateMeetMeasureClaims(pl, patient, provider)
   override def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, ph: PatientHistory): Scorecard = ldlTestValueRule.scorePatientMeetMeasure(scorecard, patient, ph)

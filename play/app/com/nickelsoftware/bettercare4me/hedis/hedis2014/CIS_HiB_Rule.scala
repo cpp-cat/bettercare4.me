@@ -85,7 +85,7 @@ class CIS_HiB_Rule(config: RuleConfig, hedisDate: DateTime) extends CIS_RuleBase
         val claims = filterClaims(ph.cpt, cptAS, { claim: MedClaim => measurementInterval.contains(claim.dos) })
 
         // need to have 3 claims with different dates
-        if (hasDifferentDates(3, claims)) s.addScore(name, HEDISRule.meetMeasure, HiBVaccine, claims)
+        if (hasDifferentDates(3, claims)) s.addScore(name, fullName, HEDISRule.meetMeasure, HiBVaccine, claims)
         else s
       })
 

@@ -160,11 +160,11 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   }
 
   def scorePatientMeetDemographic(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
-    scorecard.addScore("TEST", HEDISRule.meetDemographic, true)
+    scorecard.addScore("TEST", "TEST", HEDISRule.meetDemographic, true)
 
   def scorePatientExcluded(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
-    scorecard.addScore("TEST", HEDISRule.excluded, true)
+    scorecard.addScore("TEST", "TEST", HEDISRule.excluded, true)
 
   def scorePatientMeetMeasure(scorecard: Scorecard, patient: Patient, patientHistory: PatientHistory): Scorecard =
-    scorecard.addScore("TEST", HEDISRule.meetMeasure, true)
+    scorecard.addScore("TEST", "TEST", HEDISRule.meetMeasure, true)
 }
