@@ -58,7 +58,7 @@
 ## User Stories Sprint Backlog.
 
 ## Completed User Stories
-- Build tag is bettercare4.me-v0.8.0.00_01-02-2015
+- Build tag is bettercare4.me-v0.9.0.00_01-02-2015
 - Add link from patient scorecard page back to rule scorecard page
 - Load claim generator configuration to sort the hedis measures on patient scorecard page
   - Removed name (run name) as primary key for hedis_summary table. Has no consquence since all
