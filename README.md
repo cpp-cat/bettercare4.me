@@ -44,6 +44,23 @@
 
 ######################################################################################################
 
+# Sprint 9: Deploying on AMS
+
+- Version: 1.0.0.00 (v1.0.0.00_01-XX-2014)
+- Start Date: 01/04/2015
+- Target Date: 01/09/2015
+- Actual Date: 01/XX/2015
+
+## Product Features:
+- Deploying on AWS
+- Some UI improvements
+
+## User Stories Sprint Backlog.
+
+## Completed User Stories
+- Made presentation improvements and fix bug
+
+
 # Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
 
 - Version: 0.9.0.00 (v0.9.0.00_01-04-2014)

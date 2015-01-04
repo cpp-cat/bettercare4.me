@@ -53,9 +53,16 @@
 @displayMeasureResult(ruleResult: RuleResult) = {
         <div class="panel panel-default">
           <div class="panel-heading">
-            <p class="panel-title small text-uppercase">
-              <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1">@ruleResult.ruleFullName</a>
-            </p>
+            <div class="row">
+              <div class="col-xs-10">
+                <div class="panel-title text-uppercase">
+                  <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1">@ruleResult.ruleFullName</a>
+                </div>
+              </div>
+              <div class="col-xs-2 text-right">
+                <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1"><span class="glyphicon glyphicon-chevron-right"></span></a>
+              </div>
+            </div>
           </div>
           <div class="panel-body">
 
@@ -109,7 +116,7 @@
 @displayCriteriaResultRow(row: CriteriaResultDetail) = {
       <tr>
         <td>@row.claimId</td>
-        <td>@row.providerFName @row.providerLName</td>
+        <td>@row.providerFirstName @row.providerLastName</td>
         <td>@row.dos.toLocalDate().toString</td>
         <td>@row.reason</td>
       </tr>

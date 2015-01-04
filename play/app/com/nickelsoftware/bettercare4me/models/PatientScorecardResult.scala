@@ -122,12 +122,12 @@ object CriteriaResultDetail {
 /**
  * Particular details of a criteria result, ties to the claims meeting the conditions of that criteria
  */
-case class CriteriaResultDetail(claimId: String, providerLName: String, providerFName: String, dos: DateTime, reason: String) {
+case class CriteriaResultDetail(claimId: String, providerFirstName: String, providerLastName: String, dos: DateTime, reason: String) {
   
   def toCSVString: String = {
     var strWriter = new StringWriter()
     val writer = CSVWriter.open(strWriter)
-    writer.writeRow(List(claimId, providerLName, providerFName, dos.toLocalDate().toString, reason))
+    writer.writeRow(List(claimId, providerFirstName, providerLastName, dos.toLocalDate().toString, reason))
     writer.flush
     strWriter.toString()
   }

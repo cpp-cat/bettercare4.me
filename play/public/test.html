@@ -34,117 +34,26 @@
 
 
         <div class="panel panel-default">
-          <div class="panel-heading">
-            <p class="panel-title small text-uppercase">Patient Information</p>
-          </div>
-          <div class="panel-body">
-            <form class="form-horizontal">
-              <div class="form-group">
-                <label class="col-sm-2 control-label">First Name</label>
-                <div class="col-sm-4">
-                  <p class="form-control-static">@patient.firstName</p>
+          <div class="panel-heading ">
+            <div class="row">
+              <div class="col-xs-10">
+                <div class="panel-title text-uppercase">
+                  <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1">@ruleResult</a>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="col-sm-2 control-label">Last Name</label>
-                <div class="col-sm-4">
-                  <p class="form-control-static">@patient.lastName</p>
-                </div>
+              <div class="col-xs-2 text-right">
+                <a href="/ruleScorecard/@ruleResult.ruleName/@config.hedisDate.toLocalDate().toString/1/1"><span class="glyphicon glyphicon-chevron-right"></span></a>
               </div>
-              <div class="form-group">
-                <label class="col-sm-2 control-label">Gender</label>
-                <div class="col-sm-4">
-                  <p class="form-control-static">@patient.gender</p>
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="col-sm-2 control-label">DOB</label>
-                <div class="col-sm-4">
-                  <p class="form-control-static">@patient.dob.toLocalDate().toString</p>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
-
-
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <p class="panel-title small text-uppercase">HEDIS Measure Name</p>
+            </div>
           </div>
           <div class="panel-body">
 
             <!--  Begin Panel content -->
-            <div class="panel panel-default">
-              <!-- Default panel contents -->
-              <p class="panel-heading small text-uppercase">Measure Eligibility</p>
-              <!-- Table -->
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="panel panel-default">
-              <!-- Default panel contents -->
-              <p class="panel-heading small text-uppercase">Measure Exclusion</p>
-              <!-- Table -->
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Username</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                  </tr>
-                  <tr>
-                    <th scope="row">3</th>
-                    <td>Larry</td>
-                    <td>the Bird</td>
-                    <td>@twitter</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                <div class="panel panel-default">
+                  <!-- Default panel contents -->
+                  <p class="panel-heading small text-uppercase">Meet Measure</p>
+                  <p>The patient does not meet the measure</p>
+                </div>
             <!--  End Panel content -->
 
           </div>
