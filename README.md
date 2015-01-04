@@ -46,7 +46,7 @@
 
 # Sprint 8: Parallelizing Batch Claim Generation and Simulated HEDIS Report using Spark and Cassandra
 
-- Version: 0.9.0.00 (v0.9.0.00_12-XX-2014)
+- Version: 0.9.0.00 (v0.9.0.00_01-04-2014)
 - Start Date: 11/29/2014
 - Target Date: 12/27/2014
 - Actual Date: 01/04/2015
@@ -58,7 +58,7 @@
 ## User Stories Sprint Backlog.
 
 ## Completed User Stories
-- Build tag is bettercare4.me-v0.9.0.00_01-02-2015
+- Build tag is bettercare4.me-v0.9.0.00_01-04-2015
 - Add link from patient scorecard page back to rule scorecard page
 - Load claim generator configuration to sort the hedis measures on patient scorecard page
   - Removed name (run name) as primary key for hedis_summary table. Has no consquence since all
