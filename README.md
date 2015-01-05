@@ -26,19 +26,24 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
+- Create a Play AMI
+
+## Completed User Stories
 - Create s3 bucket for s3.bettercare4.me
   - Put application /data directory as subdirectory
   - Copy bettercare4me.cql using wget from Cassandra instance:  
     - wget http://s3.amazonaws.com/s3.bettercare4.me/data/bettercare4me.cql
     - Execute this command from ssh on the Cassandra instance.
   - Execute nodetool and cqlsh shell command to load the database schema
+    - ubuntu@ip-10-169-190-121:~$ cqlsh
+    - ubuntu@ip-10-169-190-121:~$ nodetool status
+    - are both available directly from the prompt of the ssh shell on the EC2 instance!
 
-## Completed User Stories
 - Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
   - Instance Advance Details: --clustername bettercare4meCluster --totalnodes 6 --version community
   - Connect to the instance using: ssh -i cassandra1-kp.pem ubuntu@ec2-54-161-199-197.compute-1.amazonaws.com
   - Connect to Opscenter: http://ec2-54-161-199-197.compute-1.amazonaws.com:8888/ using the AMI Launch Index 0 instance Public DNS
-  - Datastax AMI: ami-ada2b6c4
+  - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
 
 - Made presentation improvements and fix bug
   - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service

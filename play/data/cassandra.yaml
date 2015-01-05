@@ -1,2 +1,3 @@
 node: 127.0.0.1
+//node: ec2-174-129-177-186.compute-1.amazonaws.com
 keyspace: bettercare4me
