@@ -25,6 +25,7 @@ object ClaimGeneratorSparkHelper {
 
     val conf = new SparkConf()
       .setMaster("local[3]")
+//      .setMaster("spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077")
       .setAppName("Claim Generator Spark Helper")
     val sc = new SparkContext(conf)
 
@@ -51,6 +52,7 @@ object ClaimGeneratorSparkHelper {
 
     val conf = new SparkConf()
       .setMaster("local[3]")
+//      .setMaster("spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077")
       .setAppName("Claim Generator Spark Helper")
     val sc = new SparkContext(conf)
 

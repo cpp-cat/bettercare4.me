@@ -29,6 +29,23 @@
 - Create a Play AMI
 
 ## Completed User Stories
+- Create a spark cluster on AWS
+  - Created a keypair for spark cluster: spark1-kp.pem 
+  - Created a IAM user michel1 in group bc4me as power user (added user credential in .bashrc)
+  - Downloaded Spark 1.2.0 in projects/spark to have ec2 deployment scripts
+  - in downloaded spark ec2 scripts directory /home/michel/projects/spark/spark-1.2.0/ec2: 
+    - ./spark-ec2 --help
+    - ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem -r us-east-1 -z us-east-1d -t m1.large -v 1.2.0 -s 2 --worker-instances=2 launch bc4me-spark-cluster
+      - Spark AMI: ami-5bb18832
+    - ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
+    - Master Public DNS: ec2-54-145-101-109.compute-1.amazonaws.com
+    - Master status page: http://ec2-54-145-101-109.compute-1.amazonaws.com:8080/
+    - Master at spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077 (to use in SparkContext.Master())
+    - Testing the cluster at the spark cli: ./bin/spark-shell --master spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077
+    - NEED TO TEST FROM HOME W/O FIREWALL
+    - To stop the cluster: ./spark-ec2 --region=us-east-1 stop bc4me-spark-cluster
+    - To start the cluster: ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster
+
 - Create s3 bucket for s3.bettercare4.me
   - Put application /data directory as subdirectory
   - Copy bettercare4me.cql using wget from Cassandra instance:  
@@ -44,6 +61,7 @@
   - Connect to the instance using: ssh -i cassandra1-kp.pem ubuntu@ec2-54-161-199-197.compute-1.amazonaws.com
   - Connect to Opscenter: http://ec2-54-161-199-197.compute-1.amazonaws.com:8888/ using the AMI Launch Index 0 instance Public DNS
   - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
+  - Create a keypair for Cassandra cluster: cassandra1-kp.pem
 
 - Made presentation improvements and fix bug
   - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service
