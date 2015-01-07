@@ -26,18 +26,56 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
-- Create a Play AMI
 
 ## Completed User Stories
+- Create a Play AMI
+  - Create a keypair for play instance: play1-kp.pem
+  - Start the spark cluster and create a cassandra cluster
+    - Put the public DNS of the spark master onto data/spark.yaml
+    - Put the public DNS of the cassandra master onto data/cassandra.yaml
+    - Commit those changes and push it to github master
+  - Create m2.medium ubuntu linux ec2 instance having java 7: 
+  - Copy the spark1-kp.pem onto the play instance to be able to ssh into the spark cluster:
+    - scp -i ~/play1-kp.pem ~/spark1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
+  - SSH to the play ec2 instance: ssh -i ~/play1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com (using the correct public DNS)
+  - Clone the Bettercare4.me git repository onto the play instance
+    - GIT HEREXXXXXXXXXXXXXXXX
+   - Start activator in play directory: play$ ./activator
+  - Generated a new application secret key using:
+    - [bettercare4.me] $ play-update-secret
+  - Using the stage task to create an application start script:
+    - ./activator clean stage
+      - Packaged the application is in target/universal/stage/
+      - Class path for the application (specified in spark-env.sh): app_classpath="/root/stage/lib/*"
+  - Copy the packaged application to the spark master node (we're still ssh'ed onto the play instance):
+    - scp -i ~/spark1-kp.pem -r target/universal/stage root@ec2-54-xxx-xxx-xxx.compute-1.amazonaws.com:/root/ (using the correct public DNS for the spark master)
+    - scp -i ~/spark1-kp.pem data/spark-env.sh root@ec2-54-xxx-xxx-xxx.compute-1.amazonaws.com:/root/spark/conf/ (using the correct public DNS for the spark master)
+  
+  - Logon onto the cluster (on master node): ../ec2/spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
+  - RSYNC the copied files to all the slaves of the cluster:
+    - ~/spark-ec2/copy-dir /root/stage/lib
+    - ~/spark-ec2/copy-dir /root/spark/conf
+  - Exit from spark cluster to return to play instance
+
+  - Running the application (from the play directory on the play instance):
+    - play$ target/universal/stage/bin/bettercare4-me -Dhttp.port=80 
+    - see available option: target/universal/stage/bin/bettercare4-me -h
+
 - Create a spark cluster on AWS
   - Created a keypair for spark cluster: spark1-kp.pem 
   - Created a IAM user michel1 in group bc4me as power user (added user credential in .bashrc)
-  - Downloaded Spark 1.2.0 in projects/spark to have ec2 deployment scripts
+  - Downloaded Spark 1.2.0 in projects/spark to have ec2 deployment scripts (deployment script in bettercare4.me/ec2)
   - in downloaded spark ec2 scripts directory /home/michel/projects/spark/spark-1.2.0/ec2: 
     - ./spark-ec2 --help
     - ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem -r us-east-1 -z us-east-1d -t m1.large -v 1.2.0 -s 2 --worker-instances=2 launch bc4me-spark-cluster
       - Spark AMI: ami-5bb18832
     - ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
+      - Copy from the master node the environment settings (mainly the class path) from s3 and Bettercare4.me program:
+        - wget http://s3.amazonaws.com/s3.bettercare4.me/data/spark-env.sh
+	- mkdir lib
+	- cd libs
+	- 
+
     - Master Public DNS: ec2-54-145-101-109.compute-1.amazonaws.com
     - Master status page: http://ec2-54-145-101-109.compute-1.amazonaws.com:8080/
     - Master at spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077 (to use in SparkContext.Master())
