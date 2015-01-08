@@ -28,6 +28,7 @@
 ## User Stories Sprint Backlog.
 
 ## Completed User Stories
+- Added reading spark configuration from yaml file: data/spark.yaml
 - Create a Play AMI
   - Create a keypair for play instance: play1-kp.pem
   - Start the spark cluster and create a cassandra cluster
@@ -36,23 +37,24 @@
     - Commit those changes and push it to github master
   - Create m2.medium ubuntu linux ec2 instance having java 7: 
   - Copy the spark1-kp.pem and cassandra1-kp.pem onto the play instance to be able to ssh into the spark cluster:
-    - scp -i ~/play1-kp.pem ~/spark1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
-    - scp -i ~/play1-kp.pem ~/cassandra1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
+    - $ scp -i ~/play1-kp.pem ~/spark1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
+    - $ scp -i ~/play1-kp.pem ~/cassandra1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
   - SSH to the play ec2 instance: ssh -i ~/play1-kp.pem root@ec2-54-145-101-109.compute-1.amazonaws.com (using the correct public DNS)
-  - Clone the Bettercare4.me git repository onto the play instance
-    - GIT HEREXXXXXXXXXXXXXXXX
+  - Clone the Bettercare4.me git repository onto the play instance, or update the repo
+    - $ git clone https://github.com/regency901/bettercare4.me.git 
+    - $ git pull origin master
    - Start activator in play directory: play$ ./activator
   - Generated a new application secret key using:
-    - [bettercare4.me] $ play-update-secret
+    - $ ./activator play-update-secret
   - Using the stage task to create an application start script:
-    - ./activator clean stage
+    - $ ./activator clean stage
       - Packaged the application is in target/universal/stage/
       - Class path for the application (specified in spark-env.sh): app_classpath="/root/stage/lib/*"
   - Copy the packaged application to the spark master node (we're still ssh'ed onto the play instance):
     - scp -i ~/spark1-kp.pem -r target/universal/stage root@<spark master private dns>:/root/ 
     - scp -i ~/spark1-kp.pem data/spark-env.sh root@<spark master private dns>:/root/spark/conf/
   - Copy the database schema to the cassandra master node
-    - scp -i ~/spark1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/
+    - scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/
   
   - Logon onto the cluster (on master node): ../ec2/spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
   - RSYNC the copied files to all the slaves of the cluster:
@@ -63,6 +65,7 @@
   - SSH to the cassandra master node: ssh -i cassandra1-kp.pem ubuntu@<cassandra private dns>
   - Execute nodetool and cqlsh shell command to load the database schema
     - ubuntu@ip-10-169-190-121:~$ cqlsh
+      - cqlsh> source 'data/bettercare4me.cql';
     - ubuntu@ip-10-169-190-121:~$ nodetool status
     - are both available directly from the prompt of the ssh shell on the EC2 instance!
     - Exit from the cassandra master
@@ -71,7 +74,7 @@
     - play$ target/universal/stage/bin/bettercare4-me -Dhttp.port=80 
     - see available option: target/universal/stage/bin/bettercare4-me -h
   
-  -
+    -
 
 - Create a spark cluster on AWS
   - Created a keypair for spark cluster: spark1-kp.pem 
@@ -89,7 +92,7 @@
     - To stop the cluster: ./spark-ec2 --region=us-east-1 stop bc4me-spark-cluster
     - To start the cluster: ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster 
 
--
+  -
 
 - Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
   - Instance Advance Details: --clustername bettercare4meCluster --totalnodes 6 --version community
@@ -98,7 +101,7 @@
   - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
   - Create a keypair for Cassandra cluster: cassandra1-kp.pem
 
--
+  -
 
 - Made presentation improvements and fix bug
   - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service

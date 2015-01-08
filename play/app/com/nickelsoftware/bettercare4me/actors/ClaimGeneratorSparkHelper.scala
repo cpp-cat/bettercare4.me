@@ -3,12 +3,38 @@
  */
 package com.nickelsoftware.bettercare4me.actors
 
+import java.io.FileReader
+
+import scala.collection.JavaConversions.mapAsScalaMap
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
-import play.api.Logger
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.constructor.SafeConstructor
+
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
-import scala.concurrent.Await
+import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+
+import play.api.Logger
+
+/**
+ * Simple object to lead the spark configuration from file
+ * 
+ * Currently, loading from 'data/spark.yaml'
+ */
+object SparkConfig {
+  
+  private val fname = "data/spark.yaml"
+  lazy val config = loadConfig
+  
+  def master = config.getOrElse("master", "local[3]").asInstanceOf[String]
+  def appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+  
+  private def loadConfig(): Map[String, Object] = {
+    val yaml = new Yaml(new SafeConstructor());
+    yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
+  }
+}
 
 /**
  * Helper object to distribute the workload of generating the patients, providers and claims
@@ -24,10 +50,16 @@ object ClaimGeneratorSparkHelper {
   def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
     val conf = new SparkConf()
-      .setMaster("local[3]")
-//      .setMaster("spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077")
-      .setAppName("Claim Generator Spark Helper")
+      .setMaster(SparkConfig.master)
+      .setAppName(SparkConfig.appName)
+      
     val sc = new SparkContext(conf)
+    if(sc.isLocal) {
+	    Logger.info("Local Spark context created, master : "+sc.master)
+    } else {
+	    Logger.info("Remote Spark context created, master : "+sc.master)
+    }
+    Logger.info("Spark application name: "+sc.appName)
 
     // broadcast the config so it is available to each node of the cluster
     val broadcastConfigTxt = sc.broadcast(configTxt)
@@ -51,10 +83,16 @@ object ClaimGeneratorSparkHelper {
   def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
     val conf = new SparkConf()
-      .setMaster("local[3]")
-//      .setMaster("spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077")
-      .setAppName("Claim Generator Spark Helper")
+      .setMaster(SparkConfig.master)
+      .setAppName(SparkConfig.appName)
+      
     val sc = new SparkContext(conf)
+    if(sc.isLocal) {
+	    Logger.info("Local Spark context created, master : "+sc.master)
+    } else {
+	    Logger.info("Remote Spark context created, master : "+sc.master)
+    }
+    Logger.info("Spark application name: "+sc.appName)
 
     // broadcast the config so it is available to each node of the cluster
     val broadcastConfigTxt = sc.broadcast(configTxt)
