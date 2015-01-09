@@ -37,18 +37,21 @@
     - Put the public DNS of the spark master onto data/spark.yaml
     - Put the public DNS of the cassandra master onto data/cassandra.yaml
     - Commit those changes and push it to github master
-  - Create m3.medium ubuntu linux ec2 instance having java 7: ami-24af204c (Medidata Ubuntu 14.04 + Java 7)
+  - Create  ubuntu linux ec2 instance having java 7: 
+    - Instance type: m3.large
+    - Image: ami-24af204c (Medidata Ubuntu 14.04 + Java 7)
     - Availability zone: us-east-1d
-    - Root storage using EBS 20GB, mark to be persistent
-    - Security group: bc4me-spark-cluster-master (nned to open port 80 & 443 on this security group)
-    - Strarted with public DNS: ec2-54-159-192-139.compute-1.amazonaws.com
+    - Root storage using EBS 10GB, mark to be persistent
+    - Security group: bc4me-spark-cluster-master (need to open port 80 & 443 on this security group)
+    - SSH key pair: play1-kp
+    - Strarted with public DNS: ec2-54-205-171-3.compute-1.amazonaws.com
 
   - Start the system monitoring on play instance:
     - $ java -jar remote-linux-monitor-v1.05.jar -i ~/play1-kp.pem -H ec2-54-159-192-139.compute-1.amazonaws.com -u ubuntu &
   - Copy the spark1-kp.pem and cassandra1-kp.pem onto the play instance to be able to ssh into the spark cluster:
-    - $ scp -i ~/play1-kp.pem ~/spark1-kp.pem ubuntu@ec2-54-159-192-139.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
-    - $ scp -i ~/play1-kp.pem ~/cassandra1-kp.pem ubuntu@ec2-54-159-192-139.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
-  - SSH to the play ec2 instance: ssh -i ~/play1-kp.pem ubuntu@ec2-54-159-192-139.compute-1.amazonaws.com (using the correct public DNS)
+    - $ scp -i ~/play1-kp.pem ~/spark1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
+    - $ scp -i ~/play1-kp.pem ~/cassandra1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/ (using the public DNS of the play instance)
+  - SSH to the play ec2 instance: ssh -i ~/play1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com (using the correct public DNS)
   - Clone the Bettercare4.me git repository onto the play instance, or update the repo
     - $ sudo apt-get install git
     - $ git clone https://github.com/regency901/bettercare4.me.git 
@@ -70,6 +73,9 @@
     - $ ~/spark-ec2/copy-dir /root/stage/lib
     - $ ~/spark-ec2/copy-dir /root/spark/conf
   - Exit from spark cluster to return to play instance
+  - Start the spark cluster from firefly (local)
+    - $ ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster
+    - Check the cluster status at: http://ec2-54-146-63-114.compute-1.amazonaws.com:8080/ (spark master public DNS)
 
   - SSH to the cassandra master node: ssh -i cassandra1-kp.pem ubuntu@<cassandra private dns>
   - Execute nodetool and cqlsh shell command to load the database schema
@@ -94,9 +100,9 @@
     - $ ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem -r us-east-1 -z us-east-1d -t m1.large -v 1.2.0 -s 2 --worker-instances=2 launch bc4me-spark-cluster
       - Spark AMI: ami-5bb18832
     - $ ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
-    - Master Public DNS: ec2-54-145-101-109.compute-1.amazonaws.com 
-    - Master status page: http://ec2-54-145-101-109.compute-1.amazonaws.com:8080/ 
-    - Master at spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077 (to use in SparkContext.Master()) 
+    - Master Public DNS: ec2-54-146-63-114.compute-1.amazonaws.com 
+    - Master status page: http://ec2-54-146-63-114.compute-1.amazonaws.com:8080/ 
+    - Master at spark://ec2-54-146-63-114.compute-1.amazonaws.com:7077 (to use in SparkContext.Master()) 
     - Testing the cluster at the spark cli: ./bin/spark-shell --master spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077 (from play instance)
     - To stop the cluster: $ ./spark-ec2 --region=us-east-1 stop bc4me-spark-cluster
     - To start the cluster: $ ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster 
@@ -104,12 +110,17 @@
   -
 
 - Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
-  - Instance Advance Details: --clustername bettercare4meCluster --totalnodes 6 --version community
-  - Connect to the instance using: 
-    - $ ssh -i cassandra1-kp.pem ubuntu@ec2-54-161-199-197.compute-1.amazonaws.com
-  - Connect to Opscenter: http://ec2-54-161-199-197.compute-1.amazonaws.com:8888/ using the AMI Launch Index 0 instance Public DNS
-  - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
   - Create a keypair for Cassandra cluster: cassandra1-kp.pem
+  - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
+    - Instance type m3.large
+    - 3 instances
+    - Availability zone: us-east-1d
+    - Instance Advance Details: --clustername bettercare4meCluster --totalnodes 3 --version community
+    - Security group: cassandra1
+    - SSH key pair: cassandra1-kp
+  - Connect to Opscenter: http://ec2-54-159-110-116.compute-1.amazonaws.com:8888/ using the AMI Launch Index 0 instance Public DNS
+  - Connect to the instance using: 
+    - $ ssh -i cassandra1-kp.pem ubuntu@ec2-54-159-110-116.compute-1.amazonaws.com
 
   -
 
