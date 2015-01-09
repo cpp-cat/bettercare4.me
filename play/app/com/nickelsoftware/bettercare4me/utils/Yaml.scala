@@ -13,9 +13,6 @@ object Yaml {
         nbrGen: 1
         nbrPatients: 10
         nbrProviders: 1
-        maleNamesFile: ./data/male-names.csv
-        femaleNamesFile: ./data/female-names.csv
-        lastNamesFile: ./data/last-names.csv
         hedisDateTxt: 2014-12-31
         rulesConfig:
           - name: CDC-LDL-C-HEDIS-2014

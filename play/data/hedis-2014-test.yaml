@@ -1,14 +1,11 @@
         runName: HEDIS 2014 Simulation
         basePath: ./data/hedis-2014-test
         baseFname: claimGenerator
-	# generator: 'cassandra', 'file', or 'file-spark'
+        # generator: 'cassandra', 'file', or 'file-spark'
         generator: cassandra
         nbrGen: 5
         nbrPatients: 10
         nbrProviders: 1
-        maleNamesFile: ./data/male-names.csv
-        femaleNamesFile: ./data/female-names.csv
-        lastNamesFile: ./data/last-names.csv
         hedisDateTxt: 2013-12-31T00:00:00.00-05:00
 
         populationHealthMeasures:

@@ -54,7 +54,7 @@ case object ClaimFileGeneratorHelper extends ClaimGeneratorHelper {
     val claimsWriter = CSVWriter.open(new File(fnameBase + "_claims_" + igen.toString + ".csv"))
 
     // Person generator class
-    val personGenerator = new PersonGenerator(config.maleNamesFile, config.femaleNamesFile, config.lastNamesFile, config.hedisDate, persistenceLayer)
+    val personGenerator = new PersonGenerator(config.hedisDate, persistenceLayer)
 
     // create and configure the rules to use for the simulation
     val hedisDate = config.hedisDate

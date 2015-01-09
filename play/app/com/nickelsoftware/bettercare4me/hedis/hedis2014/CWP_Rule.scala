@@ -19,6 +19,7 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.Utils
+import com.nickelsoftware.bettercare4me.utils.Properties
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 
@@ -29,7 +30,7 @@ object CWP {
   val pharyngitisPatient = "Pharyngitis Diagnosed Patient"
 
   // Table CWP­-C: Antibiotic Medication
-  val ndcA = CSVReader.open(new File("./data/cwp.ndc.c.csv")).all().flatten
+  val ndcA = CSVReader.open((Properties.dataDir / "cwp.ndc.c.csv").path).all().flatten
   val ndcAS = ndcA.toSet
 
   // ICD D pharyngitis diagnosis 

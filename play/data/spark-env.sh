@@ -49,5 +49,6 @@
 # - SPARK_IDENT_STRING  A string representing this instance of spark. (Default: $USER)
 # - SPARK_NICENESS      The scheduling priority for daemons. (Default: 0)
 
-export SPARK_CLASSPATH = "/root/stage/lib/*"
+export SPARK_CLASSPATH="/root/stage/lib/*"
+export BC4ME_DATA_DIR="/root/stage/data"
 

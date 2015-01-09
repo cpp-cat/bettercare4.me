@@ -36,7 +36,7 @@ class GeneratorTestSpec extends PlaySpec {
 
     "map a seed (range 0 to 1000) to month based on US population age distribution" in {
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
+      val gen = new PersonGenerator(LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
 
       gen.seedToMonth(65) mustBe 60
       gen.seedToMonth(131) mustBe 120
@@ -49,7 +49,7 @@ class GeneratorTestSpec extends PlaySpec {
     "Person given name must be consistent with gender and last name must be from last name pool" in {
 
       val f = fixture
-      val gen = new PersonGenerator(f.maleNameFile, f.femaleNameFile, f.lastNameFile, LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
+      val gen = new PersonGenerator(LocalDate.parse("2015-01-01").toDateTimeAtStartOfDay(), new SimplePersistenceLayer(0))
 
       def testPatient(patient: Patient): Unit = {
         if (patient.gender == "M") f.maleNames.contains(patient.firstName) mustBe true
@@ -84,9 +84,6 @@ class GeneratorTestSpec extends PlaySpec {
           nbrGen: 1
           nbrPatients: 100
           nbrProviders: 1
-          maleNamesFile: ./data/male-names.csv
-          femaleNamesFile: ./data/female-names.csv
-          lastNamesFile: ./data/last-names.csv
           hedisDateTxt: 2014-01-01T00:00:00.00-05:00
           """)
 
@@ -95,9 +92,6 @@ class GeneratorTestSpec extends PlaySpec {
       config.nbrGen mustBe 1
       config.nbrPatients mustBe 100
       config.nbrProviders mustBe 1
-      config.maleNamesFile mustBe "./data/male-names.csv"
-      config.femaleNamesFile mustBe "./data/female-names.csv"
-      config.lastNamesFile mustBe "./data/last-names.csv"
       config.hedisDate mustBe new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
       config.rulesConfig mustBe List()
     }
@@ -110,9 +104,6 @@ class GeneratorTestSpec extends PlaySpec {
           nbrGen: 1
           nbrPatients: 100
           nbrProviders: 1
-          maleNamesFile: ./data/male-names.csv
-          femaleNamesFile: ./data/female-names.csv
-          lastNamesFile: ./data/last-names.csv
           hedisDateTxt: 2014-01-01T00:00:00.00-05:00
           rulesConfig:
               - name: CDC1
@@ -133,9 +124,6 @@ class GeneratorTestSpec extends PlaySpec {
       config.nbrGen mustBe 1
       config.nbrPatients mustBe 100
       config.nbrProviders mustBe 1
-      config.maleNamesFile mustBe "./data/male-names.csv"
-      config.femaleNamesFile mustBe "./data/female-names.csv"
-      config.lastNamesFile mustBe "./data/last-names.csv"
       config.hedisDate mustBe new LocalDate(2014, 1, 1).toDateTimeAtStartOfDay()
 
       config.rulesConfig.size mustBe 2

@@ -20,6 +20,7 @@ import com.nickelsoftware.bettercare4me.models.PersistenceLayer
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.RuleConfig
 import com.nickelsoftware.bettercare4me.utils.Utils
+import com.nickelsoftware.bettercare4me.utils.Properties
 import com.github.tototoshi.csv.CSVReader
 import java.io.File
 
@@ -41,7 +42,7 @@ object ASM {
   val NDCCODE = 0
   val ROUTE = 3
   val CATEGORY = 4
-  val ndcAttributes: List[List[String]] = CSVReader.open(new File("./data/asm.ndc.attributes.csv")).all()
+  val ndcAttributes: List[List[String]] = CSVReader.open((Properties.dataDir / "asm.ndc.attributes.csv").path).all()
   val asthmaMeds: Map[String, List[String]] = ndcAttributes map { l => (l.apply(0), l)} toMap
 
   // Table ASM­-D: Asthma Controller Medications (meet measure medication list)

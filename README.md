@@ -28,8 +28,14 @@
 ## User Stories Sprint Backlog.
 
 ## Completed User Stories
-- Added error handling when connection to Cassandra fails (case where there is no database)
-- Added reading spark configuration from yaml file: data/spark.yaml
+- Code changed
+-
+  - Added error handling when connection to Cassandra fails (case where there is no database)
+  - Added reading spark configuration from yaml file: data/spark.yaml
+  - Configuring `./data/` directory using environment variable `BC4ME_DATA_DIR` with `./data/` as the default
+  - Adding scalax.io incubator library for file path manipulation (http://jesseeichar.github.io/scala-io-doc/0.4.3/index.html#!/overview)
+  - Removed the first-names.csv and last-names.csv from configuration.
+  - Remove all hardcoded reference to `./data` and replace with `Properties.dataDir`
 
 - Create a Play AMI
 -
@@ -102,10 +108,9 @@
   - Running the application (from the play directory on the play instance):
     - play$ ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80 
     - see available option: target/universal/stage/bin/bettercare4-me -h
-  
-    -
 
 - Create a spark cluster on AWS
+-
   - Created a keypair for spark cluster: spark1-kp.pem 
   - Created a IAM user michel1 in group bc4me as power user (added user credential in .bashrc)
   - Downloaded Spark 1.2.0 in projects/spark to have ec2 deployment scripts (deployment script in bettercare4.me/ec2)
@@ -121,9 +126,8 @@
     - To stop the cluster: $ ./spark-ec2 --region=us-east-1 stop bc4me-spark-cluster
     - To start the cluster: $ ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster 
 
-  -
-
 - Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
+-
   - Create a keypair for Cassandra cluster: cassandra1-kp.pem
   - Datastax AMI: ami-ada2b6c4 - look for community AMI and search for Datastax. Select the HVM AMI.
     - Instance type m3.large
@@ -136,9 +140,8 @@
   - Connect to the instance using: 
     - $ ssh -i cassandra1-kp.pem ubuntu@ec2-54-159-110-116.compute-1.amazonaws.com
 
-  -
-
 - Made presentation improvements and fix bug
+-
   - Sorted the criteria result reasons (claim summary) on Patient Scorecard page according to claim date-of-service
   - Added cheveron on the right of measure link on Patient Scorecard page
   - Fix the provider name in claim list on Patient Scorecard page - first and last were inverted

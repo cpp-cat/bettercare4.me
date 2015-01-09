@@ -6,6 +6,17 @@ import scala.util.Random
 import com.nickelsoftware.bettercare4me.models.Claim
 import com.nickelsoftware.bettercare4me.hedis.Scorecard
 import org.joda.time.Days
+import scalax.file.Path
+
+/**
+ * Object to read properties from environment
+ */
+object Properties {
+  
+  val dataDir: Path = Path.fromString(scala.util.Properties.envOrElse("BC4ME_DATA_DIR", "./data" ))
+  
+}
+
 
 object Utils {
   

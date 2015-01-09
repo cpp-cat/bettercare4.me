@@ -29,9 +29,6 @@ object ClaimGeneratorConfig {
  * @param nGen number of generation to simulate
  * @param nPatients number of patients to simulate per generation
  * @param nProviders number of providers to simulate per generation
- * @param maleNamesFile file name for male given names used for person generation
- * @param femaleNamesFile file name for female given names used for person generation
- * @param lastNamesFile file name for last names used for person generation
  * @param hedisDate date to used for HEDIS report date for the simulation (usually Dec 31 of the measurement year)
  * @param populationHealthMeasures list of measures name in the population health category (for reporting categorization)
  * @param rulesConfig list of configuration parameter for each HEDISRule used in the simulation
@@ -44,9 +41,6 @@ case class ClaimGeneratorConfig(config: Map[String, Object]) {
   def nbrGen: Int = config.getOrElse("nbrGen", 1).asInstanceOf[Int]
   def nbrPatients: Int = config.getOrElse("nbrPatients", 1).asInstanceOf[Int]
   def nbrProviders: Int = config.getOrElse("nbrProviders", 1).asInstanceOf[Int]
-  def maleNamesFile: String = config.getOrElse("maleNamesFile", "./data/male-names.csv").asInstanceOf[String]
-  def femaleNamesFile: String = config.getOrElse("femaleNamesFile", "./data/female-names.csv").asInstanceOf[String]
-  def lastNamesFile: String = config.getOrElse("lastNamesFile", "./data/last-names.csv").asInstanceOf[String]
   def hedisDatejd: java.util.Date = config.getOrElse("hedisDateTxt",  java.text.DateFormat.getInstance().parse("2014-12-31T00:00:00.00-05:00")).asInstanceOf[java.util.Date]
   def rulesConfig: List[RuleConfig] = {
     val list = config.getOrElse("rulesConfig", new java.util.ArrayList()).asInstanceOf[java.util.ArrayList[java.util.Map[String, Object]]]
