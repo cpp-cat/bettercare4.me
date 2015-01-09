@@ -32,7 +32,7 @@
 -
   - Added error handling when connection to Cassandra fails (case where there is no database)
   - Added reading spark configuration from yaml file: data/spark.yaml
-  - Configuring `./data/` directory using environment variable `BC4ME_DATA_DIR` with `./data/` as the default
+  - Configuring `./data` directory using environment variable `BC4ME_DATA_DIR` with `./data` as the default
   - Adding scalax.io incubator library for file path manipulation (http://jesseeichar.github.io/scala-io-doc/0.4.3/index.html#!/overview)
   - Removed the first-names.csv and last-names.csv from configuration.
   - Remove all hardcoded reference to `./data` and replace with `Properties.dataDir`
