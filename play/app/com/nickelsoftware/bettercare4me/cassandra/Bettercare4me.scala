@@ -199,9 +199,12 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    * Query a specific HEDIS report
    */
   def queryHEDISReport(hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
-    val future: ResultSetFuture = cassandra.session.executeAsync(new BoundStatement(queryHEDISReportStmt).bind(hedisDate.toDate))
+    val bs = new BoundStatement(queryHEDISReportStmt).bind(hedisDate.toDate)
+    Logger.trace(bs.toString())
+    val future: ResultSetFuture = cassandra.session.executeAsync(bs)
     future.map { rs =>
       val row = rs.one()
+      Logger.trace(row.toString())
       val configTxt = row.getString("claim_generator_config")
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
       val rules: List[HEDISRule] = config.rulesConfig.map { c => HEDISRules.createRuleByName(c.name, c, config.hedisDate) }.toList
