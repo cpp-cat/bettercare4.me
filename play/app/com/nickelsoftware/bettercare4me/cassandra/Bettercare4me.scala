@@ -200,9 +200,10 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
    */
   def queryHEDISReport(hedisDate: DateTime): Future[(HEDISScoreSummary, String)] = {
     val bs = new BoundStatement(queryHEDISReportStmt).bind(hedisDate.toDate)
-    Logger.trace(bs.toString())
-    val future: ResultSetFuture = cassandra.session.executeAsync(bs)
+    Logger.trace("************************queryHEDISReport******************************************")
+    val future: ResultSetFuture = cassandra.session.executeAsync(bs.enableTracing())
     future.map { rs =>
+      if(rs.isExhausted()) throw NickelException("Bettercare4me.queryHEDISReport: No report found with date "+hedisDate.toDate.toString())
       val row = rs.one()
       Logger.trace(row.toString())
       val configTxt = row.getString("claim_generator_config")
