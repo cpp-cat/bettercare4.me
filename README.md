@@ -32,9 +32,10 @@
 - Added reading spark configuration from yaml file: data/spark.yaml
 
 - Create a Play AMI
+-
   - Create a keypair for play instance: play1-kp.pem
   - Start the spark cluster and create a cassandra cluster
-    - Put the public DNS of the spark master onto data/spark.yaml
+    - Put the private DNS of the spark master onto data/spark.yaml : spark://ip-10-40-46-177:7077
     - Put the public DNS of the cassandra master onto data/cassandra.yaml
     - Commit those changes and push it to github master
   - Create  ubuntu linux ec2 instance having java 7: 
@@ -67,15 +68,28 @@
     - $ scp -i ~/spark1-kp.pem data/spark-env.sh root@<spark master private dns>:/root/spark/conf/
   - Copy the database schema to the cassandra master node
     - $ scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/
+  - Exit from play instance to return to local shell (firefly)
   
-  - Logon onto the cluster (on master node): ../ec2/spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster
+  - Logon onto the cluster (on master node) from local shell (firefly): 
+    - $ ssh -i ~/spark1-kp.pem root@ec2-54-146-63-114.compute-1.amazonaws.com
+  - Update the master and slave file (since the public DNS changed since we originially created the instances)
+    - $ echo 'ec2-54-146-63-114.compute-1.amazonaws.com' > spark-ec2/masters
+    - $ cat > spark-ec2/slaves 
+      - ec2-23-20-50-246.compute-1.amazonaws.com
+      - ec2-54-162-1-86.compute-1.amazonaws.com
+      - <ctrl-D>
+    - $ cat > spark/conf/slaves 
+      - ec2-23-20-50-246.compute-1.amazonaws.com
+      - ec2-54-162-1-86.compute-1.amazonaws.com
+      - <ctrl-D>
   - RSYNC the copied files to all the slaves of the cluster:
-    - $ ~/spark-ec2/copy-dir /root/stage/lib
-    - $ ~/spark-ec2/copy-dir /root/spark/conf
-  - Exit from spark cluster to return to play instance
-  - Start the spark cluster from firefly (local)
-    - $ ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster
+    - $ ./spark-ec2/copy-dir /root/stage/lib
+    - $ ./spark-ec2/copy-dir /root/spark/conf
+  - Start the spark cluster (from the master node)
+    - $ ./spark/sbin/start-all.sh 
     - Check the cluster status at: http://ec2-54-146-63-114.compute-1.amazonaws.com:8080/ (spark master public DNS)
+  - Stop the spark cluster (from the master node)
+    - $ ./spark/sbin/stop-all.sh 
 
   - SSH to the cassandra master node: ssh -i cassandra1-kp.pem ubuntu@<cassandra private dns>
   - Execute nodetool and cqlsh shell command to load the database schema
