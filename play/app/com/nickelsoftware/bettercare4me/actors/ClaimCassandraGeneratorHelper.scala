@@ -96,6 +96,9 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
   }
 
   def processGeneratedClaims(igen: Int, configTxt: String): HEDISScoreSummary = {
+    
+    // make sure Cassandra is ready to go
+    Bettercare4me.connect
 
     val patientsFuture = Bettercare4me.queryPatients(igen)
     val providerFuture = Bettercare4me.queryProviders(igen)
