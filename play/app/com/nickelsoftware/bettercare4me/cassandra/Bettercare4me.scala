@@ -4,18 +4,15 @@
 package com.nickelsoftware.bettercare4me.cassandra
 
 import java.io.FileReader
-
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.asScalaSet
 import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
-
 import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.Cluster
 import com.datastax.driver.core.Metadata
@@ -36,8 +33,8 @@ import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.ProviderParser
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.cassandra.resultset.toFuture
-
 import play.api.Logger
+import com.datastax.driver.core.exceptions.NoHostAvailableException
 
 /**
  * Class managing a connection to Cassandra cluster and
@@ -381,7 +378,14 @@ object Bettercare4me {
    * Default config file name: "data/cassandra.yaml"
    */
   def connect(fname: String = "data/cassandra.yaml") = {
-    bc4me = Some(new Bc4me(new Cassandra(fname)))
+    bc4me = try {
+	    Some(new Bc4me(new Cassandra(fname)))
+    } catch {
+      case ex: NoHostAvailableException => {
+        Logger.error("No Cassandra database available.")
+        None
+      }
+    }
   }
 
   /**

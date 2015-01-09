@@ -1,6 +1,7 @@
         runName: HEDIS 2014 Simulation
         basePath: ./data/hedis-2014-test
         baseFname: claimGenerator
+	# generator: 'cassandra', 'file', or 'file-spark'
         generator: cassandra
         nbrGen: 5
         nbrPatients: 10
