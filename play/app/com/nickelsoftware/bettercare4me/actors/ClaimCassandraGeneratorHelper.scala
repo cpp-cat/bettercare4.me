@@ -42,6 +42,9 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
   def generateClaims(igen: Int, configTxt: String): ClaimGeneratorCounts = {
 
     val config = ClaimGeneratorConfig.loadConfig(configTxt)
+    
+    // make sure Cassandra is ready to go
+    Bettercare4me.connect
 
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)

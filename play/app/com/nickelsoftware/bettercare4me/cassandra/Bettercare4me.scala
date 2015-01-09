@@ -35,6 +35,7 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.cassandra.resultset.toFuture
 import play.api.Logger
 import com.datastax.driver.core.exceptions.NoHostAvailableException
+import com.nickelsoftware.bettercare4me.utils.Properties
 
 /**
  * Class managing a connection to Cassandra cluster and
@@ -372,12 +373,24 @@ object Bettercare4me {
    * Connect to Cassandra cluster and open session to keyspace
    * based on config file
    *
-   * This is called *only* by Global.onStart at application start.
+   * This is called *only* by Global.onStart at application start or
+   * in spark worker thread at top of the job.
+   * 
    * Therefore the fact that it is no thread safe should not be an issue.
    *
    * Default config file name: "data/cassandra.yaml"
    */
-  def connect(fname: String = "data/cassandra.yaml") = {
+  def connect = {
+    
+    val fname: String = (Properties.dataDir / "cassandra.yaml").path
+    
+    // close if it was already opened
+    bc4me match {
+      case Some(c) => c.close
+      case _ => Unit
+    }
+    
+    // open a new connection
     bc4me = try {
 	    Some(new Bc4me(new Cassandra(fname)))
     } catch {

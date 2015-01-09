@@ -36,6 +36,7 @@
   - Adding scalax.io incubator library for file path manipulation (http://jesseeichar.github.io/scala-io-doc/0.4.3/index.html#!/overview)
   - Removed the first-names.csv and last-names.csv from configuration.
   - Remove all hardcoded reference to `./data` and replace with `Properties.dataDir`
+  - Ensure connection to Cassandra is initialized in spark slave.
 
 - Create a Play AMI
 -
@@ -70,8 +71,9 @@
       - Packaged the application is in target/universal/stage/
       - Class path for the application (specified in spark-env.sh): app_classpath="/root/stage/lib/*"
   - Copy the packaged application to the spark master node (we're still ssh'ed onto the play instance):
-    - $ scp -i ~/spark1-kp.pem -r target/universal/stage root@<spark master private dns>:/root/ 
-    - $ scp -i ~/spark1-kp.pem data/spark-env.sh root@<spark master private dns>:/root/spark/conf/
+    - $ scp -i ~/spark1-kp.pem -r target/universal/stage root@<spark master private IP>:/root/ 
+    - $ scp -i ~/spark1-kp.pem -r data root@<spark master private IP>:/root/stage/
+    - $ scp -i ~/spark1-kp.pem data/spark-env.sh root@<spark master private IP>:/root/spark/conf/
   - Copy the database schema to the cassandra master node
     - $ scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/
   - Exit from play instance to return to local shell (firefly)
@@ -89,7 +91,7 @@
       - ec2-54-162-1-86.compute-1.amazonaws.com
       - <ctrl-D>
   - RSYNC the copied files to all the slaves of the cluster:
-    - $ ./spark-ec2/copy-dir /root/stage/lib
+    - $ ./spark-ec2/copy-dir /root/stage
     - $ ./spark-ec2/copy-dir /root/spark/conf
   - Start the spark cluster (from the master node)
     - $ ./spark/sbin/start-all.sh 
@@ -106,7 +108,7 @@
     - Exit from the cassandra master
 
   - Running the application (from the play directory on the play instance):
-    - play$ ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80 
+    - play$ sudo ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80 
     - see available option: target/universal/stage/bin/bettercare4-me -h
 
 - Create a spark cluster on AWS
