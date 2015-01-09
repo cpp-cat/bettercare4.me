@@ -26,6 +26,9 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
+- Need to use fully qualified dates, e.g., `2013-12-31T00:00:00.00-05:00` throughout the code (no LocalDate)
+- Specify filename `spark.yaml` and `cassandra.yaml` using env `BC4ME_SPARK_CONF` and `BC4ME_CASSANDRA_CONF`
+  to have a dev (local) and prod files.
 
 ## Completed User Stories
 - Code changed
