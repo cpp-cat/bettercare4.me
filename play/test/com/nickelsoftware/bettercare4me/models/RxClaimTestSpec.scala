@@ -34,7 +34,7 @@ class RxClaimTestSpec extends PlaySpec {
 
       val l = claim.toList
       val ans = List("RX", "claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
-        "2014-09-05", "claimStatus", "ndc", "30", "60", "Y")
+        "2014-09-05T00:00:00.000-04:00", "claimStatus", "ndc", "30", "60", "Y")
 
       l.size mustBe ans.size
       l mustBe ans
@@ -46,7 +46,7 @@ class RxClaimTestSpec extends PlaySpec {
 
       val l = claim.toList
       val ans = List("RX", "claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
-        "2014-09-05", "", "", "1", "0", "N")
+        "2014-09-05T00:00:00.000-04:00", "", "", "1", "0", "N")
 
       l.size mustBe ans.size
       l mustBe ans
@@ -57,7 +57,7 @@ class RxClaimTestSpec extends PlaySpec {
       val claim = RxClaim("claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
         fillD, claimStatus="claimStatus", ndc="ndc", daysSupply=30, qty=60, supplyF="Y")
         
-        ClaimParser.fromList(claim.toList) mustBe claim
+        ClaimParser.fromList(claim.toList) mustEqual claim
     }
   }
   

@@ -43,5 +43,23 @@ class UtilsTestSpec extends PlaySpec {
       val daysSupply = Utils.daysBetween(dos2, dos1)
       dos2.plusDays(daysSupply).isEqual(dos1) mustBe true
     }
+    
+    "parsing dates" in {
+      
+      val d = new DateTime(1962, 7, 27, 0, 0)
+      val s = d.toString
+      d.isEqual(DateTime.parse(s)) mustBe true 
+      
+      val d2 = new LocalDate(1962, 7, 27).toDateTimeAtStartOfDay() 
+      val d3 = new DateTime(1962, 7, 27, 0, 0)
+      d2.isEqual(d3) mustBe true
+      d2 mustEqual d3
+      // but d2 mustBe d3 would be false
+      
+      case class Test(d: DateTime)
+      val t1 = Test(d2)
+      val t2 = Test(d3)
+      t1 mustEqual t2
+    }
   }
 }

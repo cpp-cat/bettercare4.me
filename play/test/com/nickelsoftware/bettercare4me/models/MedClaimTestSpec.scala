@@ -66,7 +66,7 @@ class MedClaimTestSpec extends PlaySpec {
       val claim = mkClaim
 
       val l = claim.toList
-      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05", "2014-09-05",
+      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05T00:00:00.000-04:00", "2014-09-05T00:00:00.000-04:00",
         "claimStatus", "Y", "specialtyCde", "hcfaPOS", "dischargeStatus", "5", "Y",
         "icdDPri",
         "icd 1", "icd 2", "", "", "", "", "", "", "", "",
@@ -82,7 +82,7 @@ class MedClaimTestSpec extends PlaySpec {
       val claim = mkClaim0
 
       val l = claim.toList
-      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05", "2014-09-05",
+      val ans = List("MD", "claimID", "patientID", "patient.first", "patient.last", "providerID", "provider.first", "provider.last", "2014-09-05T00:00:00.000-04:00", "2014-09-05T00:00:00.000-04:00",
         "", "", "", "", "", "0", "N",
         "",
         "", "", "", "", "", "", "", "", "", "",
@@ -96,7 +96,7 @@ class MedClaimTestSpec extends PlaySpec {
 
     "parse a Claim from a list of attributes" in {
       val claim = mkClaim
-      ClaimParser.fromList(claim.toList) mustBe claim
+      ClaimParser.fromList(claim.toList) mustEqual claim
     }
   }
 

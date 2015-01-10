@@ -57,7 +57,7 @@
   <div class="container">
     <h2>@ruleScoreSummary.ruleInfo.fullName</h2>
     <p>@ruleScoreSummary.ruleInfo.description</p>
-    <p>HEDIS Measures Dashboard for Period Ending on @hedisDate on a population of @patientCount Patients:</p>
+    <p>HEDIS Measures Dashboard for Period Ending on @{org.joda.time.DateTime.parse(hedisDate).toLocalDate.toString} on a population of @patientCount Patients:</p>
     <ul class="list-group">
       <li class="list-group-item"><span class="badge">@ruleScoreSummary.meetDemographics</span> Meet the demographics criteria</li>
       <li class="list-group-item"><span class="badge">@ruleScoreSummary.eligible</span> Meet the eligibility criteria</li> 

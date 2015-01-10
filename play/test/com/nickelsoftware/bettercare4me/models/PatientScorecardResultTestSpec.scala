@@ -14,19 +14,19 @@ class PatientScorecardResultTestSpec extends PlaySpec {
     "serialize to a csv string" in {
       
       val c1 = CriteriaResultDetail("claimId", "providerLName", "providerFName", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay(), "reason")
-      c1.toCSVString mustBe "claimId,providerLName,providerFName,1962-07-27,reason\r\n"
+      c1.toCSVString mustBe "claimId,providerLName,providerFName,1962-07-27T00:00:00.000-04:00,reason\r\n"
       
       val c2 = CriteriaResultDetail("claimId", "provider, LName", "providerFName", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay(), "reason")
-      c2.toCSVString mustBe "claimId,\"provider, LName\",providerFName,1962-07-27,reason\r\n"
+      c2.toCSVString mustBe "claimId,\"provider, LName\",providerFName,1962-07-27T00:00:00.000-04:00,reason\r\n"
     }
 
     "de-serialize from a csv string" in {
       
       val c1 = CriteriaResultDetail("claimId", "providerLName", "providerFName", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay(), "reason")
-      CriteriaResultDetail("claimId,providerLName,providerFName,1962-07-27,reason\r\n") mustBe c1
+      CriteriaResultDetail("claimId,providerLName,providerFName,1962-07-27T00:00:00.000-04:00,reason\r\n") mustEqual c1
       
       val c2 = CriteriaResultDetail("claimId", "provider, LName", "providerFName", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay(), "reason")
-      CriteriaResultDetail("claimId,\"provider, LName\",providerFName,1962-07-27,reason\r\n") mustBe c2
+      CriteriaResultDetail("claimId,\"provider, LName\",providerFName,1962-07-27T00:00:00.000-04:00,reason\r\n") mustEqual c2
     }
   }
 }

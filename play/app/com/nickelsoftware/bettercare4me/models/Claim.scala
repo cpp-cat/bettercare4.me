@@ -6,7 +6,6 @@ package com.nickelsoftware.bettercare4me.models
 import scala.math.BigDecimal.double2bigDecimal
 
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 
 import com.nickelsoftware.bettercare4me.utils.NickelException
 
@@ -27,8 +26,8 @@ object ClaimParser {
         l(5), // providerID Provider ID
         l(6), // providerFirstName provider first name 
         l(7), // providerLastName provider last name 
-        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // dos Date of Service
-        LocalDate.parse(l(9)).toDateTimeAtStartOfDay(), // dosThru DOS Thru
+        DateTime.parse(l(8)), // dos Date of Service
+        DateTime.parse(l(9)), // dosThru DOS Thru
         MHead(
           l(10), // claimStatus Claim status
           l(11), // pcpFlag PCP Flag
@@ -63,7 +62,7 @@ object ClaimParser {
         l(5), // providerID Provider ID
         l(6), // providerFirstName provider first name 
         l(7), // providerLastName provider last name 
-        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // fill date
+        DateTime.parse(l(8)), // fill date
         l(9), // claimStatus Claim status
         l(10), // ndc
         l(11).toInt, // days of supply
@@ -82,7 +81,7 @@ object ClaimParser {
         l(5), // providerID Provider ID
         l(6), // providerFirstName provider first name 
         l(7), // providerLastName provider last name 
-        LocalDate.parse(l(8)).toDateTimeAtStartOfDay(), // date of service
+        DateTime.parse(l(8)), // date of service
         l(9), // claimStatus Claim status
         l(10), // cpt
         l(11), // LOINC
@@ -259,7 +258,7 @@ case class MedClaim(claimID: String,
 
   def toList: List[String] = List.concat(List("MD", claimID,
     patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
-    dos.toLocalDate().toString, dosThru.toLocalDate().toString), mHead.toList, mCodes.toList, mBill.toList)
+    dos.toString, dosThru.toString), mHead.toList, mCodes.toList, mBill.toList)
 
   /**
    * @param dia set of diasgnotics to check against
@@ -272,6 +271,19 @@ case class MedClaim(claimID: String,
       if (mCodes.icdDPri == d || mCodes.icdD.contains(d)) true
       else hasDiagnostic(dia.tail)
     }
+  }
+    
+  /**
+   * Must override `equals` because of `DateTime`
+   */
+  override def equals(that: Any): Boolean = that match {
+    case rhs: MedClaim =>
+      claimID == rhs.claimID &&
+      patientID == rhs.patientID && patientFirstName == rhs.patientFirstName && patientLastName == rhs.patientLastName &&
+      providerID == rhs.providerID && providerFirstName == rhs.providerFirstName && providerLastName == rhs.providerLastName &&
+      dos.isEqual(rhs.dos) && dosThru.isEqual(rhs.dosThru) && 
+      mHead == rhs.mHead && mCodes == rhs.mCodes && mBill == rhs.mBill
+    case _ => false
   }
 }
 
@@ -309,7 +321,20 @@ case class RxClaim(claimID: String,
 
   def toList: List[String] = List("RX", claimID,
     patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
-    fillD.toLocalDate().toString, claimStatus, ndc, daysSupply.toString(), qty.toString(), supplyF)
+    fillD.toString, claimStatus, ndc, daysSupply.toString(), qty.toString(), supplyF)
+    
+  /**
+   * Must override `equals` because of `DateTime`
+   */
+  override def equals(that: Any): Boolean = that match {
+    case rhs: RxClaim =>
+      claimID == rhs.claimID &&
+      patientID == rhs.patientID && patientFirstName == rhs.patientFirstName && patientLastName == rhs.patientLastName &&
+      providerID == rhs.providerID && providerFirstName == rhs.providerFirstName && providerLastName == rhs.providerLastName &&
+      fillD.isEqual(rhs.fillD) && claimStatus == rhs.claimStatus &&
+      ndc == rhs.ndc && daysSupply == rhs.daysSupply && qty == rhs.qty && supplyF == rhs.supplyF
+    case _ => false
+  }
 }
 
 /**
@@ -346,5 +371,18 @@ case class LabClaim(claimID: String,
 
   def toList: List[String] = List("LC", claimID,
     patientID, patientFirstName, patientLastName, providerID, providerFirstName, providerLastName,
-    dos.toLocalDate().toString, claimStatus, cpt, loinc, result.toString(), posNegResult)
+    dos.toString, claimStatus, cpt, loinc, result.toString(), posNegResult)
+    
+  /**
+   * Must override `equals` because of `DateTime`
+   */
+  override def equals(that: Any): Boolean = that match {
+    case rhs: LabClaim =>
+      claimID == rhs.claimID &&
+      patientID == rhs.patientID && patientFirstName == rhs.patientFirstName && patientLastName == rhs.patientLastName &&
+      providerID == rhs.providerID && providerFirstName == rhs.providerFirstName && providerLastName == rhs.providerLastName &&
+      dos.isEqual(rhs.dos) && claimStatus == rhs.claimStatus &&
+      cpt == rhs.cpt && loinc == rhs.loinc && result == rhs.result && posNegResult == rhs.posNegResult
+    case _ => false
+  }
 }

@@ -4,7 +4,6 @@
 package com.nickelsoftware.bettercare4me.hedis
 
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.AAB
 import com.nickelsoftware.bettercare4me.hedis.hedis2014.AAB_Rule
@@ -151,7 +150,7 @@ class TestRule(config: RuleConfig, hedisDate: DateTime) extends HEDISRuleBase(co
   def isPatientMeetMeasure(patient: Patient, patientHistory: PatientHistory): Boolean = true
 
   override def generateClaims(persistenceLayer: PersistenceLayer, patient: Patient, provider: Provider, eligibleSimScore: Int, excludedSimScore: Int, meetCriteriaSimScore: Int): List[Claim] = {
-    val dos = new LocalDate(2014, 9, 5).toDateTimeAtStartOfDay()
+    val dos = new DateTime(2014, 9, 5, 0, 0)
     List(
       persistenceLayer.createMedClaim(
         patient.patientID, patient.firstName, patient.lastName, provider.providerID, provider.firstName, provider.lastName, dos, dos,

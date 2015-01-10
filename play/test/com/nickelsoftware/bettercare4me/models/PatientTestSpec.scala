@@ -6,6 +6,7 @@ package com.nickelsoftware.bettercare4me.models;
 import org.joda.time.LocalDate
 import org.scalatestplus.play.OneAppPerSuite
 import org.scalatestplus.play.PlaySpec
+import org.joda.time.DateTime
 
 class PatientTestSpec extends PlaySpec {
 
@@ -41,11 +42,11 @@ class PatientTestSpec extends PlaySpec {
     "put all atributes into a List" in {
       val patient = Patient("key1", "Michel", "Dufresne", "M", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay())
 
-      patient.toList mustBe List("key1", "Michel", "Dufresne", "M", "1962-07-27")
+      patient.toList mustBe List("key1", "Michel", "Dufresne", "M", "1962-07-27T00:00:00.000-04:00")
     }
 
     "create a Patient from a list of attributes" in {
-      val patient = Patient("key1", "Michel", "Dufresne", "M", LocalDate.parse("1962-07-27").toDateTimeAtStartOfDay())
+      val patient = Patient("key1", "Michel", "Dufresne", "M", DateTime.parse("1962-07-27T00:00:00.000-04:00"))
 
       PatientParser.fromList(patient.toList) mustBe patient
     }

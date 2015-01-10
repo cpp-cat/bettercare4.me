@@ -3,12 +3,12 @@
  */
 package com.nickelsoftware.bettercare4me.models
 
-import scala.beans.BeanProperty
-import org.joda.time.LocalDate
+import scala.collection.JavaConversions.asScalaBuffer
+import scala.collection.JavaConversions.mapAsScalaMap
+
+import org.joda.time.DateTime
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.SafeConstructor
-import scala.collection.JavaConversions._
-import org.joda.time.DateTime
 
 object ClaimGeneratorConfig {
 

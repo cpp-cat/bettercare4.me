@@ -3,14 +3,6 @@
  */
 package com.nickelsoftware.bettercare4me.models
 
-import org.joda.time.DateTime
-import com.nickelsoftware.bettercare4me.hedis.HEDISRule
-import com.nickelsoftware.bettercare4me.utils.NickelException
-import org.joda.time.LocalDate
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
-import com.nickelsoftware.bettercare4me.hedis.RuleScore
-import com.nickelsoftware.bettercare4me.hedis.RuleCriteriaScore
-
 
 /**
  * Summary class for HEDIS rules, listing all eligible patients

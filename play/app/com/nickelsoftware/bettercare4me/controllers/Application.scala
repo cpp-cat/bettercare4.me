@@ -2,6 +2,7 @@ package com.nickelsoftware.bettercare4me.controllers
 
 import java.io.FileNotFoundException
 import java.io.IOException
+
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -9,8 +10,11 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.future
 import scala.io.Source
 import scala.language.postfixOps
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.joda.time.DateTime
+
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsCompleted
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsRequest
@@ -23,9 +27,10 @@ import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleResponse
 import com.nickelsoftware.bettercare4me.actors.SimpleActor.SimpleSparkRequest
 import com.nickelsoftware.bettercare4me.cassandra.Bettercare4me
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
+import com.nickelsoftware.bettercare4me.models.Paginator
 import com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig
-import com.nickelsoftware.bettercare4me.views.html.hedisReport
 import com.nickelsoftware.bettercare4me.views.html.patientList
+
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
@@ -38,8 +43,6 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
-import org.joda.time.LocalDate
-import com.nickelsoftware.bettercare4me.models.Paginator
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -190,7 +193,7 @@ object Application extends Controller {
   // ------------------------------------------------------------
   def hedisReport(date: String) = Action.async {
 
-    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    val hedisDate = DateTime.parse(date)
     Bettercare4me.queryHEDISReport(hedisDate) map {
       case (hedisScoreSummary, configTxt) =>
         val config = ClaimGeneratorConfig.loadConfig(configTxt)
@@ -202,7 +205,7 @@ object Application extends Controller {
   // ------------------------------------------------------------
   def ruleScorecard(ruleName: String, date: String, pageID: Long, pageCnt: Int) = Action.async {
 
-    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    val hedisDate = DateTime.parse(date)
     val futureRss = Bettercare4me.queryRuleScorecardPaginated(ruleName, hedisDate, pageID, pageCnt)
     val futureRi = Bettercare4me.queryRuleInformation(ruleName, hedisDate)
     for {
@@ -220,16 +223,13 @@ object Application extends Controller {
   // ------------------------------------------------------------
   def patientScorecard(batchID: Int, patientID: String, date: String) = Action.async {
     
-    val hedisDate = LocalDate.parse(date).toDateTimeAtStartOfDay()
+    val hedisDate = DateTime.parse(date)
     val patientScorecardFuture = Bettercare4me.queryPatientScorecardResult(batchID, patientID, hedisDate)
     val configFuture = Bettercare4me.queryClaimGeneratorConfig(hedisDate)
     for {
       configTuple <- configFuture
       patientScorecard <- patientScorecardFuture
     } yield {
-//      println(patientScorecard.patient.lastName+", "+patientScorecard.patient.lastName+" - "+patientScorecard.patient.patientID)
-//      patientScorecard.scorecardResult foreach { case (n, _) => println(n) }
-      
       Ok(com.nickelsoftware.bettercare4me.views.html.patientScorecard(configTuple._1, patientScorecard))
     }
   }

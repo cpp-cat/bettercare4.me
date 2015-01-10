@@ -6,7 +6,6 @@ package com.nickelsoftware.bettercare4me.models
 import java.io.StringWriter
 
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 
 import com.github.tototoshi.csv.CSVParser
 import com.github.tototoshi.csv.CSVWriter
@@ -116,7 +115,7 @@ object CriteriaResultDetail {
   
   def apply(s: String): CriteriaResultDetail = {
     CSVParser.parse(s, '\\', ',', '"') match {
-      case Some(l) => CriteriaResultDetail(l(0), l(1), l(2), LocalDate.parse(l(3)).toDateTimeAtStartOfDay(), l(4))
+      case Some(l) => CriteriaResultDetail(l(0), l(1), l(2), DateTime.parse(l(3)), l(4))
       case None => throw NickelException("CriteriaResultDetail: Invalid CriteriaResultDetail string representation: " + s)
     } 
   }
@@ -130,8 +129,20 @@ case class CriteriaResultDetail(claimId: String, providerFirstName: String, prov
   def toCSVString: String = {
     var strWriter = new StringWriter()
     val writer = CSVWriter.open(strWriter)
-    writer.writeRow(List(claimId, providerFirstName, providerLastName, dos.toLocalDate().toString, reason))
+    writer.writeRow(List(claimId, providerFirstName, providerLastName, dos.toString, reason))
     writer.flush
     strWriter.toString()
+  }
+    
+  /**
+   * Must override `equals` because of `DateTime`
+   */
+  override def equals(that: Any): Boolean = that match {
+    case rhs: CriteriaResultDetail =>
+      claimId == rhs.claimId &&
+      providerFirstName == rhs.providerFirstName && providerLastName == rhs.providerLastName &&
+      dos.isEqual(rhs.dos) && 
+      reason == rhs.reason
+    case _ => false
   }
 }

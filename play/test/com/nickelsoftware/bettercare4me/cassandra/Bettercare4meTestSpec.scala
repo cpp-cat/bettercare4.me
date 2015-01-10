@@ -3,26 +3,18 @@
  */
 package com.nickelsoftware.bettercare4me.cassandra;
 
-import scala.collection.Set
-import org.scalatest._
-import org.scalatestplus.play._
-import play.api.Logger
-import play.api.Play.current
-import org.scalatest.SuiteMixin
-import org.scalatest.Suite
-import org.joda.time.DateTime
-import org.joda.time.LocalDate
-import org.joda.time.LocalTime
 import scala.language.postfixOps
-import java.io.File
-import java.io.BufferedWriter
-import java.io.FileWriter
-import scala.io.Source
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import com.nickelsoftware.bettercare4me.models.Patient
+
+import org.joda.time.DateTime
+import org.scalatest.Suite
+import org.scalatest.SuiteMixin
+import org.scalatestplus.play.OneAppPerSuite
+import org.scalatestplus.play.PlaySpec
+
 import com.nickelsoftware.bettercare4me.models.Patient
 import com.nickelsoftware.bettercare4me.models.Provider
-import play.api.test.FakeApplication
+
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 
 
 // -----------------------------------------------------------------------------------------------------------
@@ -49,7 +41,7 @@ class Bettercare4meTestSpec extends PlaySpec with OneAppPerSuite with TestCassan
   "The Bettercare4me object" must {
 
     "read patients from cassandra" in {
-      Bettercare4me.queryPatients(991) map { l => l.toList mustBe List(Patient("patient-1-0", "MARCIA", "COOPER", "F", new LocalDate(1964, 9, 30).toDateTimeAtStartOfDay()))}
+      Bettercare4me.queryPatients(991) map { l => l.toList mustBe List(Patient("patient-1-0", "MARCIA", "COOPER", "F", new DateTime(1964, 9, 30, 0, 0)))}
     }
 
     "read providers from cassandra" in {

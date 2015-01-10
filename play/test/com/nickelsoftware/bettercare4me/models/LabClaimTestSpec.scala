@@ -43,7 +43,7 @@ class LabClaimTestSpec extends PlaySpec {
 
       val l = claim.toList
       val ans = List("LC", "claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
-        "2014-09-05", "claimStatus", "cpt", "loinc", "60.0123456789", "1")
+        "2014-09-05T00:00:00.000-04:00", "claimStatus", "cpt", "loinc", "60.0123456789", "1")
 
       l.size mustBe ans.size
       l mustBe ans
@@ -55,7 +55,7 @@ class LabClaimTestSpec extends PlaySpec {
 
       val l = claim.toList
       val ans = List("LC", "claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
-        "2014-09-05", "", "", "", "0.0", "")
+        "2014-09-05T00:00:00.000-04:00", "", "", "", "0.0", "")
 
       l.size mustBe ans.size
       l mustBe ans
@@ -65,8 +65,8 @@ class LabClaimTestSpec extends PlaySpec {
       val dos = LocalDate.parse("2014-09-05").toDateTimeAtStartOfDay()
       val claim = LabClaim("claim 1", "patient.uuid", "patient.first", "patient.last", "provider.uuid", "provider.first", "provider.last",
         dos, claimStatus="claimStatus", cpt="cpt", loinc="loinc", result=60.0123456789, posNegResult="1")
-        
-        ClaimParser.fromList(claim.toList) mustBe claim
+      
+        ClaimParser.fromList(claim.toList) mustEqual claim
     }
   }
   

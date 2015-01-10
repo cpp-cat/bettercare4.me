@@ -4,7 +4,6 @@
 package com.nickelsoftware.bettercare4me.models
 
 import org.joda.time.DateTime
-import org.joda.time.LocalDate
 import org.joda.time.Months
 import org.joda.time.Years
 
@@ -13,7 +12,7 @@ import com.nickelsoftware.bettercare4me.utils.Utils.add2Map
 
 object PatientParser {
 
-  def fromList(l: List[String]): Patient = Patient(l(0), l(1), l(2), l(3), LocalDate.parse(l(4)).toDateTimeAtStartOfDay())
+  def fromList(l: List[String]): Patient = Patient(l(0), l(1), l(2), l(3), DateTime.parse(l(4)))
 }
 
 /**
@@ -24,7 +23,7 @@ case class Patient(patientID: String, firstName: String, lastName: String, gende
   def age(asOf: DateTime): Int = Years.yearsBetween(dob, asOf).getYears()
   def ageInMonths(asOf: DateTime): Int = Months.monthsBetween(dob, asOf).getMonths()
 
-  def toList = List(patientID, firstName, lastName, gender, dob.toLocalDate().toString)
+  def toList = List(patientID, firstName, lastName, gender, dob.toString)
 }
 
 object PatientHistoryFactory {
