@@ -43,8 +43,9 @@ import com.nickelsoftware.bettercare4me.utils.Properties
  *
  * Default config file name: "data/cassandra.yaml"
  */
-class Cassandra(fname: String = "data/cassandra.yaml") {
+class Cassandra {
 
+  private val fname: String = Properties.cassandraConfig.path
   val config = loadConfig
   def node = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
 
@@ -61,6 +62,14 @@ class Cassandra(fname: String = "data/cassandra.yaml") {
     }
   }
 
+  /**
+   * Close the underlying cassandra connection
+   */
+  def close = {
+    session.close()
+    cluster.close()
+  }
+
   private def loadConfig(): Map[String, Object] = {
     val yaml = new Yaml(new SafeConstructor());
     yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
@@ -73,8 +82,20 @@ class Cassandra(fname: String = "data/cassandra.yaml") {
  *
  * Local class that manage the data access.
  */
-protected[cassandra] class Bc4me(cassandra: Cassandra) {
+protected[cassandra] class Bc4me {
 
+  /**
+   * Should that be private?
+   */
+  val cassandra = new Cassandra
+
+  /**
+   * Close the underlying cassandra connection
+   */
+  def close = {
+    cassandra.close
+  }
+  
   // prepared statements
   private val queryPatientsStmt = cassandra.session.prepare("SELECT data FROM patients WHERE batch_id = ?")
   private val queryProvidersStmt = cassandra.session.prepare("SELECT data FROM providers WHERE batch_id = ?")
@@ -357,11 +378,6 @@ protected[cassandra] class Bc4me(cassandra: Cassandra) {
       }
     }
   }
-
-  def close = {
-    cassandra.session.close()
-    cassandra.cluster.close()
-  }
 }
 
 /**
@@ -384,23 +400,50 @@ object Bettercare4me {
    */
   def connect = {
     
-    val fname: String = (Properties.dataDir / "cassandra.yaml").path
-    
-    // close if it was already opened
+//    // close if it was already opened
+//    bc4me match {
+//      case Some(c) => c.close
+//      case _ => Unit
+//    }
+//    
+//    // open a new connection
+//    bc4me = try {
+//	    Some(new Bc4me)
+//    } catch {
+//      case ex: NoHostAvailableException => {
+//        Logger.error("No Cassandra database available.")
+//        None
+//      }
+//    }
+    // Open a connection only if does not have one already
+    bc4me match {
+      case None => 
+	    bc4me = try {
+		    Some(new Bc4me)
+	    } catch {
+	      case ex: NoHostAvailableException => {
+	        Logger.error("No Cassandra database available.")
+	        None
+	      }
+	    }
+      case _ => 
+        Logger.info("Cassandra database connection already opened.")
+        Unit
+    }
+  }
+
+  /**
+   * Closing the connection with Cassandra cluster
+   *
+   * This is called *only* by Global.onStop at application shutdown.
+   * Therefore the fact that it is no thread safe should not be an issue.
+   */
+  def close = {
     bc4me match {
       case Some(c) => c.close
-      case _ => Unit
+      case _ => Logger.warn("Bettercare4me: NOTHING TO CLOSE HERE!!!")
     }
-    
-    // open a new connection
-    bc4me = try {
-	    Some(new Bc4me(new Cassandra(fname)))
-    } catch {
-      case ex: NoHostAvailableException => {
-        Logger.error("No Cassandra database available.")
-        None
-      }
-    }
+    bc4me = None
   }
 
   /**
@@ -617,19 +660,5 @@ object Bettercare4me {
       case Some(c) => c.queryPatientScorecardResult(batchID, patientID, hedisDate)
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
-  }
-
-  /**
-   * Closing the connection with Cassandra cluster
-   *
-   * This is called *only* by Global.onStop at application shutdown.
-   * Therefore the fact that it is no thread safe should not be an issue.
-   */
-  def close = {
-    bc4me match {
-      case Some(c) => c.close
-      case _ => Logger.warn("Bettercare4me: NOTHING TO CLOSE HERE!!!")
-    }
-    bc4me = None
   }
 }

@@ -104,15 +104,15 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
 
       } catch {
         case ex: FileNotFoundException => {
-          log.error("FileNotFoundException, cannot save claim generator config " + ex.getMessage())
+          log.error("ClaimGeneratorActor.GenerateClaimsRequest: FileNotFoundException caught 1! cannot save claim generator config " + ex.getMessage())
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: IOException => {
-          log.error("IOException, " + ex.getMessage())
+          log.error("ClaimGeneratorActor.GenerateClaimsRequest: IOException caught 2! " + ex.getMessage())
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
         case ex: NickelException => {
-          log.error("NickelException, " + ex.message)
+          log.error("ClaimGeneratorActor.GenerateClaimsRequest: NickelException caught 3! " + ex.message)
           sender ! GenerateClaimsCompleted(ClaimGeneratorCounts(0, 0, 0), 1)
         }
       }
@@ -145,15 +145,15 @@ class ClaimGeneratorActor() extends Actor with ActorLogging {
 
       } catch {
         case ex: FileNotFoundException => {
-          log.error("FileNotFoundException, cannot save claim generator config " + ex.getMessage())
+          log.error("ClaimGeneratorActor.ProcessGenereatedClaims: FileNotFoundException caught 1! cannot save claim generator config " + ex.getMessage())
           sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
         }
         case ex: IOException => {
-          log.error("IOException, " + ex.getMessage())
+          log.error("ClaimGeneratorActor.ProcessGenereatedClaims: IOException caught 2! " + ex.getMessage())
           sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
         }
         case ex: NickelException => {
-          log.error("NickelException, " + ex.message)
+          log.error("ClaimGeneratorActor.ProcessGenereatedClaims: NickelException caught 3! " + ex.message)
           sender ! akka.actor.Status.Failure(NickelException(ex.getMessage()))
         }
       }

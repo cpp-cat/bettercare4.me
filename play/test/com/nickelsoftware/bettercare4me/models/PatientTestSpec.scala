@@ -49,6 +49,12 @@ class PatientTestSpec extends PlaySpec {
       val patient = Patient("key1", "Michel", "Dufresne", "M", DateTime.parse("1962-07-27T00:00:00.000-04:00"))
 
       PatientParser.fromList(patient.toList) mustBe patient
+
+      // just to make sure ...
+      val l = List("key1", "Michel", "Dufresne", "M", "1962-07-27T00:00:00.000-04:00")
+      PatientParser.fromList(l) mustBe patient
+      PatientParser.fromList(l) mustEqual patient
+      
     }
   }
 

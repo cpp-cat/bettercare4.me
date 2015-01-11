@@ -32,8 +32,15 @@
 ## Completed User Stories
 - Code changed
 -
+  - Better error handling when failures occurs during spark jobs. See `Application.reportGeneratorSubmit` handling error sent by
+    `ClaimGeneratorActor.ProcessGenereatedClaims`
+  - Open only one database connection to Cassandra, check perfomed in the `connect` method.
+  - Reading spark and cassandra configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties`
+    - Spark config file name from env variable `BC4ME_SPARK_CONFIG` with default of `spark.yaml` (relative to `BC4ME_DATA_DIR`)
+    - Cassandra config file name from env variable `BC4ME_CASSANDRA_CONFIG` with default of `cassandra.yaml` (relative to `BC4ME_DATA_DIR`)
   - Need to use fully qualified dates, e.g., `2013-12-31T00:00:00.00-05:00` throughout the code (no LocalDate)
     - Needed to `override def equals(that: Any): Boolean = that match { ...` to use `DateTime.isEqual`
+      - Overrided for Claim (MedClaim, RxClaim, and LabClaim)
   - Added error handling when connection to Cassandra fails (case where there is no database)
   - Added reading spark configuration from yaml file: data/spark.yaml
   - Configuring `./data` directory using environment variable `BC4ME_DATA_DIR` with `./data` as the default

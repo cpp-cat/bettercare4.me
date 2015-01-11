@@ -2,7 +2,6 @@ package com.nickelsoftware.bettercare4me.controllers
 
 import java.io.FileNotFoundException
 import java.io.IOException
-
 import scala.concurrent.Await
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
@@ -10,11 +9,9 @@ import scala.concurrent.duration.DurationInt
 import scala.concurrent.future
 import scala.io.Source
 import scala.language.postfixOps
-
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.joda.time.DateTime
-
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsCompleted
 import com.nickelsoftware.bettercare4me.actors.ClaimGeneratorActor.GenerateClaimsRequest
@@ -30,7 +27,6 @@ import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import com.nickelsoftware.bettercare4me.models.Paginator
 import com.nickelsoftware.bettercare4me.views.html.claimGeneratorConfig
 import com.nickelsoftware.bettercare4me.views.html.patientList
-
 import akka.actor.Props
 import akka.pattern.ask
 import akka.util.Timeout
@@ -43,6 +39,8 @@ import play.api.libs.concurrent.Akka
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.mvc.Action
 import play.api.mvc.Controller
+import scala.util.Success
+import scala.util.Failure
 
 // Define the form data classes
 case class GeneratorConfigData(configTxt: String)
@@ -149,11 +147,17 @@ object Application extends Controller {
     result match {
 
       case Some((Some(configTxt), _)) =>
-        val fresponse: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedClaims(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
-        fresponse map { processGenereatedFilesCompleted =>
+
+        // The *good* case:
+        val f: Future[ProcessGenereatedFilesCompleted] = (claimGeneratorActor ? ProcessGenereatedClaims(configTxt)).mapTo[ProcessGenereatedFilesCompleted]
+        f map { processGenereatedFilesCompleted =>
           val config = ClaimGeneratorConfig.loadConfig(configTxt)
           //*** use report view with config and ss
           Ok(com.nickelsoftware.bettercare4me.views.html.hedisReport(config, processGenereatedFilesCompleted.ss))
+        } recover {
+          case t =>
+            Logger.error("Application.reportGeneratorSubmit: Throwable caught 1! " + t.toString())
+            Redirect(routes.Application.index("Process Generated Claim Job Returned ERROR, please see log files"))
         }
 
       case Some((None, Some(err))) =>
@@ -215,14 +219,14 @@ object Application extends Controller {
       val patientCount = ri._1
       val totalPageCount = ri._2
       val ruleScoreSummary = ri._3
-      Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, patientCount, ruleScoreSummary, tuples.toList, Paginator(pageID, pageCnt, totalPageCount) ))
+      Ok(com.nickelsoftware.bettercare4me.views.html.ruleScorecard(ruleName, date, patientCount, ruleScoreSummary, tuples.toList, Paginator(pageID, pageCnt, totalPageCount)))
     }
   }
 
   // Returns the patient profile / scorecard
   // ------------------------------------------------------------
   def patientScorecard(batchID: Int, patientID: String, date: String) = Action.async {
-    
+
     val hedisDate = DateTime.parse(date)
     val patientScorecardFuture = Bettercare4me.queryPatientScorecardResult(batchID, patientID, hedisDate)
     val configFuture = Bettercare4me.queryClaimGeneratorConfig(hedisDate)
@@ -234,7 +238,6 @@ object Application extends Controller {
     }
   }
 
-  
   // ---------------- SIMPLE TEST STUFF ----------------------------------------------------
   // Using Akka Actor to perform the action
   import SimpleActor._
