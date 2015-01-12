@@ -28,6 +28,10 @@ object SparkConfig {
 
   def master = config.getOrElse("master", "local[3]").asInstanceOf[String]
   def appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+  
+  Logger.info("Spark Configuration leaded from "+fname)
+  Logger.info("Spark master: "+master)
+  Logger.info("Spark app name: "+appName)
 
   private def loadConfig(): Map[String, Object] = {
     val yaml = new Yaml(new SafeConstructor());
