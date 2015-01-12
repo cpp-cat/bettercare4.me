@@ -48,6 +48,11 @@ class Cassandra {
   private val fname: String = Properties.cassandraConfig.path
   val config = loadConfig
   def node = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
+  //*
+  println("**> Cassandra: Loading configuration from: "+fname)
+  Logger.info("Cassandra: Loading configuration from: "+fname)
+  Logger.info("Cassandra Node IP: "+node)
+  println("**> Cassandra Node IP: "+node)
 
   val cluster = Cluster.builder().addContactPoint(node).build()
   log(cluster.getMetadata)
@@ -398,23 +403,7 @@ object Bettercare4me {
    *
    * Default config file name: "data/cassandra.yaml"
    */
-  def connect = {
-    
-//    // close if it was already opened
-//    bc4me match {
-//      case Some(c) => c.close
-//      case _ => Unit
-//    }
-//    
-//    // open a new connection
-//    bc4me = try {
-//	    Some(new Bc4me)
-//    } catch {
-//      case ex: NoHostAvailableException => {
-//        Logger.error("No Cassandra database available.")
-//        None
-//      }
-//    }
+  def connect: Unit = {
     // Open a connection only if does not have one already
     bc4me match {
       case None => 
@@ -422,13 +411,14 @@ object Bettercare4me {
 		    Some(new Bc4me)
 	    } catch {
 	      case ex: NoHostAvailableException => {
-	        Logger.error("No Cassandra database available.")
+	        //*
+            println("**> Bettercare4me.connect: NoHostAvailableException caught! -- No Cassandra database available.")
+	        Logger.error("Bettercare4me.connect: NoHostAvailableException caught! -- No Cassandra database available.")
 	        None
 	      }
 	    }
       case _ => 
         Logger.info("Cassandra database connection already opened.")
-        Unit
     }
   }
 

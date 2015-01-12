@@ -53,8 +53,8 @@
 -
   - Create a keypair for play instance: play1-kp.pem
   - Start the spark cluster and create a cassandra cluster
-    - Put the private DNS of the spark master onto data/spark-prod.yaml : spark://ip-10-40-46-177:7077
-    - Put the public DNS of the cassandra master onto data/cassandra-prod.yaml
+    - Put the private DNS of the spark master onto data/spark-prod.yaml : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
+    - Put the private IP of the cassandra master onto data/cassandra-prod.yaml
     - Commit those changes and push it to github master
   - Create  ubuntu linux ec2 instance having java 7: 
     - Instance type: m3.large
@@ -109,6 +109,8 @@
   - Start the spark cluster (from the master node)
     - `$ ./spark/sbin/start-all.sh `
     - Check the cluster status at: http://ec2-54-146-63-114.compute-1.amazonaws.com:8080/ (spark master public DNS)
+    - Get the spark master URL from cluster status page
+    - Log files are in worker nodes in `/root/spark/work` dir based on bach job ID
   - Stop the spark cluster (from the master node)
     - $ ./spark/sbin/stop-all.sh 
 
