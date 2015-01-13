@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+#
+# Make sure you're on the Play instance
+#
+# EDIT THE NEXT TWO LINES WITH PRIVATE IPS
+# ----------------------------------------
+spark_master_private_ip="<IP>"
+cassandra_master_private_ip="<IP>"
+#
+
+cd /root/bettercare4.me/play
+git checkout -- .
+git pull origin master
+./activator clean play-update-secret stage
+
+scp -i ~/spark1-kp.pem -r target/universal/stage root@$spark_master_private_ip:/root/
+scp -i ~/spark1-kp.pem -r data root@$spark_master_private_ip:/root/stage/
+scp -i ~/spark1-kp.pem data/spark_prod_conf/* root@$spark_master_private_ip:/root/spark/conf/
+scp -i ~/spark1-kp.pem data/spark_prod_conf/masters root@$spark_master_private_ip:/root/spark-ec2/
+scp -i ~/spark1-kp.pem data/spark_prod_conf/slaves root@$spark_master_private_ip:/root/spark-ec2/
+scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@$cassandra_master_private_ip:~/
+
+# RSYNC the spark cluster
+ssh -i ~/spark1-kp.pem root@$spark_master_private_ip 'cd /root/spark-ec2; ./copy-dir /root/stage; ./copy-dir /root/spark/conf'
+
+# Start the spark cluster
+ssh -i ~/spark1-kp.pem root@$spark_master_private_ip '/root/spark/sbin/start-all.sh'
+
+# Source the Cassandra database
+# at the prompt type `source 'data/bettercare4me.cql';`
+ssh -t -i ~/cassandra1-kp.pem ubuntu@$cassandra_master_private_ip 'cqlsh'
