@@ -14,7 +14,6 @@ import scalax.file.Path
 object Properties {
   
   val dataDir: Path = Path.fromString(scala.util.Properties.envOrElse("BC4ME_DATA_DIR", "./data" ))
-  val sparkConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_SPARK_CONFIG", "spark.yaml" )
   val cassandraConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_CASSANDRA_CONFIG", "cassandra.yaml" )
 }
 

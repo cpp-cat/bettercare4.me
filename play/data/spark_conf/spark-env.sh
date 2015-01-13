@@ -50,4 +50,7 @@
 # - SPARK_NICENESS      The scheduling priority for daemons. (Default: 0)
 
 export SPARK_CLASSPATH="/root/stage/lib/*"
+export BC4ME_DATA_DIR="/root/stage/data"
+export BC4ME_SPARK_CONF="spark-prod.yaml"
+export BC4ME_CASSANDRA_CONF="cassandra-prod.yaml"
 

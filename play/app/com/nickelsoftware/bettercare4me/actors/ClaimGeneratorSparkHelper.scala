@@ -16,28 +16,6 @@ import com.nickelsoftware.bettercare4me.utils.Properties
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.apache.spark.SparkException
 
-/**
- * Simple object to lead the spark configuration from file
- *
- * Loading from Properties.sparkConfig
- */
-object SparkConfig {
-
-  private val fname = Properties.sparkConfig.path
-  lazy val config = loadConfig
-
-  def master = config.getOrElse("master", "local[3]").asInstanceOf[String]
-  def appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
-  
-  Logger.info("Spark Configuration leaded from "+fname)
-  Logger.info("Spark master: "+master)
-  Logger.info("Spark app name: "+appName)
-
-  private def loadConfig(): Map[String, Object] = {
-    val yaml = new Yaml(new SafeConstructor());
-    yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
-  }
-}
 
 /**
  * Helper object to distribute the workload of generating the patients, providers and claims
@@ -52,11 +30,10 @@ object ClaimGeneratorSparkHelper {
    */
   def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
-    val conf = new SparkConf()
-      .setMaster(SparkConfig.master)
-      .setAppName(SparkConfig.appName)
+    val sc = new SparkContext(new SparkConf())
+    Logger.info("generateClaims: Spark master: " + sc.master)
+    Logger.info("generateClaims: Spark app name: " + sc.appName)
 
-    val sc = new SparkContext(conf)
     if (sc.isLocal) {
       Logger.info("Local Spark context created, master : " + sc.master)
     } else {
@@ -99,11 +76,10 @@ object ClaimGeneratorSparkHelper {
 
   def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
-    val conf = new SparkConf()
-      .setMaster(SparkConfig.master)
-      .setAppName(SparkConfig.appName)
+    val sc = new SparkContext(new SparkConf())
+    Logger.info("processGeneratedClaims: Spark master: " + sc.master)
+    Logger.info("processGeneratedClaims: Spark app name: " + sc.appName)
 
-    val sc = new SparkContext(conf)
     if (sc.isLocal) {
       Logger.info("Local Spark context created, master : " + sc.master)
     } else {

@@ -35,14 +35,13 @@
   - Better error handling when failures occurs during spark jobs. See `Application.reportGeneratorSubmit` handling error sent by
     `ClaimGeneratorActor.ProcessGenereatedClaims`
   - Open only one database connection to Cassandra, check perfomed in the `connect` method.
-  - Reading spark and cassandra configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties`
-    - Spark config file name from env variable `BC4ME_SPARK_CONFIG` with default of `spark.yaml` (relative to `BC4ME_DATA_DIR`)
+  - Spark config (master IP and app name) from env variable using `spark/conf/spark-defaults.conf`
+  - Reading cassandra configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties`
     - Cassandra config file name from env variable `BC4ME_CASSANDRA_CONFIG` with default of `cassandra.yaml` (relative to `BC4ME_DATA_DIR`)
   - Need to use fully qualified dates, e.g., `2013-12-31T00:00:00.00-05:00` throughout the code (no LocalDate)
     - Needed to `override def equals(that: Any): Boolean = that match { ...` to use `DateTime.isEqual`
       - Overrided for Claim (MedClaim, RxClaim, and LabClaim)
   - Added error handling when connection to Cassandra fails (case where there is no database)
-  - Added reading spark configuration from yaml file: data/spark.yaml
   - Configuring `./data` directory using environment variable `BC4ME_DATA_DIR` with `./data` as the default
   - Adding scalax.io incubator library for file path manipulation (http://jesseeichar.github.io/scala-io-doc/0.4.3/index.html#!/overview)
   - Removed the first-names.csv and last-names.csv from configuration.
@@ -52,10 +51,6 @@
 - Create a Play AMI
 -
   - Create a keypair for play instance: play1-kp.pem
-  - Start the spark cluster and create a cassandra cluster
-    - Put the private DNS of the spark master onto data/spark-prod.yaml : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
-    - Put the private IP of the cassandra master onto data/cassandra-prod.yaml
-    - Commit those changes and push it to github master
   - Create  ubuntu linux ec2 instance having java 7: 
     - Instance type: m3.large
     - Image: ami-24af204c (Medidata Ubuntu 14.04 + Java 7)
@@ -64,12 +59,22 @@
     - Security group: bc4me-spark-cluster-master (need to open port 80 & 443 on this security group)
     - SSH key pair: play1-kp
     - Strarted with public DNS: ec2-54-205-171-3.compute-1.amazonaws.com
-
-  - Start the system monitoring on play instance:
-    - `$ java -jar remote-linux-monitor-v1.05.jar -i ~/play1-kp.pem -H ec2-54-159-192-139.compute-1.amazonaws.com -u ubuntu &`
+  - The Play instance is started
   - Copy the spark1-kp.pem and cassandra1-kp.pem onto the play instance to be able to ssh into the spark cluster:
     - `$ scp -i ~/play1-kp.pem ~/spark1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
     - `$ scp -i ~/play1-kp.pem ~/cassandra1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
+
+- Starting the Play Application on Play instance
+-
+  - Start the spark cluster and create a cassandra cluster
+    - Put the spark master private IP onto `data/spark_conf/master`
+    - Put the spark slaves private IP onto `data/spark_conf/slaves`
+    - Put the spark master url onto `data/spark_conf/spark-defaults-prod.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
+    - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
+    - Commit those changes and push it to github master
+
+  - Start the system monitoring on play instance:
+    - `$ java -jar remote-linux-monitor-v1.05.jar -i ~/play1-kp.pem -H ec2-54-159-192-139.compute-1.amazonaws.com -u ubuntu &`
   - SSH to the play ec2 instance: 
     - `$ ssh -i ~/play1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com` (using the correct public DNS)
   - Clone the Bettercare4.me git repository onto the play instance, or update the repo
@@ -77,32 +82,25 @@
     - `$ git clone https://github.com/regency901/bettercare4.me.git`
     - `$ git checkout -- .` to discard modified files not on the git index
     - `$ git pull origin master`
-  - Generated a new application secret key using:
-    - `$ ./activator play-update-secret`
-  - Using the stage task to create an application start script:
-    - `$ ./activator clean stage`
+  - Generated a new application secret key and package the application using:
+    - `$ ./activator clean play-update-secret stage`
       - Packaged the application is in target/universal/stage/
       - Class path for the application (specified in spark-env.sh): app_classpath="/root/stage/lib/*"
   - Copy the packaged application to the spark master node (we're still ssh'ed onto the play instance):
     - `$ scp -i ~/spark1-kp.pem -r target/universal/stage root@<spark master private IP>:/root/` 
     - `$ scp -i ~/spark1-kp.pem -r data root@<spark master private IP>:/root/stage/`
-    - `$ scp -i ~/spark1-kp.pem data/spark-env.sh root@<spark master private IP>:/root/spark/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/spark-env.sh root@<spark master private IP>:/root/spark/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/log4j.properties root@<spark master private IP>:/root/spark/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/spark-defaults-prod.conf root@<spark master private IP>:/root/spark/conf/spark-defaults.conf`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/slaves root@<spark master private IP>:/root/spark/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/master root@<spark master private IP>:/root/spark-ec2/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_conf/slaves root@<spark master private IP>:/root/spark-ec2/conf/`
   - Copy the database schema to the cassandra master node
     - `$ scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/`
   - Exit from play instance to return to local shell (firefly)
   
   - Logon onto the cluster (on master node) from local shell (firefly): 
     - `$ ssh -i ~/spark1-kp.pem root@ec2-54-146-63-114.compute-1.amazonaws.com`
-  - Update the master and slave file (since the public DNS changed since we originially created the instances)
-    - `$ echo 'ec2-54-146-63-114.compute-1.amazonaws.com' > spark-ec2/masters`
-    - `$ cat > spark-ec2/slaves `
-      - `ec2-23-20-50-246.compute-1.amazonaws.com`
-      - `ec2-54-162-1-86.compute-1.amazonaws.com`
-      - `<ctrl-D>`
-    - `$ cat > spark/conf/slaves` 
-      - `ec2-23-20-50-246.compute-1.amazonaws.com`
-      - `ec2-54-162-1-86.compute-1.amazonaws.com`
-      - `<ctrl-D>`
   - RSYNC the copied files to all the slaves of the cluster:
     - `$ ./spark-ec2/copy-dir /root/stage`
     - `$ ./spark-ec2/copy-dir /root/spark/conf`
@@ -114,16 +112,16 @@
   - Stop the spark cluster (from the master node)
     - $ ./spark/sbin/stop-all.sh 
 
-  - SSH to the cassandra master node: `$ ssh -i cassandra1-kp.pem ubuntu@<cassandra private dns>`
+  - SSH to the cassandra master node: 
+    - `$ ssh -i cassandra1-kp.pem ubuntu@<cassandra private dns>`
   - Execute nodetool and cqlsh shell command to load the database schema
-    - ubuntu@ip-10-169-190-121:~$ cqlsh
-      - cqlsh> source 'data/bettercare4me.cql';
-    - ubuntu@ip-10-169-190-121:~$ nodetool status
+    - `ubuntu@ip-10-169-190-121:~$ cqlsh`
+      - `cqlsh> source 'data/bettercare4me.cql';`
+    - `ubuntu@ip-10-169-190-121:~$ nodetool status`
     - are both available directly from the prompt of the ssh shell on the EC2 instance!
     - Exit from the cassandra master
 
   - Running the application (from the play directory on the play instance):
-    - `$ export BC4ME_SPARK_CONFIG=spark-prod.yaml`
     - `$ export BC4ME_CASSANDRA_CONFIG=cassandra-prod.yaml`
     - `play$ sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80`
     - see available option: target/universal/stage/bin/bettercare4-me -h
