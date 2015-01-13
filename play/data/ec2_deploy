@@ -3,7 +3,7 @@
 #
 # Make sure you're on the Play instance
 #
-# EDIT THE NEXT TWO LINES WITH PRIVATE IPS
+# EDIT THE NEXT TWO LINES WITH PRIVATE IPs
 # ----------------------------------------
 spark_master_private_ip="<IP>"
 cassandra_master_private_ip="<IP>"
@@ -28,5 +28,5 @@ ssh -i ~/spark1-kp.pem root@$spark_master_private_ip 'cd /root/spark-ec2; ./copy
 ssh -i ~/spark1-kp.pem root@$spark_master_private_ip '/root/spark/sbin/start-all.sh'
 
 # Source the Cassandra database
-# at the prompt type `source 'data/bettercare4me.cql';`
+# at the prompt type: "source 'data/bettercare4me.cql'; exit;"
 ssh -t -i ~/cassandra1-kp.pem ubuntu@$cassandra_master_private_ip 'cqlsh'
