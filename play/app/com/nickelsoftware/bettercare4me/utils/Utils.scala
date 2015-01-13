@@ -15,6 +15,7 @@ object Properties {
   
   val dataDir: Path = Path.fromString(scala.util.Properties.envOrElse("BC4ME_DATA_DIR", "./data" ))
   val cassandraConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_CASSANDRA_CONFIG", "cassandra.yaml" )
+  val isLocal: String = scala.util.Properties.envOrElse("BC4ME_IS_LOCAL", "false" )
 }
 
 

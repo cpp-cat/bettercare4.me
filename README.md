@@ -34,8 +34,10 @@
 -
   - Better error handling when failures occurs during spark jobs. See `Application.reportGeneratorSubmit` handling error sent by
     `ClaimGeneratorActor.ProcessGenereatedClaims`
-  - Open only one database connection to Cassandra, check perfomed in the `connect` method.
-  - Spark config (master IP and app name) from env variable using `spark/conf/spark-defaults.conf`
+  - Open only one database connection to Cassandra, check perfomed in the `cnnect` method.
+  - Reading spark master and app name from:
+    - Production Env: Spark config (master IP and app name) from env variable using `spark/conf/spark-defaults.conf`
+    - Local Env: reading `BC4ME_IS_LOCAL`, it is set in `.bashrc` : `export BC4ME_IS_LOCAL="true"`
   - Reading cassandra configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties`
     - Cassandra config file name from env variable `BC4ME_CASSANDRA_CONFIG` with default of `cassandra.yaml` (relative to `BC4ME_DATA_DIR`)
   - Need to use fully qualified dates, e.g., `2013-12-31T00:00:00.00-05:00` throughout the code (no LocalDate)
@@ -67,9 +69,9 @@
 - Starting the Play Application on Play instance
 -
   - Start the spark cluster and create a cassandra cluster
-    - Put the spark master private IP onto `data/spark_conf/master`
-    - Put the spark slaves private IP onto `data/spark_conf/slaves`
-    - Put the spark master url onto `data/spark_conf/spark-defaults-prod.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
+    - Put the spark master private IP onto `data/spark_prod_conf/masters`
+    - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
+    - Put the spark master url onto `data/spark_prod_conf/spark-defaults.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
     - Commit those changes and push it to github master
 
@@ -89,12 +91,9 @@
   - Copy the packaged application to the spark master node (we're still ssh'ed onto the play instance):
     - `$ scp -i ~/spark1-kp.pem -r target/universal/stage root@<spark master private IP>:/root/` 
     - `$ scp -i ~/spark1-kp.pem -r data root@<spark master private IP>:/root/stage/`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/spark-env.sh root@<spark master private IP>:/root/spark/conf/`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/log4j.properties root@<spark master private IP>:/root/spark/conf/`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/spark-defaults-prod.conf root@<spark master private IP>:/root/spark/conf/spark-defaults.conf`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/slaves root@<spark master private IP>:/root/spark/conf/`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/master root@<spark master private IP>:/root/spark-ec2/conf/`
-    - `$ scp -i ~/spark1-kp.pem data/spark_conf/slaves root@<spark master private IP>:/root/spark-ec2/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_prod_conf/* root@<spark master private IP>:/root/spark/conf/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_prod_conf/masters root@<spark master private IP>:/root/spark-ec2/`
+    - `$ scp -i ~/spark1-kp.pem data/spark_prod_conf/slaves root@<spark master private IP>:/root/spark-ec2/`
   - Copy the database schema to the cassandra master node
     - `$ scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@<cassandra master private dns>:~/`
   - Exit from play instance to return to local shell (firefly)
@@ -122,6 +121,7 @@
     - Exit from the cassandra master
 
   - Running the application (from the play directory on the play instance):
+    - `$ export SPARK_CONF_DIR="~/bettercare4.me/play/data/spark_prod_conf"
     - `$ export BC4ME_CASSANDRA_CONFIG=cassandra-prod.yaml`
     - `play$ sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80`
     - see available option: target/universal/stage/bin/bettercare4-me -h

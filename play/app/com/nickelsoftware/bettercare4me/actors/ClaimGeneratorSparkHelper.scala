@@ -30,16 +30,14 @@ object ClaimGeneratorSparkHelper {
    */
   def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
-    val sc = new SparkContext(new SparkConf())
+    val sc = if(Properties.isLocal=="true") {
+      val conf = new SparkConf()
+      conf.setMaster("local[3]")
+      conf.setAppName("Bettercare4me Local Spark")
+      new SparkContext(conf)
+    } else new SparkContext(new SparkConf())
     Logger.info("generateClaims: Spark master: " + sc.master)
     Logger.info("generateClaims: Spark app name: " + sc.appName)
-
-    if (sc.isLocal) {
-      Logger.info("Local Spark context created, master : " + sc.master)
-    } else {
-      Logger.info("Remote Spark context created, master : " + sc.master)
-    }
-    Logger.info("Spark application name: " + sc.appName)
 
     val result = try {
 
@@ -76,16 +74,14 @@ object ClaimGeneratorSparkHelper {
 
   def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
-    val sc = new SparkContext(new SparkConf())
+    val sc = if(Properties.isLocal=="true") {
+      val conf = new SparkConf()
+      conf.setMaster("local[3]")
+      conf.setAppName("Bettercare4me Local Spark")
+      new SparkContext(conf)
+    } else new SparkContext(new SparkConf())
     Logger.info("processGeneratedClaims: Spark master: " + sc.master)
     Logger.info("processGeneratedClaims: Spark app name: " + sc.appName)
-
-    if (sc.isLocal) {
-      Logger.info("Local Spark context created, master : " + sc.master)
-    } else {
-      Logger.info("Remote Spark context created, master : " + sc.master)
-    }
-    Logger.info("Spark application name: " + sc.appName)
 
     val result = try {
 

@@ -1,3 +1,0 @@
-master: local[3]
-# master: spark://ip-10-40-46-177:7077
-appName: Bettercare4.me Spark Cluster
