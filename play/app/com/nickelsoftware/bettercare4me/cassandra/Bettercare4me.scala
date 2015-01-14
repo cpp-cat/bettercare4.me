@@ -3,20 +3,19 @@
  */
 package com.nickelsoftware.bettercare4me.cassandra
 
-import java.io.FileReader
 import scala.collection.JavaConversions.asScalaBuffer
 import scala.collection.JavaConversions.asScalaSet
-import scala.collection.JavaConversions.mapAsScalaMap
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 import org.joda.time.DateTime
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
+
 import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.Cluster
 import com.datastax.driver.core.Metadata
 import com.datastax.driver.core.ResultSetFuture
+import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.nickelsoftware.bettercare4me.hedis.HEDISRule
 import com.nickelsoftware.bettercare4me.hedis.HEDISRuleInfo
 import com.nickelsoftware.bettercare4me.hedis.HEDISRules
@@ -32,10 +31,11 @@ import com.nickelsoftware.bettercare4me.models.PatientScorecardResult
 import com.nickelsoftware.bettercare4me.models.Provider
 import com.nickelsoftware.bettercare4me.models.ProviderParser
 import com.nickelsoftware.bettercare4me.utils.NickelException
-import com.nickelsoftware.bettercare4me.utils.cassandra.resultset.toFuture
-import play.api.Logger
-import com.datastax.driver.core.exceptions.NoHostAvailableException
 import com.nickelsoftware.bettercare4me.utils.Properties
+import com.nickelsoftware.bettercare4me.utils.Utils
+import com.nickelsoftware.bettercare4me.utils.cassandra.resultset.toFuture
+
+import play.api.Logger
 
 /**
  * Class managing a connection to Cassandra cluster and
@@ -46,11 +46,11 @@ import com.nickelsoftware.bettercare4me.utils.Properties
 class Cassandra {
 
   private val fname: String = Properties.cassandraConfig.path
-  val config = loadConfig
+  val config = Utils.loadYamlConfig(fname)
   def node = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
 
   Logger.info("Cassandra Node IP: " + node)
-  
+
   val cluster = Cluster.builder().addContactPoint(node).build()
   log(cluster.getMetadata)
 
@@ -70,18 +70,6 @@ class Cassandra {
   def close = {
     session.close()
     cluster.close()
-  }
-
-  private def loadConfig(): Map[String, Object] = {
-    try {
-      Logger.info("Cassandra.loadConfig: Loading cassandra config from: '"+fname+"'")
-      val yaml = new Yaml(new SafeConstructor());
-      yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
-    } catch {
-      case ex: Exception =>
-        Logger.error("Cassandra.loadConfig: Exception caught while loading cassandra config: "+ex.getMessage())
-        Map()
-    }
   }
 }
 

@@ -26,7 +26,6 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
-- Catch this error: (No such file or directory): ./data/cassandra-prod.yaml
 
 
 ## Completed User Stories
@@ -35,10 +34,8 @@
   - Better error handling when failures occurs during spark jobs. See `Application.reportGeneratorSubmit` handling error sent by
     `ClaimGeneratorActor.ProcessGenereatedClaims`
   - Open only one database connection to Cassandra, check perfomed in the `connect` method.
-  - Reading spark master and app name from:
-    - Production Env: Spark config (master IP and app name) from env variable using `spark/conf/spark-defaults.conf`
-    - Local Env: reading `BC4ME_IS_LOCAL`, it is set in `.bashrc` : `export BC4ME_IS_LOCAL="true"`
-  - Reading cassandra configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties`
+  - Reading cassandra and spark configuration file name from `com.nickelsoftware.bettercare4me.utils.Properties` (for Play Application only, not spark cluster)
+    - Spark config file name from env variable `BC4ME_SPARK_CONFIG` with default of `spark.yaml` (relative to `BC4ME_DATA_DIR`)
     - Cassandra config file name from env variable `BC4ME_CASSANDRA_CONFIG` with default of `cassandra.yaml` (relative to `BC4ME_DATA_DIR`)
   - Need to use fully qualified dates, e.g., `2013-12-31T00:00:00.00-05:00` throughout the code (no LocalDate)
     - Needed to `override def equals(that: Any): Boolean = that match { ...` to use `DateTime.isEqual`
@@ -72,6 +69,7 @@
     - Put the spark master private IP onto `data/spark_prod_conf/masters`
     - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
     - Put the spark master url onto `data/spark_prod_conf/spark-defaults.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
+    - Put the spark master url onto `data/spark-prod.yaml`
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
     - Put spark master and cassandra master private IP in `data/ec2-deploy`
     - Commit those changes and push it to github master
@@ -127,7 +125,8 @@
     - Exit from the cassandra master
 
   - Running the application (from the play directory on the play instance) (move to `./data/play_prod_env/.bashrc`):
-    - `$ export BC4ME_DATA_DIR="~/bettercare4.me/play/data"`
+    - `$ export BC4ME_DATA_DIR="/home/ubuntu/bettercare4.me/play/data"`
+    - `$ export BC4ME_SPARK_CONFIG="spark-prod.yaml"`
     - `$ export BC4ME_CASSANDRA_CONFIG="cassandra-prod.yaml"`
     - `play$ sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80`
     - see available option: `target/universal/stage/bin/bettercare4-me -h`

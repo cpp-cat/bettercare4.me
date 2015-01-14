@@ -1,26 +1,48 @@
 package com.nickelsoftware.bettercare4me.utils
 
-import org.joda.time.Interval
-import org.joda.time.DateTime
+import java.io.File
+import java.io.FileReader
+
+import scala.collection.JavaConversions.mapAsScalaMap
 import scala.util.Random
-import com.nickelsoftware.bettercare4me.models.Claim
-import com.nickelsoftware.bettercare4me.hedis.Scorecard
+
+import org.joda.time.DateTime
 import org.joda.time.Days
+import org.joda.time.Interval
+import org.yaml.snakeyaml.constructor.SafeConstructor
+
+import com.github.tototoshi.csv.CSVReader
+import com.github.tototoshi.csv.CSVWriter
+import com.nickelsoftware.bettercare4me.hedis.Scorecard
+import com.nickelsoftware.bettercare4me.models.Claim
+
+import play.api.Logger
 import scalax.file.Path
 
 /**
  * Object to read properties from environment
  */
 object Properties {
-  
-  val dataDir: Path = Path.fromString(scala.util.Properties.envOrElse("BC4ME_DATA_DIR", "./data" ))
-  val cassandraConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_CASSANDRA_CONFIG", "cassandra.yaml" )
-  val isLocal: String = scala.util.Properties.envOrElse("BC4ME_IS_LOCAL", "false" )
+
+  val dataDir: Path = Path.fromString(scala.util.Properties.envOrElse("BC4ME_DATA_DIR", "./data"))
+  val cassandraConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_CASSANDRA_CONFIG", "cassandra.yaml")
+  val sparkConfig: Path = dataDir / scala.util.Properties.envOrElse("BC4ME_SPARK_CONFIG", "spark.yaml")
 }
 
-
 object Utils {
-  
+
+  def loadYamlConfig(fname: String): Map[String, Object] = {
+    try {
+      Logger.info("Cassandra.loadConfig: Loading cassandra config from: '" + fname + "'")
+      val yaml = new org.yaml.snakeyaml.Yaml(new SafeConstructor());
+      yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
+    } catch {
+      case ex: Exception =>
+        Logger.error("Cassandra.loadConfig: Exception caught while loading cassandra config: " + ex.getMessage())
+        Map()
+    }
+  }
+
   /**
    * @param from date of the start of the interval
    * @param to date of the end date of the interval
@@ -32,24 +54,24 @@ object Utils {
    * @returns an interval in months leading to date
    */
   def getIntervalFromMonths(months: Int, date: DateTime): Interval = {
-      val temp = date.plusDays(1)
-      new Interval(temp.minusMonths(months), temp)
+    val temp = date.plusDays(1)
+    new Interval(temp.minusMonths(months), temp)
   }
-  
+
   /**
    * @returns an interval in years leading to date
    */
   def getIntervalFromYears(years: Int, date: DateTime): Interval = {
-      val temp = date.plusDays(1)
-      new Interval(temp.minusYears(years), temp)
+    val temp = date.plusDays(1)
+    new Interval(temp.minusYears(years), temp)
   }
-  
+
   /**
    * @returns an interval in days leading to date
    */
   def getIntervalFromDays(days: Int, date: DateTime): Interval = {
-      val temp = date.plusDays(1)
-      new Interval(temp.minusDays(days), temp)
+    val temp = date.plusDays(1)
+    new Interval(temp.minusDays(days), temp)
   }
 
   def add2Map[C](s: String, c: C, map: Map[String, List[C]]): Map[String, List[C]] = {
@@ -110,7 +132,7 @@ object Utils {
     }
     loop(Set(), claims)
   }
-  
+
   /**
    * Utility method to increase readability in the HEDIS Rule classes.
    *
@@ -147,7 +169,7 @@ object Utils {
     import com.github.tototoshi.csv.CSVWriter
     import java.io.File
     val l = CSVReader.open(new File(from)).all()
-    val f = for(r <- l if(r(2).toLowerCase().startsWith(name))) yield r(0)
+    val f = for (r <- l if (r(2).toLowerCase().startsWith(name))) yield r(0)
     val w = CSVWriter.open(new File(to))
     w.writeAll(List(f))
     w.close

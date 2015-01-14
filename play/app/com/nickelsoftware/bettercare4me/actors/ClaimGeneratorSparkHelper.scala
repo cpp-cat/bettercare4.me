@@ -3,19 +3,34 @@
  */
 package com.nickelsoftware.bettercare4me.actors
 
-import java.io.FileReader
-import scala.collection.JavaConversions.mapAsScalaMap
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.SafeConstructor
 import com.nickelsoftware.bettercare4me.hedis.HEDISScoreSummary
 import com.nickelsoftware.bettercare4me.models.ClaimGeneratorConfig
 import play.api.Logger
 import com.nickelsoftware.bettercare4me.utils.Properties
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.apache.spark.SparkException
+import com.nickelsoftware.bettercare4me.utils.Utils
 
+/**
+ * Simple object to lead the spark configuration from file
+ *
+ * Loading from Properties.sparkConfig
+ */
+object SparkConfig {
+
+  private val fname = Properties.sparkConfig.path
+  lazy val config = Utils.loadYamlConfig(fname)
+
+  def master = config.getOrElse("master", "local[3]").asInstanceOf[String]
+  def appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+
+  Logger.info("Spark Configuration leaded from " + fname)
+  Logger.info("Spark master: " + master)
+  Logger.info("Spark app name: " + appName)
+
+}
 
 /**
  * Helper object to distribute the workload of generating the patients, providers and claims
@@ -30,12 +45,11 @@ object ClaimGeneratorSparkHelper {
    */
   def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
-    val sc = if(Properties.isLocal=="true") {
-      val conf = new SparkConf()
-      conf.setMaster("local[3]")
-      conf.setAppName("Bettercare4me Local Spark")
-      new SparkContext(conf)
-    } else new SparkContext(new SparkConf())
+    val conf = new SparkConf()
+      .setMaster(SparkConfig.master)
+      .setAppName(SparkConfig.appName)
+
+    val sc = new SparkContext(conf)
     Logger.info("generateClaims: Spark master: " + sc.master)
     Logger.info("generateClaims: Spark app name: " + sc.appName)
 
@@ -74,12 +88,11 @@ object ClaimGeneratorSparkHelper {
 
   def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
-    val sc = if(Properties.isLocal=="true") {
-      val conf = new SparkConf()
-      conf.setMaster("local[3]")
-      conf.setAppName("Bettercare4me Local Spark")
-      new SparkContext(conf)
-    } else new SparkContext(new SparkConf())
+    val conf = new SparkConf()
+      .setMaster(SparkConfig.master)
+      .setAppName(SparkConfig.appName)
+
+    val sc = new SparkContext(conf)
     Logger.info("processGeneratedClaims: Spark master: " + sc.master)
     Logger.info("processGeneratedClaims: Spark app name: " + sc.appName)
 

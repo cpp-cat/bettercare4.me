@@ -14,6 +14,9 @@ git checkout -- .
 git pull origin master
 ./activator clean play-update-secret stage
 
+echo "Done packaging the application!"
+echo "Copying files to Spark cluster and Cassandra master"
+
 scp -i ~/spark1-kp.pem -r target/universal/stage root@$spark_master_private_ip:/root/
 scp -i ~/spark1-kp.pem -r data root@$spark_master_private_ip:/root/stage/
 scp -i ~/spark1-kp.pem data/spark_prod_conf/* root@$spark_master_private_ip:/root/spark/conf/
@@ -21,12 +24,22 @@ scp -i ~/spark1-kp.pem data/spark_prod_conf/masters root@$spark_master_private_i
 scp -i ~/spark1-kp.pem data/spark_prod_conf/slaves root@$spark_master_private_ip:/root/spark-ec2/
 scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@$cassandra_master_private_ip:~/
 
+echo "RSYNC the spark cluster"
+
 # RSYNC the spark cluster
 ssh -i ~/spark1-kp.pem root@$spark_master_private_ip 'cd /root/spark-ec2; ./copy-dir /root/stage; ./copy-dir /root/spark/conf'
+
+echo "Start the Spark cluster"
 
 # Start the spark cluster
 ssh -i ~/spark1-kp.pem root@$spark_master_private_ip '/root/spark/sbin/start-all.sh'
 
+echo "Source the Cassandra database"
+
 # Source the Cassandra database
 # at the prompt type: "source 'data/bettercare4me.cql'; exit;"
 ssh -t -i ~/cassandra1-kp.pem ubuntu@$cassandra_master_private_ip 'cqlsh'
+
+echo "Alright, now start the app!"
+
+sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80
