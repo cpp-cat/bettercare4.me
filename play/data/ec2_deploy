@@ -17,6 +17,9 @@ git pull origin master
 echo "Done packaging the application!"
 echo "Copying files to Spark cluster and Cassandra master"
 
+# start from a clean spark conf directory
+ssh -i ~/spark1-kp.pem root@$spark_master_private_ip 'rm -f /root/spark/conf/*'
+
 scp -i ~/spark1-kp.pem -r target/universal/stage root@$spark_master_private_ip:/root/
 scp -i ~/spark1-kp.pem -r data root@$spark_master_private_ip:/root/stage/
 scp -i ~/spark1-kp.pem data/spark_prod_conf/* root@$spark_master_private_ip:/root/spark/conf/
