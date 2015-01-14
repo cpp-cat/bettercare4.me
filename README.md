@@ -144,12 +144,8 @@
     - `$ ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem -r us-east-1 -z us-east-1d -t m1.large -v 1.2.0 -s 2 --worker-instances=2 launch bc4me-spark-cluster`
       - Spark AMI: ami-5bb18832
     - `$ ./spark-ec2 -k spark1-kp -i ~/spark1-kp.pem login bc4me-spark-cluster`
-    - Master Public DNS: ec2-54-146-63-114.compute-1.amazonaws.com 
-    - Master status page: http://ec2-54-146-63-114.compute-1.amazonaws.com:8080/ 
-    - Master at spark://ec2-54-146-63-114.compute-1.amazonaws.com:7077 (to use in SparkContext.Master()) 
-    - Testing the cluster at the spark cli: `./bin/spark-shell --master` spark://ec2-54-145-101-109.compute-1.amazonaws.com:7077 (from play instance)
-    - To stop the cluster: `$ ./spark-ec2 --region=us-east-1 stop bc4me-spark-cluster` (or ssh on spark master)
-    - To start the cluster: `$ ./spark-ec2 --region=us-east-1 start bc4me-spark-cluster` (or ssh on spark master)
+    - Master status page: `http://<public IP>:8080/` 
+    - Master at `spark://ip-54-146-63-114:7077` (to use in SparkContext.Master() via the `spark-prod.yaml`) 
 
 - Created Cassandra instance on EC2 using Datastax Community  Edition (3 instance of type m3.large)
 -
