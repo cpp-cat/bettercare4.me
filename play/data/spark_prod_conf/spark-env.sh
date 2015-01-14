@@ -50,5 +50,5 @@
 # - SPARK_NICENESS      The scheduling priority for daemons. (Default: 0)
 
 export SPARK_CLASSPATH="/root/stage/lib/*"
-# not used here export SPARK_CONF_DIR="/root/stage/data/spark_prod_conf"
+export SPARK_CONF_DIR="/root/stage/data/spark_prod_conf"
 
