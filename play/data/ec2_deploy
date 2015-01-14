@@ -27,7 +27,8 @@ scp -i ~/cassandra1-kp.pem data/bettercare4me.cql ubuntu@$cassandra_master_priva
 echo "RSYNC the spark cluster"
 
 # RSYNC the spark cluster
-ssh -i ~/spark1-kp.pem root@$spark_master_private_ip 'cd /root/spark-ec2; ./copy-dir /root/stage; ./copy-dir /root/spark/conf'
+ssh -i ~/spark1-kp.pem root@$spark_master_private_ip '/root/spark-ec2/copy-dir /root/stage'
+ssh -i ~/spark1-kp.pem root@$spark_master_private_ip '/root/spark-ec2/copy-dir /root/spark/conf'
 
 echo "Start the Spark cluster"
 
