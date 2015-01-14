@@ -44,10 +44,7 @@ case object ClaimCassandraGeneratorHelper extends ClaimGeneratorHelper {
     val config = ClaimGeneratorConfig.loadConfig(configTxt)
     
     // make sure Cassandra is ready to go
-    //*
-    println("**> About to call Bettercare4me.connect")
     Bettercare4me.connect
-    println("**> Done!!")
 
     // The persistence layer provides an abstraction level to the UUID generation
     val persistenceLayer = new SimplePersistenceLayer(igen)

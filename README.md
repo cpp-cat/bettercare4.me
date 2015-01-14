@@ -26,6 +26,8 @@
 - Some UI improvements
 
 ## User Stories Sprint Backlog.
+- Catch this error: (No such file or directory): ./data/cassandra-prod.yaml
+
 
 ## Completed User Stories
 - Code changed
@@ -76,8 +78,13 @@
 
   - Start the system monitoring on play instance:
     - `$ java -jar remote-linux-monitor-v1.05.jar -i ~/play1-kp.pem -H <public IP> -u ubuntu &`
+  - Copy the `ec2_deploy` script to play instance
+    - `$ scp -i ~\play1-kp.pem ./data/ec2_deploy ubuntu@<public IP>:~/`
   - SSH to the play ec2 instance: 
     - `$ ssh -i ~/play1-kp.pem ubuntu@<public IP>` (using the correct public DNS)
+  - The following command are now in script `data/ec2_deploy`
+    - `~$ cd bettercare4.me/play/`
+    - `$ ~/ec2_deploy -v`
   - Clone the Bettercare4.me git repository onto the play instance, or update the repo
     - `$ sudo apt-get install git`
     - `$ git clone https://github.com/regency901/bettercare4.me.git`
@@ -119,8 +126,8 @@
     - are both available directly from the prompt of the ssh shell on the EC2 instance!
     - Exit from the cassandra master
 
-  - Running the application (from the play directory on the play instance) (move to `~/.bashrc`?):
-    - `$ export SPARK_CONF_DIR="~/bettercare4.me/play/data/spark_prod_conf"`
+  - Running the application (from the play directory on the play instance) (move to `./data/play_prod_env/.bashrc`):
+    - `$ export BC4ME_DATA_DIR="~/bettercare4.me/play/data"`
     - `$ export BC4ME_CASSANDRA_CONFIG="cassandra-prod.yaml"`
     - `play$ sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80`
     - see available option: `target/universal/stage/bin/bettercare4-me -h`

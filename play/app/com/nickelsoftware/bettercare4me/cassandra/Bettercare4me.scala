@@ -48,12 +48,9 @@ class Cassandra {
   private val fname: String = Properties.cassandraConfig.path
   val config = loadConfig
   def node = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
-  //*
-  println("**> Cassandra: Loading configuration from: "+fname)
-  Logger.info("Cassandra: Loading configuration from: "+fname)
-  Logger.info("Cassandra Node IP: "+node)
-  println("**> Cassandra Node IP: "+node)
 
+  Logger.info("Cassandra Node IP: " + node)
+  
   val cluster = Cluster.builder().addContactPoint(node).build()
   log(cluster.getMetadata)
 
@@ -76,8 +73,15 @@ class Cassandra {
   }
 
   private def loadConfig(): Map[String, Object] = {
-    val yaml = new Yaml(new SafeConstructor());
-    yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
+    try {
+      Logger.info("Cassandra.loadConfig: Loading cassandra config from: '"+fname+"'")
+      val yaml = new Yaml(new SafeConstructor());
+      yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
+    } catch {
+      case ex: Exception =>
+        Logger.error("Cassandra.loadConfig: Exception caught while loading cassandra config: "+ex.getMessage())
+        Map()
+    }
   }
 }
 
@@ -100,7 +104,7 @@ protected[cassandra] class Bc4me {
   def close = {
     cassandra.close
   }
-  
+
   // prepared statements
   private val queryPatientsStmt = cassandra.session.prepare("SELECT data FROM patients WHERE batch_id = ?")
   private val queryProvidersStmt = cassandra.session.prepare("SELECT data FROM providers WHERE batch_id = ?")
@@ -228,7 +232,7 @@ protected[cassandra] class Bc4me {
     val bs = new BoundStatement(queryHEDISReportStmt).bind(hedisDate.toDate)
     val future: ResultSetFuture = cassandra.session.executeAsync(bs)
     future.map { rs =>
-      if(rs.isExhausted()) throw NickelException("Bettercare4me.queryHEDISReport: No report found with date "+hedisDate.toString())
+      if (rs.isExhausted()) throw NickelException("Bettercare4me.queryHEDISReport: No report found with date " + hedisDate.toString())
       val row = rs.one()
       val configTxt = row.getString("claim_generator_config")
       val config = ClaimGeneratorConfig.loadConfig(configTxt)
@@ -236,7 +240,7 @@ protected[cassandra] class Bc4me {
       (HEDISScoreSummary(rules, row.getLong("patient_count"): Long, row.getList("score_summaries", classOf[String]).toList), configTxt)
     }
   }
-  
+
   /**
    * Query the Claim Generator Configuration for a specific HEDIS date (run)
    */
@@ -398,7 +402,7 @@ object Bettercare4me {
    *
    * This is called *only* by Global.onStart at application start or
    * in spark worker thread at top of the job.
-   * 
+   *
    * Therefore the fact that it is no thread safe should not be an issue.
    *
    * Default config file name: "data/cassandra.yaml"
@@ -406,19 +410,16 @@ object Bettercare4me {
   def connect: Unit = {
     // Open a connection only if does not have one already
     bc4me match {
-      case None => 
-	    bc4me = try {
-		    Some(new Bc4me)
-	    } catch {
-	      case ex: NoHostAvailableException => {
-	        //*
-            println("**> Bettercare4me.connect: NoHostAvailableException caught! -- No Cassandra database available.")
-	        Logger.error("Bettercare4me.connect: NoHostAvailableException caught! -- No Cassandra database available.")
-	        None
-	      }
-	    }
-      case _ => 
-        Logger.info("Cassandra database connection already opened.")
+      case None =>
+        bc4me = try {
+          Some(new Bc4me)
+        } catch {
+          case ex: NoHostAvailableException => {
+            Logger.error("Bettercare4me.connect: NoHostAvailableException caught! -- No Cassandra database available.")
+            None
+          }
+        }
+      case _ => Unit
     }
   }
 
@@ -525,7 +526,7 @@ object Bettercare4me {
       case _ => throw NickelException("Bettercare4me: Connection to Cassandra not opened, must call Bettercare4me.connect once before use")
     }
   }
-  
+
   /**
    * Query the Claim Generator Configuration for a specific HEDIS date (run)
    */
