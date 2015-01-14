@@ -48,11 +48,11 @@ object ClaimGeneratorSparkHelper {
    */
   def generateClaims(generator: ClaimGeneratorHelper, configTxt: String): ClaimGeneratorCounts = {
 
-    val conf = new SparkConf()
+    var conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
-      .set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
-      .set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
+    if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
+    if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
     Logger.info("generateClaims: Spark master: " + sc.master)
@@ -93,11 +93,11 @@ object ClaimGeneratorSparkHelper {
 
   def processGeneratedClaims(generator: ClaimGeneratorHelper, configTxt: String): HEDISScoreSummary = {
 
-    val conf = new SparkConf()
+    var conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
-      .set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
-      .set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
+    if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
+    if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
     Logger.info("processGeneratedClaims: Spark master: " + sc.master)
