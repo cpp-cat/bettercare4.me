@@ -23,13 +23,16 @@ object SparkConfig {
   private val fname = Properties.sparkConfig.path
   lazy val config = Utils.loadYamlConfig(fname)
 
-  def master = config.getOrElse("master", "local[3]").asInstanceOf[String]
-  def appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+  lazy val master = config.getOrElse("master", "local[3]").asInstanceOf[String]
+  lazy val appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+  lazy val dataDir = config.getOrElse("spark.executorEnv.BC4ME_DATA_DIR", "").asInstanceOf[String]
+  lazy val cassandraConf = config.getOrElse("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", "").asInstanceOf[String]
 
   Logger.info("Spark Configuration leaded from " + fname)
   Logger.info("Spark master: " + master)
   Logger.info("Spark app name: " + appName)
-
+  if(dataDir != "") Logger.info("Spark data dir: " + dataDir)
+  if(cassandraConf != "") Logger.info("Spark cassandra conf file: " + cassandraConf)
 }
 
 /**
@@ -48,6 +51,8 @@ object ClaimGeneratorSparkHelper {
     val conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
+      .set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
+      .set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
     Logger.info("generateClaims: Spark master: " + sc.master)
@@ -91,6 +96,8 @@ object ClaimGeneratorSparkHelper {
     val conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
+      .set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
+      .set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
     Logger.info("processGeneratedClaims: Spark master: " + sc.master)
