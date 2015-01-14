@@ -71,7 +71,6 @@
   - Start the spark cluster and create a cassandra cluster
     - Put the spark master private IP onto `data/spark_prod_conf/masters`
     - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
-    - Put the spark master url onto `data/spark_prod_conf/spark-defaults.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
     - Put the spark master url onto `data/spark-prod.yaml`
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
     - Put spark master and cassandra master private IP in `data/ec2-deploy`
