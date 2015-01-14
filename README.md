@@ -71,6 +71,7 @@
     - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
     - Put the spark master url onto `data/spark_prod_conf/spark-defaults.yaml` : `spark://ip-10-40-46-177:7077` (THIS IP FORMAT, See Spark cluster status page)
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
+    - Put spark master and cassandra master private IP in `data/ec2-deploy`
     - Commit those changes and push it to github master
 
   - Start the system monitoring on play instance:
@@ -119,8 +120,8 @@
     - Exit from the cassandra master
 
   - Running the application (from the play directory on the play instance) (move to `~/.bashrc`?):
-    - `$ export SPARK_CONF_DIR="~/bettercare4.me/play/data/spark_prod_conf`
-    - `$ export BC4ME_CASSANDRA_CONFIG=cassandra-prod.yaml`
+    - `$ export SPARK_CONF_DIR="~/bettercare4.me/play/data/spark_prod_conf"`
+    - `$ export BC4ME_CASSANDRA_CONFIG="cassandra-prod.yaml"`
     - `play$ sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80`
     - see available option: `target/universal/stage/bin/bettercare4-me -h`
 
