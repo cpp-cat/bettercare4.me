@@ -8,9 +8,7 @@ import scala.collection.JavaConversions.asScalaSet
 import scala.collection.JavaConversions.seqAsJavaList
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 import org.joda.time.DateTime
-
 import com.datastax.driver.core.BoundStatement
 import com.datastax.driver.core.Cluster
 import com.datastax.driver.core.Metadata
@@ -34,8 +32,8 @@ import com.nickelsoftware.bettercare4me.utils.NickelException
 import com.nickelsoftware.bettercare4me.utils.Properties
 import com.nickelsoftware.bettercare4me.utils.Utils
 import com.nickelsoftware.bettercare4me.utils.cassandra.resultset.toFuture
-
 import play.api.Logger
+import java.io.FileNotFoundException
 
 /**
  * Class managing a connection to Cassandra cluster and
@@ -45,17 +43,36 @@ import play.api.Logger
  */
 class Cassandra {
 
-  private val fname: String = Properties.cassandraConfig.path
-  val config = Utils.loadYamlConfig(fname)
-  def node = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
+  private lazy val fname: String = Properties.cassandraConfig.path
+  
+  lazy val config: Map[String,Object] = try {
+    val c = Utils.loadYamlConfig(fname)
+    Logger.info("Cassandra config read from: " + fname)
+    c
+  } catch {
+    case ex: FileNotFoundException =>
+      Logger.error("Cassandra.config: FileNotFoundException caught when trying to load "+fname)
+      Map()
+  }
+  
+  lazy val node = {
+    val n = config.getOrElse("node", "127.0.0.1").asInstanceOf[String]
+    Logger.info("Cassandra Node IP: " + n)
+    n
+  }
 
-  Logger.info("Cassandra Node IP: " + node)
 
-  val cluster = Cluster.builder().addContactPoint(node).build()
-  log(cluster.getMetadata)
+  lazy val cluster = {
+    val c = Cluster.builder().addContactPoint(node).build()
+    log(c.getMetadata)
+    c
+  }
 
-  val session = cluster.connect(config.getOrElse("keyspace", "bettercare4me").asInstanceOf[String])
-  Logger.info(s"Session connected to keyspace: ${session.getLoggedKeyspace()}")
+  lazy val session = {
+    val s = cluster.connect(config.getOrElse("keyspace", "bettercare4me").asInstanceOf[String])
+    Logger.info(s"Session connected to keyspace: ${s.getLoggedKeyspace()}")
+    s
+  }
 
   private def log(metadata: Metadata): Unit = {
     Logger.info(s"Connected to cluster: ${metadata.getClusterName} using $fname")

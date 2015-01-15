@@ -33,12 +33,11 @@ object Utils {
 
   def loadYamlConfig(fname: String): Map[String, Object] = {
     try {
-      Logger.info("Cassandra.loadConfig: Loading cassandra config from: '" + fname + "'")
       val yaml = new org.yaml.snakeyaml.Yaml(new SafeConstructor());
       yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
     } catch {
       case ex: Exception =>
-        Logger.error("Cassandra.loadConfig: Exception caught while loading cassandra config: " + ex.getMessage())
+        Logger.error("Utils.loadYamlConfig: Exception caught while loading cassandra config: " + ex.getMessage())
         Map()
     }
   }

@@ -12,6 +12,7 @@ import com.nickelsoftware.bettercare4me.utils.Properties
 import com.nickelsoftware.bettercare4me.utils.NickelException
 import org.apache.spark.SparkException
 import com.nickelsoftware.bettercare4me.utils.Utils
+import java.io.FileNotFoundException
 
 /**
  * Simple object to lead the spark configuration from file
@@ -20,19 +21,42 @@ import com.nickelsoftware.bettercare4me.utils.Utils
  */
 object SparkConfig {
 
-  private val fname = Properties.sparkConfig.path
-  lazy val config = Utils.loadYamlConfig(fname)
+  private lazy val fname = Properties.sparkConfig.path
+  
+  lazy val config: Map[String,Object] = try {
+    val c = Utils.loadYamlConfig(fname)
+    Logger.info("Spark config read from: " + fname)
+    c
+  } catch {
+    case ex: FileNotFoundException =>
+      Logger.error("SparkConfig.config: FileNotFoundException caught when trying to load "+fname)
+      Map()
+  }
 
-  lazy val master = config.getOrElse("master", "local[3]").asInstanceOf[String]
-  lazy val appName = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
-  lazy val dataDir = config.getOrElse("spark.executorEnv.BC4ME_DATA_DIR", "").asInstanceOf[String]
-  lazy val cassandraConf = config.getOrElse("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", "").asInstanceOf[String]
+  lazy val master = {
+    val m = config.getOrElse("master", "local[3]").asInstanceOf[String]
+    Logger.info("Spark master: " + m)
+    m
+  }
+  
+  lazy val appName = {
+    val a = config.getOrElse("appName", "Local Bettercare4.me App").asInstanceOf[String]
+    Logger.info("Spark app name: " + a)
+    a
+  }
+  
+  lazy val dataDir = {
+    val d = config.getOrElse("spark.executorEnv.BC4ME_DATA_DIR", "").asInstanceOf[String]
+    if(d != "") Logger.info("Spark data dir: " + d)
+    d
+  }
+  
+  lazy val cassandraConf = {
+    val c = config.getOrElse("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", "").asInstanceOf[String]
+    if(c != "") Logger.info("Spark cassandra conf file: " + c)
+    c
+  }
 
-  Logger.info("Spark Configuration leaded from " + fname)
-  Logger.info("Spark master: " + master)
-  Logger.info("Spark app name: " + appName)
-  if(dataDir != "") Logger.info("Spark data dir: " + dataDir)
-  if(cassandraConf != "") Logger.info("Spark cassandra conf file: " + cassandraConf)
 }
 
 /**
@@ -55,8 +79,7 @@ object ClaimGeneratorSparkHelper {
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
-    Logger.info("generateClaims: Spark master: " + sc.master)
-    Logger.info("generateClaims: Spark app name: " + sc.appName)
+    Logger.info("ClaimGeneratorSparkHelper.generateClaims: SparkContext created w/ master: " + sc.master)
 
     val result = try {
 
@@ -100,8 +123,7 @@ object ClaimGeneratorSparkHelper {
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
     val sc = new SparkContext(conf)
-    Logger.info("processGeneratedClaims: Spark master: " + sc.master)
-    Logger.info("processGeneratedClaims: Spark app name: " + sc.appName)
+    Logger.info("ClaimGeneratorSparkHelper.processGeneratedClaims: SparkContext created w/ master: " + sc.master)
 
     val result = try {
 
