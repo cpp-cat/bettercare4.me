@@ -14,7 +14,28 @@
 
 ######################################################################################################
 
-# Sprint 9: Deploying on AMS
+# Sprint 10: Monitoring using JMX on AWS
+
+- Version: 0.11.0.00 (v0.11.0.00_01-XX-2015)
+- Start Date: 01/15/2015
+- Target Date: 01/18/2015
+- Actual Date: 01/XX/2015
+
+## Product Features:
+- Monitoring application JVM using JMX on AWS
+- Setting JVM memory parameters on AWS
+
+## User Stories Sprint Backlog.
+- Testing JMX remote monitoring using `jconsole` on a sample application
+
+## Completed User Stories
+- Code changed
+-
+  - Setting the `spark.driver.host` to the Spark master public IP in `data/spark-prod.yaml` to see the env settings of the driver at `http://<spark.driver.host>:4040`
+  - Set the `SPARK_PUBLIC_DNS` of the master and workers in `data/spark_prod_conf/spark-env.sh`
+
+
+# Sprint 9: Deploying on AWS
 
 - Version: 0.10.0.00 (v0.10.0.00_01-15-2015)
 - Start Date: 01/04/2015

@@ -51,4 +51,15 @@
 
 export SPARK_CLASSPATH="/root/stage/lib/*"
 
+export SPARK_WORKER_MEMORY="3500m"
+export SPARK_PUBLIC_DNS="`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`"
 
+jmx_opt="-Dcom.sun.management.jmxremote"
+jmx_opt="${jmx_opt} -Djava.net.preferIPv4Stack=true"
+jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.port=9999"
+jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.rmi.port=9998"
+jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.ssl=false"
+jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.authenticate=false"
+jmx_opt="${jmx_opt} -Djava.rmi.server.hostname=${SPARK_PUBLIC_DNS}"
+
+export SPARK_DAEMON_JAVA_OPTS="${jmx_opt}"
