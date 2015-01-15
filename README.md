@@ -16,7 +16,7 @@
 
 # Sprint 9: Deploying on AMS
 
-- Version: 0.10.0.00 (v0.10.0.00_01-15-2014)
+- Version: 0.10.0.00 (v0.10.0.00_01-15-2015)
 - Start Date: 01/04/2015
 - Target Date: 01/09/2015
 - Actual Date: 01/15/2015
