@@ -16,10 +16,10 @@
 
 # Sprint 9: Deploying on AMS
 
-- Version: 1.0.0.00 (v1.0.0.00_01-XX-2014)
+- Version: 0.10.0.00 (v0.10.0.00_01-15-2014)
 - Start Date: 01/04/2015
 - Target Date: 01/09/2015
-- Actual Date: 01/XX/2015
+- Actual Date: 01/15/2015
 
 ## Product Features:
 - Deploying on AWS
@@ -62,8 +62,7 @@
   - Copy the `spark1-kp.pem` and `cassandra1-kp.pem` onto the play instance to be able to ssh into the spark cluster:
     - `$ scp -i ~/play1-kp.pem ~/spark1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
     - `$ scp -i ~/play1-kp.pem ~/cassandra1-kp.pem ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
-  - Copy the `data/play_prod_env/.bashrc` and `data/ec2_deploy` on the home directory of Play instance
-    - `$ scp -i ~/play1-kp.pem data/play_prod_env/.bashrc ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
+  - Copy the `data/ec2_deploy` on the home directory of Play instance
     - `$ scp -i ~/play1-kp.pem data/ec2_deploy ubuntu@ec2-54-205-171-3.compute-1.amazonaws.com:~/` (using the public DNS of the play instance)
 
 - Starting the Play Application on Play instance
@@ -127,7 +126,7 @@
       - are both available directly from the prompt of the ssh shell on the EC2 instance!
       - Exit from the cassandra master
 
-    - Running the application (from the play directory on the play instance) (env var move to `./data/play_prod_env/.bashrc`):
+    - Running the application (from the play directory on the play instance):
       - `$ export BC4ME_DATA_DIR="/home/ubuntu/bettercare4.me/play/data"`
       - `$ export BC4ME_SPARK_CONFIG="spark-prod.yaml"`
       - `$ export BC4ME_CASSANDRA_CONFIG="cassandra-prod.yaml"`
