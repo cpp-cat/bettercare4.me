@@ -52,12 +52,6 @@ object SparkConfig {
     d
   }
   
-  lazy val exJvm = {
-    val d = config.getOrElse("spark.executor.extraJavaOptions", "").asInstanceOf[String]
-    if(d != "") Logger.info("Spark executor jvm opt: " + d)
-    d
-  }
-  
   lazy val dataDir = {
     val d = config.getOrElse("spark.executorEnv.BC4ME_DATA_DIR", "").asInstanceOf[String]
     if(d != "") Logger.info("Spark data dir: " + d)
@@ -91,7 +85,6 @@ object ClaimGeneratorSparkHelper {
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
     if(SparkConfig.exMem != "") conf = conf.set("spark.executor.memory", SparkConfig.exMem)
-    if(SparkConfig.exJvm != "") conf = conf.set("spark.executor.extraJavaOptions", SparkConfig.exJvm)
 
     val sc = new SparkContext(conf)
     Logger.info("ClaimGeneratorSparkHelper.generateClaims: SparkContext created w/ master: " + sc.master)
@@ -138,7 +131,6 @@ object ClaimGeneratorSparkHelper {
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
     if(SparkConfig.exMem != "") conf = conf.set("spark.executor.memory", SparkConfig.exMem)
-    if(SparkConfig.exJvm != "") conf = conf.set("spark.executor.extraJavaOptions", SparkConfig.exJvm)
 
     val sc = new SparkContext(conf)
     Logger.info("ClaimGeneratorSparkHelper.processGeneratedClaims: SparkContext created w/ master: " + sc.master)

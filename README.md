@@ -26,11 +26,12 @@
 - Setting JVM memory parameters on AWS
 
 ## User Stories Sprint Backlog.
-- Testing JMX remote monitoring using `jconsole` on a sample application
+- Setting the JMX opt to the slave's executor JVM, not the deamon
 
 ## Completed User Stories
+- Testing JMX remote monitoring using `jconsole` on a sample application
   - Set the `SPARK_PUBLIC_DNS` of the master and workers in `data/spark_prod_conf/spark-env.sh`
-  - Set the workers memory setting in `data/spark_prod_conf/spark-env.sh`
+  - Set the workers memory setting in `data/spark_prod.yaml`
   - Open ports 9999 and 9998 in `bc4me-spark-cluster-master` and `bc4me-spark-cluster-slaves` security groups
 
 
