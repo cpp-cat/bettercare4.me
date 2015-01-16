@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+export BC4ME_DATA_DIR="/home/ubuntu/bettercare4.me/play/data"
+export BC4ME_SPARK_CONFIG="spark-prod.yaml"
+export BC4ME_CASSANDRA_CONFIG="cassandra-prod.yaml"
+
+sudo -E ./target/universal/stage/bin/bettercare4-me -Dhttp.port=80

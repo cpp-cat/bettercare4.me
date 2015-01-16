@@ -33,8 +33,6 @@ object Utils {
 
   def loadYamlConfig(fname: String): Map[String, Object] = {
     try {
-      //*
-      println("**> Reading config file at "+fname)
       val yaml = new org.yaml.snakeyaml.Yaml(new SafeConstructor());
       yaml.load(new FileReader(fname)).asInstanceOf[java.util.Map[String, Object]].toMap
     } catch {

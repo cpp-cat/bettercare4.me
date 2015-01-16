@@ -45,12 +45,6 @@ object SparkConfig {
     a
   }
   
-  lazy val driverHost = {
-    val d = config.getOrElse("spark.driver.host", "").asInstanceOf[String]
-    if(d != "") Logger.info("Spark driver host: " + d)
-    d
-  }
-  
   lazy val dataDir = {
     val d = config.getOrElse("spark.executorEnv.BC4ME_DATA_DIR", "").asInstanceOf[String]
     if(d != "") Logger.info("Spark data dir: " + d)
@@ -83,7 +77,6 @@ object ClaimGeneratorSparkHelper {
       .setAppName(SparkConfig.appName)
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
-    if(SparkConfig.driverHost != "") conf = conf.set("spark.driver.host", SparkConfig.driverHost)
 
     val sc = new SparkContext(conf)
     Logger.info("ClaimGeneratorSparkHelper.generateClaims: SparkContext created w/ master: " + sc.master)
@@ -128,7 +121,6 @@ object ClaimGeneratorSparkHelper {
       .setAppName(SparkConfig.appName)
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
-    if(SparkConfig.driverHost != "") conf = conf.set("spark.driver.host", SparkConfig.driverHost)
 
     val sc = new SparkContext(conf)
     Logger.info("ClaimGeneratorSparkHelper.processGeneratedClaims: SparkContext created w/ master: " + sc.master)
