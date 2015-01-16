@@ -42,7 +42,7 @@ echo "Source the Cassandra database"
 
 # Source the Cassandra database
 # at the prompt type: "source 'data/bettercare4me.cql'; exit;"
-ssh -t -i ~/cassandra1-kp.pem ubuntu@$cassandra_master_private_ip 'cqlsh'
+ssh -t -i ~/cassandra1-kp.pem ubuntu@$cassandra_master_private_ip 'cqlsh -e "source 'bettercare4me.cql';"'
 
 echo "Alright, now start the app!"
 
