@@ -29,10 +29,10 @@
 - Testing JMX remote monitoring using `jconsole` on a sample application
 
 ## Completed User Stories
-- Code changed
--
   - Setting the `spark.driver.host` to the Spark master public IP in `data/spark-prod.yaml` to see the env settings of the driver at `http://<spark.driver.host>:4040`
   - Set the `SPARK_PUBLIC_DNS` of the master and workers in `data/spark_prod_conf/spark-env.sh`
+  - Open ports 9999 and 9998 in `bc4me-spark-cluster-master` and `bc4me-spark-cluster-slaves` security groups
+
 
 
 # Sprint 9: Deploying on AWS

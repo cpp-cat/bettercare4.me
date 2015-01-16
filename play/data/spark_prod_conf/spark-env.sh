@@ -51,7 +51,8 @@
 
 export SPARK_CLASSPATH="/root/stage/lib/*"
 
-export SPARK_WORKER_MEMORY="3500m"
+export SPARK_WORKER_INSTANCES="1"
+export SPARK_WORKER_MEMORY="6g"
 export SPARK_PUBLIC_DNS="`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`"
 
 jmx_opt="-Dcom.sun.management.jmxremote"
