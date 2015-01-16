@@ -75,6 +75,7 @@ object ClaimGeneratorSparkHelper {
     var conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
+      .set("spark.executor.memory", "4g")
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
@@ -119,6 +120,7 @@ object ClaimGeneratorSparkHelper {
     var conf = new SparkConf()
       .setMaster(SparkConfig.master)
       .setAppName(SparkConfig.appName)
+      .set("spark.executor.memory", "4g")
     if(SparkConfig.dataDir != "") conf = conf.set("spark.executorEnv.BC4ME_DATA_DIR", SparkConfig.dataDir)
     if(SparkConfig.cassandraConf != "") conf = conf.set("spark.executorEnv.BC4ME_CASSANDRA_CONFIG", SparkConfig.cassandraConf)
 
