@@ -92,6 +92,7 @@
     - Put the spark master private IP onto `data/spark_prod_conf/masters`
     - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
     - Put the spark master url onto `data/spark-prod.yaml`
+    - Put the spark public IP onto `data/spark-prod.yaml`
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
     - Put spark master and cassandra master private IP in `data/ec2-deploy`
     - Commit those changes and push it to github master

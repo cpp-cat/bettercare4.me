@@ -1,2 +1,3 @@
-node: 10.37.162.7
+# Cassandra master private IP
+node: 10.7.174.98
 keyspace: bettercare4me

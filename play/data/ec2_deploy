@@ -5,8 +5,8 @@
 #
 # EDIT THE NEXT TWO LINES WITH PRIVATE IPs
 # ----------------------------------------
-spark_master_private_ip="10.40.11.11"
-cassandra_master_private_ip="10.37.162.7"
+spark_master_private_ip="10.80.207.207"
+cassandra_master_private_ip="10.7.174.98"
 #
 
 cd ~/bettercare4.me/play

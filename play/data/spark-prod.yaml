@@ -1,8 +1,8 @@
 # Use the spark master private ID
-master: spark://ip-10-40-11-11:7077
+master: spark://ip-10-80-207-207:7077
 
 # Use the spark master public IP
-spark.driver.host: 
+spark.driver.host: 23.20.95.213
 
 appName: Remote Bettercare4.me Spark Cluster
 spark.executorEnv.BC4ME_DATA_DIR: /root/stage/data
