@@ -19,7 +19,7 @@
 - Version: 0.11.0.00 (v0.11.0.00_01-XX-2015)
 - Start Date: 01/15/2015
 - Target Date: 01/18/2015
-- Actual Date: 01/XX/2015
+- Actual Date: 01/16/2015
 
 ## Product Features:
 - Monitoring application JVM using JMX on AWS
@@ -30,9 +30,25 @@
 ## Completed User Stories
 - Runing a performance test on AWS
   - 3 Cassandra nodes of type `m3.xlarge`
-  - 
-- Setting the JMX opt to the slave's executor JVM, not the deamon
-  - Set the env var `SPARK_EXECUTOR_OPTS` in `spark-env.sh` to setup JMX for the spark executors.
+  - nbrGen: 60
+  - nbrPatients: 5000
+  - nbrProviders: 2000
+  - Loading the database completed in 22 min
+    - ClaimGeneratorCounts: 300,000 patients, 120,000 providers, 6,394,493 claims
+    - Cassandra database size is 4.8g
+    - Maximum memory utilization by the spark executor is aprox. 2.1g based on top
+  - Computing the CQM analytics completed in 
+    - Analytics phase in 14 min, pagination of the rules in 4 min
+    - example of pagination: CDC-HbA1c-Test-HEDIS-2014 has 4223 pages of 20 patients each.
+    - Cassandra database is now 6.4g
+    - Maximum memory utilization by the spark executors is aprox. 5.2g
+    - Pulling the patient record with claims detail is so FREAKING fast!!!
+
+- Can only set the JMX opt to the slave's deamon, not the executor :(
+  - Looks like a bug in Spark, the argument `SPARK_EXECUTOR_OPTS` in `spark-env.sh` is not passed to the executor process
+    - However using `top` on the spark node allow to check the memory consuption of the executor process and ensure it's below the
+      `5g` setting in `spark-prod.yaml`
+  - Currently using the env var `SPARK_DAEMON_JAVA_OPTS` in `spark-env.sh` to setup JMX for the spark daemon.
 - Testing JMX remote monitoring using `jconsole` on a sample application
 - Set the `SPARK_PUBLIC_DNS` of the master and workers in `data/spark_prod_conf/spark-env.sh`
 - Set the workers memory setting in `data/spark_prod.yaml`

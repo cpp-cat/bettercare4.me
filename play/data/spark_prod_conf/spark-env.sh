@@ -61,4 +61,5 @@ jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.ssl=false"
 jmx_opt="${jmx_opt} -Dcom.sun.management.jmxremote.authenticate=false"
 jmx_opt="${jmx_opt} -Djava.rmi.server.hostname=${SPARK_PUBLIC_DNS}"
 
-export SPARK_EXECUTOR_OPTS="${jmx_opt}"
+# export SPARK_EXECUTOR_OPTS="${jmx_opt}"
+export SPARK_DAEMON_JAVA_OPTS="${jmx_opt}"
