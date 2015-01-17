@@ -26,10 +26,13 @@
 - Setting JVM memory parameters on AWS
 
 ## User Stories Sprint Backlog.
-- Setting the JMX opt to the slave's executor JVM, not the deamon
 
 ## Completed User Stories
-- Set the env var `SPARK_EXECUTOR_OPTS` in `spark-env.sh` to setup JMX for the spark executors.
+- Runing a performance test on AWS
+  - 3 Cassandra nodes of type `m3.xlarge`
+  - 
+- Setting the JMX opt to the slave's executor JVM, not the deamon
+  - Set the env var `SPARK_EXECUTOR_OPTS` in `spark-env.sh` to setup JMX for the spark executors.
 - Testing JMX remote monitoring using `jconsole` on a sample application
 - Set the `SPARK_PUBLIC_DNS` of the master and workers in `data/spark_prod_conf/spark-env.sh`
 - Set the workers memory setting in `data/spark_prod.yaml`
@@ -94,7 +97,6 @@
     - Put the spark master private IP onto `data/spark_prod_conf/masters`
     - Put the spark slaves private IP onto `data/spark_prod_conf/slaves`
     - Put the spark master url onto `data/spark-prod.yaml`
-    - Put the spark public IP onto `data/spark-prod.yaml`
     - Put the private IP of the cassandra master onto `data/cassandra-prod.yaml`
     - Put spark master and cassandra master private IP in `data/ec2-deploy`
     - Commit those changes and push it to github master
