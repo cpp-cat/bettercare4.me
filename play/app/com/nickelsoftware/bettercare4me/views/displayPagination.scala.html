@@ -1,0 +1,25 @@
+@* displayPagination Template File *@
+
+@(baseUrl: String, paginator: com.nickelsoftware.bettercare4me.models.Paginator)
+<nav>
+  <ul class="pagination">
+    <li class="@paginator.prevClass">
+      <a href="@baseUrl/@paginator.prevPageID/@paginator.pageCnt" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    
+    @for(i <- 1 to paginator.nbrPageLinks) {
+      <li class="@paginator.pageClass(i)">
+        <a href="@baseUrl/@paginator.getPageID(i)/@paginator.pageCnt">@paginator.getPageID(i)</a>
+      </li>
+    }
+    
+    <li class="@paginator.nextClass">
+      <a href="@baseUrl/@paginator.nextPageID/@paginator.pageCnt" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+

@@ -27,30 +27,6 @@
      </tr>
 }
 
-@displayPagination = {
-    <nav>
-      <ul class="pagination">
-        <li class="@paginator.prevClass">
-          <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.prevPageID/@paginator.pageCnt" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
-          </a>
-        </li>
-        
-        @for(i <- 1 to paginator.nbrPageLinks) {
-          <li class="@paginator.pageClass(i)">
-            <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.getPageID(i)/@paginator.pageCnt">@paginator.getPageID(i)</a>
-          </li>
-        }
-        
-        <li class="@paginator.nextClass">
-          <a href="/ruleScorecard/@ruleName/@hedisDate/@paginator.nextPageID/@paginator.pageCnt" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-}
-
 
 @main("BetterCare4.me") {
   
@@ -70,7 +46,7 @@
     <div class="panel panel-default">
       <div class="panel-heading">
         <!--  Add pagination here -->
-        @displayPagination
+        @displayPagination(s"/ruleScorecard/$ruleName/$hedisDate", paginator)
       </div>
       
       <div class="panel-body">
@@ -97,7 +73,7 @@
 
       <div class="panel-footer">
         <!--  Add pagination here -->
-        @displayPagination
+        @displayPagination(s"/ruleScorecard/$ruleName/$hedisDate", paginator)
       </div>
   
       </div>

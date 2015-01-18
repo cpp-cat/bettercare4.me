@@ -14,9 +14,24 @@
 
 ######################################################################################################
 
+# Sprint 11: Bug fixes for Release 1.0
+
+- Version: 0.12.0.00 (v0.12.0.00_01-XX-2015)
+- Start Date: 01/17/2015
+- Target Date: 01/18/2015
+- Actual Date: 01/XX/2015
+
+## Product Features:
+- Big fixes / UI Improvement for Bettercare4.me Release 1.0
+- Add a Patient Gaps-In-Care summary next to patient demographics on patient scorecard page
+
+## User Stories Sprint Backlog.
+
+## Completed User Stories
+
 # Sprint 10: Monitoring using JMX on AWS
 
-- Version: 0.11.0.00 (v0.11.0.00_01-XX-2015)
+- Version: 0.11.0.00 (v0.11.0.00_01-16-2015)
 - Start Date: 01/15/2015
 - Target Date: 01/18/2015
 - Actual Date: 01/16/2015
