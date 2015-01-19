@@ -9,9 +9,13 @@
       </a>
     </li>
     
-    @for(i <- 1 to paginator.nbrPageLinks) {
-      <li class="@paginator.pageClass(i)">
-        <a href="@baseUrl/@paginator.getPageID(i)/@paginator.pageCnt">@paginator.getPageID(i)</a>
+    @for(page <- paginator.pages) {
+      <li class="@page.pageClass">
+        @if(page.isPage) {
+          <a href="@baseUrl/@page.pageID/@paginator.pageCnt">@page.pageLabel</a>
+        } else {
+          <span aria-hidden="true">&#8230;</span>
+        }
       </li>
     }
     
