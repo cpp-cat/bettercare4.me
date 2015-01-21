@@ -9,5 +9,6 @@ class ModelsTestSuite extends Suites(
     new PatientTestSpec,
     new PatientScorecardResultTestSpec,
     new ProviderTestSpec,
-    new RxClaimTestSpec
+    new RxClaimTestSpec,
+    new ViewObjectsTestSpec
     )
