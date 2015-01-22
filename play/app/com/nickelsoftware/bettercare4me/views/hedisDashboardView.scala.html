@@ -5,7 +5,7 @@
 @displayRow(config: ClaimGeneratorConfig) = {
   <li><a href="/hedisReport/@config.hedisDate.toString">
     <h3>@config.runName</h3>
-    <p><strong>@config.hedisDate.toString</strong></p>
+    <p><strong>@config.hedisDate.toLocalDate.toString</strong></p>
   </a></li>
 }
 

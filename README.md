@@ -16,10 +16,10 @@
 
 # Sprint 11: Bug fixes for Release 1.0
 
-- Version: 0.12.0.00 (v0.12.0.00_01-XX-2015)
+- Version: 1.0.0.00 (v1.0.0.00_01-21-2015)
 - Start Date: 01/17/2015
 - Target Date: 01/18/2015
-- Actual Date: 01/XX/2015
+- Actual Date: 01/21/2015
 
 ## Product Features:
 - Big fixes / UI Improvement for Bettercare4.me Release 1.0
@@ -28,6 +28,9 @@
 ## User Stories Sprint Backlog.
 
 ## Completed User Stories
+- Release 1.0 Tag v1.0.0.00_01-21-2015 !!!
+- Fix pagination by adding `com.nickelsoftware.bettercare4me.models.Pagination` class
+- Added Font Awesome
 
 # Sprint 10: Monitoring using JMX on AWS
 

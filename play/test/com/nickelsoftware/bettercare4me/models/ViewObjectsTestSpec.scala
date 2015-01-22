@@ -80,7 +80,7 @@ class ViewObjectsTestSpec extends PlaySpec {
     "be created with argument for first page of 10 pages, count 1" in {
 
       val p = Paginator(1L, 1, 10L)
-      p.prevPageID mustEqual 0
+      p.prevPageID mustEqual 1
       p.nextPageID mustEqual 2L
       p.hasPrev mustEqual false
       p.hasNext mustEqual true
@@ -103,7 +103,7 @@ class ViewObjectsTestSpec extends PlaySpec {
 
       val p = Paginator(10L, 1, 10L)
       p.prevPageID mustEqual 9L
-      p.nextPageID mustEqual 11L
+      p.nextPageID mustEqual 10L
       p.hasPrev mustEqual true
       p.hasNext mustEqual false
       
@@ -124,8 +124,8 @@ class ViewObjectsTestSpec extends PlaySpec {
     "be created with argument for page single page, count 1" in {
 
       val p = Paginator(1L, 1, 1L)
-      p.prevPageID mustEqual 0L
-      p.nextPageID mustEqual 2L
+      p.prevPageID mustEqual 1L
+      p.nextPageID mustEqual 1L
       p.hasPrev mustEqual false
       p.hasNext mustEqual false
       
@@ -141,8 +141,8 @@ class ViewObjectsTestSpec extends PlaySpec {
     "be created with argument for page 1 of 2 pages, count 2" in {
 
       val p = Paginator(1L, 2, 2L)
-      p.prevPageID mustEqual -1L
-      p.nextPageID mustEqual 3L
+      p.prevPageID mustEqual 1L
+      p.nextPageID mustEqual 1L
       p.hasPrev mustEqual false
       p.hasNext mustEqual false
       
@@ -199,6 +199,50 @@ class ViewObjectsTestSpec extends PlaySpec {
         PaginationDetail(10L, "", "4"),
         PaginationDetail(13L, "", "5"),
         PaginationDetail(0L, "", "...", false))
+    }
+
+    "be created with argument for page 4  of 7 pages, page count of 1" in {
+
+      val p = Paginator(4L, 1, 7L)
+      p.prevPageID mustEqual 3L
+      p.nextPageID mustEqual 5L
+      p.hasPrev mustEqual true
+      p.hasNext mustEqual true
+      
+      p.firstPageID mustEqual 1L
+      p.lastPageID mustEqual 7L
+      p.firstClass mustEqual ""
+      p.lastClass mustEqual ""
+
+      p.pages mustEqual List(
+        PaginationDetail(0L, "", "...", false),
+        PaginationDetail(2L, "", "2"),
+        PaginationDetail(3L, "", "3"),
+        PaginationDetail(4L, "active", "4"),
+        PaginationDetail(5L, "", "5"),
+        PaginationDetail(6L, "", "6"),
+        PaginationDetail(0L, "", "...", false))
+    }
+
+    "be created with argument for page 4  of 5 pages, page count of 1" in {
+
+      val p = Paginator(4L, 1, 5L)
+      p.prevPageID mustEqual 3L
+      p.nextPageID mustEqual 5L
+      p.hasPrev mustEqual true
+      p.hasNext mustEqual true
+      
+      p.firstPageID mustEqual 1L
+      p.lastPageID mustEqual 5L
+      p.firstClass mustEqual ""
+      p.lastClass mustEqual ""
+
+      p.pages mustEqual List(
+        PaginationDetail(1L, "", "1"),
+        PaginationDetail(2L, "", "2"),
+        PaginationDetail(3L, "", "3"),
+        PaginationDetail(4L, "active", "4"),
+        PaginationDetail(5L, "", "5"))
     }
   }
 }

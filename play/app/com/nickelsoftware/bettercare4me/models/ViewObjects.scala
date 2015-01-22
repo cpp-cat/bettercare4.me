@@ -27,12 +27,12 @@ case class PaginationDetail(pageID: Long, pageClass: String, pageLabel: String, 
  */
 case class Paginator(currentPageID: Long, pageCnt: Int, totalPageCnt: Long) {
     
-  def prevPageID = currentPageID - pageCnt
-  def nextPageID = currentPageID + pageCnt
+  def prevPageID = if(currentPageID - pageCnt < 1) 1; else currentPageID - pageCnt 
+  def nextPageID = if(currentPageID + pageCnt > lastPageID) lastPageID; else currentPageID + pageCnt
   def nbrRows = pageCnt * Paginator.pageSize1
   
-  def hasPrev = prevPageID > 0
-  def hasNext = nextPageID <= totalPageCnt
+  def hasPrev = if(currentPageID - pageCnt < 1) false; else true 
+  def hasNext = if(currentPageID + pageCnt > lastPageID) false; else true
   
   def prevClass = if(hasPrev) ""; else "disabled"
   def nextClass = if(hasNext) ""; else "disabled"
@@ -45,7 +45,7 @@ case class Paginator(currentPageID: Long, pageCnt: Int, totalPageCnt: Long) {
   
   private def plID(i: Long): Int = (i/pageCnt + (if(i%pageCnt > 0) 1; else 0)).toInt
     
-  val pages: List[PaginationDetail] = {
+  def pages: List[PaginationDetail] = {
     // convert the pageID to page link nbr
     def plLabel(i: Long) = plID(i).toString 
     def plClass(i: Long) = if(i == currentPageID) "active"; else ""
@@ -75,7 +75,7 @@ case class Paginator(currentPageID: Long, pageCnt: Int, totalPageCnt: Long) {
       // paginate to the first 5 pages     
       l = loop(5, 1, l)
       
-    } else if(current > 2 && last - current > 3)  {
+    } else if(current > 2 && last - current > 2)  {
       
       l = PaginationDetail(0, "", "...", false) :: l
       
@@ -89,7 +89,7 @@ case class Paginator(currentPageID: Long, pageCnt: Int, totalPageCnt: Long) {
     }
     
     // put a page spacer (label w/ ellipsis) if have more than 2 pages to the left of current page
-    if(current > 3) l = PaginationDetail(0, "", "...", false) :: l
+    if(current > 3 && last > 5) l = PaginationDetail(0, "", "...", false) :: l
     l
   }
 }
